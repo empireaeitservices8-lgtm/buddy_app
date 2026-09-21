@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
+import 'package:buddy_app/data/models/user_profile.dart';
 import 'package:buddy_app/views/widgets/toast_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -51,7 +52,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   void _handleStateChange() {
-    if (_viewModel.errorMessage != null && _viewModel.errorMessage!.isNotEmpty) {
+    if (_viewModel.errorMessage != null &&
+        _viewModel.errorMessage!.isNotEmpty) {
       showNeoToast(context, _viewModel.errorMessage!, isError: true);
       _viewModel.clearError();
     }
@@ -91,7 +93,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         agentName: match.name,
         agentAvatar: match.avatarUrl,
         category: match.professionCategory,
-        callId: _viewModel.lastEndedCallId ?? _viewModel.lastCallRequest?.callId,
+        callId:
+            _viewModel.lastEndedCallId ?? _viewModel.lastCallRequest?.callId,
       );
     }
   }
@@ -99,13 +102,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _viewModel.activeTab == 0 &&
+      canPop:
+          _viewModel.activeTab == 0 &&
           _viewModel.exploreStep == HomeExploreStep.intentSelection,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           if (_viewModel.activeTab != 0) {
             _viewModel.setTab(0);
-          } else if (_viewModel.exploreStep != HomeExploreStep.intentSelection) {
+          } else if (_viewModel.exploreStep !=
+              HomeExploreStep.intentSelection) {
             _viewModel.goBackInExplore();
           }
         }
@@ -287,11 +292,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 child: const Stack(
                   alignment: Alignment.center,
                   children: [
-                    Icon(
-                      Icons.phone_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    Icon(Icons.phone_rounded, color: Colors.white, size: 20),
                     Positioned(
                       top: 5,
                       right: 5,
@@ -373,12 +374,20 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               GestureDetector(
                 onTap: () => _viewModel.setTab(1),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3.5,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.cardWhite,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.strokeBlack, width: 1.6),
-                    boxShadow: AppTheme.neoShadow(offset: const Offset(1.5, 1.5)),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.6,
+                    ),
+                    boxShadow: AppTheme.neoShadow(
+                      offset: const Offset(1.5, 1.5),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -428,7 +437,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 200),
+        padding: const EdgeInsets.only(
+          left: 12,
+          right: 12,
+          top: 4,
+          bottom: 200,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -494,7 +508,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(width: 20, height: 1.5, color: const Color(0xFF94A3B8)),
+                      Container(
+                        width: 20,
+                        height: 1.5,
+                        color: const Color(0xFF94A3B8),
+                      ),
                       const SizedBox(width: 6),
                       const Flexible(
                         child: Text(
@@ -508,7 +526,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Container(width: 20, height: 1.5, color: const Color(0xFF94A3B8)),
+                      Container(
+                        width: 20,
+                        height: 1.5,
+                        color: const Color(0xFF94A3B8),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 3),
@@ -546,7 +568,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.only(left: 18, right: 18, top: 6, bottom: 100),
+        padding: const EdgeInsets.only(
+          left: 18,
+          right: 18,
+          top: 6,
+          bottom: 100,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -557,11 +584,17 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 GestureDetector(
                   onTap: _viewModel.goBackInExplore,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 7,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.cardWhite,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 2.0,
+                      ),
                       boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
                     ),
                     child: const Row(
@@ -586,12 +619,20 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFC3E2A0),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.strokeBlack, width: 1.8),
-                    boxShadow: AppTheme.neoShadow(offset: const Offset(1.5, 1.5)),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.8,
+                    ),
+                    boxShadow: AppTheme.neoShadow(
+                      offset: const Offset(1.5, 1.5),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -644,7 +685,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             // Selected Topics Box
             if (_viewModel.selectedIntents.isNotEmpty) ...[
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.cardWhite,
                   borderRadius: BorderRadius.circular(18),
@@ -685,16 +729,25 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       runSpacing: 6,
                       children: _viewModel.selectedIntents.map((intent) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: intent.badgeColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.strokeBlack, width: 1.4),
+                            border: Border.all(
+                              color: AppColors.strokeBlack,
+                              width: 1.4,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(intent.emoji, style: const TextStyle(fontSize: 13)),
+                              Text(
+                                intent.emoji,
+                                style: const TextStyle(fontSize: 13),
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 intent.title,
@@ -706,8 +759,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                               ),
                               const SizedBox(width: 4),
                               GestureDetector(
-                                onTap: () => _viewModel.removeSelectedIntent(intent.id),
-                                child: const Icon(Icons.close_rounded, size: 14, color: AppColors.strokeBlack),
+                                onTap: () =>
+                                    _viewModel.removeSelectedIntent(intent.id),
+                                child: const Icon(
+                                  Icons.close_rounded,
+                                  size: 14,
+                                  color: AppColors.strokeBlack,
+                                ),
                               ),
                             ],
                           ),
@@ -813,10 +871,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             const SizedBox(height: 16),
 
             // Matches Feed Cards or Loader
-            if (_viewModel.isLoadingCategoryMatches || _viewModel.isLoadingCategories)
+            if (_viewModel.isLoadingCategoryMatches ||
+                _viewModel.isLoadingCategories)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 48,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.cardWhite,
                   borderRadius: BorderRadius.circular(24),
@@ -875,7 +937,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             else if (matches.isEmpty)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 36,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.cardWhite,
                   borderRadius: BorderRadius.circular(24),
@@ -915,7 +980,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       _viewModel.showFavoritesOnly
                           ? 'Tap the heart icon on any listener card to save favorites!'
                           : (_viewModel.discoverMessage ??
-                              'No matching agents found for the selected topics.'),
+                                'No matching agents found for the selected topics.'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
@@ -984,21 +1049,36 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   String _getCategoryImagePath(String id, String title) {
     final key = '${id.toLowerCase()} ${title.toLowerCase()}';
-    if (key.contains('just_talk') || key.contains('just talk') || key.contains('conversation')) {
+    if (key.contains('just_talk') ||
+        key.contains('just talk') ||
+        key.contains('conversation')) {
       return 'assets/images/categories/just_talk.png';
     } else if (key.contains('friendly') || key.contains('friendship')) {
       return 'assets/images/categories/friendly_conversation.png';
     } else if (key.contains('advice') || key.contains('perspective')) {
       return 'assets/images/categories/advice.png';
-    } else if (key.contains('career') || key.contains('motivation') || key.contains('mentor') || key.contains('work')) {
+    } else if (key.contains('career') ||
+        key.contains('motivation') ||
+        key.contains('mentor') ||
+        key.contains('work')) {
       return 'assets/images/categories/career.png';
-    } else if (key.contains('travel') || key.contains('guidance') || key.contains('place')) {
+    } else if (key.contains('travel') ||
+        key.contains('guidance') ||
+        key.contains('place')) {
       return 'assets/images/categories/travel.png';
-    } else if (key.contains('elder') || key.contains('companionship') || key.contains('retired')) {
+    } else if (key.contains('elder') ||
+        key.contains('companionship') ||
+        key.contains('retired')) {
       return 'assets/images/categories/elder_companion.png';
-    } else if (key.contains('student') || key.contains('study') || key.contains('college') || key.contains('academics')) {
+    } else if (key.contains('student') ||
+        key.contains('study') ||
+        key.contains('college') ||
+        key.contains('academics')) {
       return 'assets/images/categories/student_companion.jpg';
-    } else if (key.contains('language') || key.contains('listening') || key.contains('english') || key.contains('hindi')) {
+    } else if (key.contains('language') ||
+        key.contains('listening') ||
+        key.contains('english') ||
+        key.contains('hindi')) {
       return 'assets/images/categories/language.png';
     } else {
       return 'assets/images/categories/casual.png';
@@ -1052,8 +1132,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       _viewModel.showFavoritesOnly
                           ? '❤️'
                           : (_viewModel.selectedIntent != null
-                              ? _viewModel.selectedIntent!.emoji
-                              : '✨'),
+                                ? _viewModel.selectedIntent!.emoji
+                                : '✨'),
                       style: const TextStyle(fontSize: 22),
                     ),
                   ),
@@ -1069,11 +1149,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                                 _viewModel.showFavoritesOnly
                                     ? 'MY FAVORITES'
                                     : (_viewModel.selectedIntent != null
-                                        ? _viewModel.selectedIntent!.title.toUpperCase()
-                                        : (_viewModel.selectedCategoryTitle != null
-                                            ? _viewModel.selectedCategoryTitle!
-                                                  .toUpperCase()
-                                            : 'ALL MATCHES')),
+                                          ? _viewModel.selectedIntent!.title
+                                                .toUpperCase()
+                                          : (_viewModel.selectedCategoryTitle !=
+                                                    null
+                                                ? _viewModel
+                                                      .selectedCategoryTitle!
+                                                      .toUpperCase()
+                                                : 'ALL MATCHES')),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: const TextStyle(
@@ -1112,10 +1195,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           _viewModel.showFavoritesOnly
                               ? 'Showing all your saved favorites (${matches.length})'
                               : (_viewModel.selectedIntent != null
-                                  ? 'Intent: ${_viewModel.selectedIntent!.title} (${_viewModel.selectedCategoryTitle}) • Tap to clear'
-                                  : (_viewModel.selectedCategoryTitle != null
-                                      ? 'Filtered by ${_viewModel.selectedCategoryTitle!} • Tap to clear'
-                                      : 'Exploring all verified matches (${matches.length})')),
+                                    ? 'Intent: ${_viewModel.selectedIntent!.title} (${_viewModel.selectedCategoryTitle}) • Tap to clear'
+                                    : (_viewModel.selectedCategoryTitle != null
+                                          ? 'Filtered by ${_viewModel.selectedCategoryTitle!} • Tap to clear'
+                                          : 'Exploring all verified matches (${matches.length})')),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -1378,11 +1461,30 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     color: match.avatarColor.withOpacity(0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.face_rounded,
-                    size: 72,
-                    color: match.avatarColor,
-                  ),
+
+                  //   child: _viewModel.userProfile.gender == "male" ?
+                  //   Icon(
+                  //   Icons.face_rounded,
+                  //   size: 72,
+                  //   color: match.avatarColor,
+                  // )
+                  child: _viewModel.userProfile?.gender == Gender.man
+                      ? Image.asset(
+                          'assets/images/Boy.png',
+                          width: 72,
+                          height: 72,
+                        )
+                      : _viewModel.userProfile?.gender == Gender.woman
+                      ? Image.asset(
+                          'assets/images/Girl.png',
+                          width: 72,
+                          height: 72,
+                        )
+                      : Icon(
+                          Icons.face_rounded,
+                          size: 72,
+                          color: match.avatarColor,
+                        ),
                 ),
                 // Sparkle on avatar hair
                 Positioned(
@@ -1719,7 +1821,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     }
     if (profile?.language != null && profile!.language!.isNotEmpty) {
       final lang = profile!.language!;
-      subtitleParts.add(lang.length > 1 ? (lang[0].toUpperCase() + lang.substring(1)) : lang.toUpperCase());
+      subtitleParts.add(
+        lang.length > 1
+            ? (lang[0].toUpperCase() + lang.substring(1))
+            : lang.toUpperCase(),
+      );
     }
     if (profile?.gender != null && profile!.gender!.displayName.isNotEmpty) {
       subtitleParts.add(profile!.gender!.displayName);
@@ -2394,7 +2500,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   // Floating Action Button for Category Multi-Selection
   Widget _buildFloatingCategoryActionButton() {
-    final bool isVisible = _viewModel.activeTab == 0 &&
+    final bool isVisible =
+        _viewModel.activeTab == 0 &&
         _viewModel.exploreStep == HomeExploreStep.intentSelection &&
         _viewModel.selectedIntents.isNotEmpty;
 
@@ -2419,18 +2526,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF0F2444),
-                    Color(0xFF1E3A8A),
-                  ],
+                  colors: [Color(0xFF0F2444), Color(0xFF1E3A8A)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(32),
-                border: Border.all(
-                  color: AppColors.strokeBlack,
-                  width: 2.2,
-                ),
+                border: Border.all(color: AppColors.strokeBlack, width: 2.2),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF0F2444).withOpacity(0.38),
