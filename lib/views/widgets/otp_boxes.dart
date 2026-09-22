@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
+import '../../core/theme/app_theme.dart';
 
 class OtpInputField extends StatefulWidget {
   final int length;
@@ -37,7 +38,6 @@ class _OtpInputFieldState extends State<OtpInputField> {
       });
     }
 
-    // Auto-focus first box after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _focusNodes.isNotEmpty) {
         _focusNodes[0].requestFocus();
@@ -62,7 +62,6 @@ class _OtpInputFieldState extends State<OtpInputField> {
 
   void _onChanged(int index, String value) {
     if (value.length > 1) {
-      // Pasted content or multiple chars
       final cleanVal = value.replaceAll(RegExp(r'\D'), '');
       for (int i = 0; i < widget.length; i++) {
         if (i < cleanVal.length) {
@@ -90,7 +89,6 @@ class _OtpInputFieldState extends State<OtpInputField> {
         _focusNodes[index].unfocus();
       }
     } else {
-      // Backspaced / deleted empty field
       if (index > 0) {
         _focusNodes[index - 1].requestFocus();
       }
@@ -119,15 +117,14 @@ class _OtpInputFieldState extends State<OtpInputField> {
 
   @override
   Widget build(BuildContext context) {
-    final boxSize = widget.length > 4 ? 48.0 : 70.0;
-    final borderRadius = widget.length > 4 ? 16.0 : 22.0;
-    final fontSize = widget.length > 4 ? 22.0 : 28.0;
+    final boxSize = widget.length > 4 ? 50.0 : 66.0;
+    final fontSize = widget.length > 4 ? 22.0 : 26.0;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(widget.length, (index) {
         final isFocused = _focusNodes[index].hasFocus;
-        final _ = _controllers[index].text.isNotEmpty;
+        final hasValue = _controllers[index].text.isNotEmpty;
 
         return RawKeyboardListener(
           focusNode: FocusNode(),
@@ -141,23 +138,24 @@ class _OtpInputFieldState extends State<OtpInputField> {
               width: boxSize,
               height: boxSize,
               decoration: BoxDecoration(
-                color: isFocused
-                    ? const Color(0xFFE8EDFF)
-                    : AppColors.cardWhite,
-                borderRadius: BorderRadius.circular(borderRadius),
-                border: Border.all(
-                  color: isFocused
-                      ? const Color(0xFF8C9DFF)
-                      : AppColors.strokeBlack,
-                  width: isFocused ? 2.2 : 2.0,
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFE0F2FE), // Soft sky
+                    Color(0xFFFFE4E6), // Soft peach/pink
+                    Color(0xFFFEF3C7), // Soft yellow
+                    Color(0xFFD1FAE5), // Soft mint
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.strokeBlack.withOpacity(0.12),
-                    offset: const Offset(2, 2),
-                    blurRadius: 0,
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: AppColors.strokeBlack,
+                  width: isFocused ? 2.6 : 2.0,
+                ),
+                boxShadow: AppTheme.neoShadow(
+                  offset: isFocused ? const Offset(1.5, 1.5) : const Offset(3.0, 3.0),
+                ),
               ),
               alignment: Alignment.center,
               child: TextField(
@@ -166,8 +164,8 @@ class _OtpInputFieldState extends State<OtpInputField> {
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 showCursor: isFocused,
-                cursorColor: const Color(0xFF6B82FF),
-                cursorWidth: 2.0,
+                cursorColor: const Color(0xFF00A79D),
+                cursorWidth: 2.2,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(1),

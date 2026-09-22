@@ -4,7 +4,7 @@ class AppColors {
   AppColors._();
 
   // Cartoon Neo-brutalist Pastel Palette
-  static const Color background = Color(0xFFF8FAFC); // Soft porcelain canvas
+  static const Color background = Color(0xFFFBF8EE); // Soft warm cream canvas
   static const Color backgroundCream = Color(0xFFFFFFFF); // Clean white for modal sheets & cards
   static const Color canvasCream = backgroundCream;
   

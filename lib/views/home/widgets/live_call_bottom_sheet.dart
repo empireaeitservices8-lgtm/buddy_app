@@ -141,12 +141,16 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                         },
                       ),
 
-                      // Avatar circle
+                      // Gender Icon Circle (No DP)
                       Container(
                         width: 90,
                         height: 90,
                         decoration: BoxDecoration(
-                          color: match.avatarColor,
+                          color: match.isFemale
+                              ? const Color(0xFFFFF0F5)
+                              : (match.isNonBinary
+                                  ? const Color(0xFFF5F3FF)
+                                  : const Color(0xFFF0F9FF)),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: isAttended
@@ -164,23 +168,12 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                             ),
                           ],
                         ),
-                        child: ClipOval(
-                          child: match.avatarUrl != null &&
-                                  match.avatarUrl!.isNotEmpty
-                              ? Image.network(
-                                  match.avatarUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.person_rounded,
-                                    size: 52,
-                                    color: AppColors.strokeBlack,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.person_rounded,
-                                  size: 52,
-                                  color: AppColors.strokeBlack,
-                                ),
+                        child: Center(
+                          child: Icon(
+                            match.genderIcon,
+                            size: 50,
+                            color: match.genderColor,
+                          ),
                         ),
                       ),
                     ],

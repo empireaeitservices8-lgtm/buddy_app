@@ -173,6 +173,7 @@ class MatchProfile {
   final List<String> conversationCategoryNames;
   final List<String> interests;
   final double rating;
+  final String? gender;
 
   const MatchProfile({
     required this.id,
@@ -193,7 +194,81 @@ class MatchProfile {
     this.conversationCategoryNames = const [],
     this.interests = const [],
     this.rating = 5.0,
+    this.gender,
   });
+
+  bool get isFemale {
+    final g = (gender ?? '').trim().toLowerCase();
+    if (g == 'woman' ||
+        g == 'female' ||
+        g == 'girl' ||
+        g == 'lady' ||
+        g == 'f' ||
+        g == 'w') {
+      return true;
+    }
+    if (g == 'man' ||
+        g == 'male' ||
+        g == 'boy' ||
+        g == 'guy' ||
+        g == 'm') {
+      return false;
+    }
+    final n = name.trim().toLowerCase();
+    return n.endsWith('a') ||
+        n.endsWith('i') ||
+        n.endsWith('e') ||
+        n.contains('girl') ||
+        (id.hashCode.abs() % 2 == 0);
+  }
+
+  bool get isMale {
+    final g = (gender ?? '').trim().toLowerCase();
+    if (g == 'man' ||
+        g == 'male' ||
+        g == 'boy' ||
+        g == 'guy' ||
+        g == 'm') {
+      return true;
+    }
+    if (g == 'woman' ||
+        g == 'female' ||
+        g == 'girl' ||
+        g == 'lady' ||
+        g == 'f' ||
+        g == 'w') {
+      return false;
+    }
+    return !isFemale;
+  }
+
+  bool get isNonBinary {
+    final g = (gender ?? '').trim().toLowerCase();
+    return g == 'non_binary' ||
+        g == 'non-binary' ||
+        g == 'other' ||
+        g == 'nb';
+  }
+
+  IconData get genderIcon {
+    if (isMale) {
+      return Icons.male_rounded;
+    } else if (isNonBinary) {
+      return Icons.transgender_rounded;
+    } else {
+      return Icons.female_rounded;
+    }
+  }
+
+  Color get genderColor {
+    if (isMale) {
+      return const Color(0xFF0284C7);
+    } else if (isNonBinary) {
+      return const Color(0xFF7C3AED);
+    } else {
+      return const Color(0xFFD81B60);
+    }
+  }
 
   factory MatchProfile.fromJson(Map<String, dynamic> json, [int index = 0]) {
     final profObj = json['profession'] is Map
@@ -295,6 +370,11 @@ class MatchProfile {
         ? rawRating.toDouble()
         : (double.tryParse(rawRating?.toString() ?? '') ?? 5.0);
 
+    final rawGender = json['gender']?.toString() ??
+        json['sex']?.toString() ??
+        (json['user'] is Map ? json['user']['gender']?.toString() : null) ??
+        (json['profile'] is Map ? json['profile']['gender']?.toString() : null);
+
     return MatchProfile(
       id: json['id']?.toString() ?? '',
       name:
@@ -317,6 +397,7 @@ class MatchProfile {
       conversationCategoryNames: convCatNames,
       interests: interestsList,
       rating: ratingVal,
+      gender: rawGender,
     );
   }
 
@@ -348,7 +429,7 @@ class MatchProfile {
         final nl = n.toLowerCase();
         return nl == catIdLower ||
             nl.contains(catIdLower) ||
-            catIdLower.contains(nl);
+            catTitleLower.contains(nl);
       })) {
         return true;
       }
@@ -383,6 +464,7 @@ class MatchProfile {
       'conversation_categories': conversationCategoryIds,
       'interests': interests,
       'rating': rating,
+      'gender': gender,
     };
   }
 }
@@ -509,6 +591,10 @@ class CallLogItem {
         bio: 'Verified listener on Gabby Talk',
         cardColor: avatarColors[colorIndex],
         avatarColor: avatarColors[colorIndex],
+        gender: otherUser?['gender']?.toString() ??
+            agent?['gender']?.toString() ??
+            caller?['gender']?.toString() ??
+            json['gender']?.toString(),
       ),
     );
   }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import 'sparkle_widget.dart';
 
-/// Reusable background widget providing the signature neo-brutalist organic pastel background:
-/// - Base pastel lime canvas (#D7F688)
-/// - Top-Right muted sage circle (#C3E2A0) extending around the wallet coin pill
-/// - Middle-Left warm sandy peach circle (#E8D4AF)
-/// - Bottom-Right subtle soft lime highlight (#CEF17D)
+/// Signature neo-brutalist organic pastel background matching the reference mockups:
+/// - Warm cream base canvas (#FBF8EE)
+/// - Top-Right soft mint green circle (#C5EBAA)
+/// - Middle-Left warm peach/sand circle (#F6E3BE)
+/// - Bottom-Right pastel chartreuse circle (#D4F49C)
+/// - Delicate floating sparkle accents (✦, ★)
 class NeoBackground extends StatelessWidget {
   final Widget? child;
 
@@ -14,52 +16,102 @@ class NeoBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.background,
+      color: const Color(0xFFFBF8EE),
       child: Stack(
         children: [
-          // 1. Top-Right Soft Sage Circle (Wraps around status bar and Coin badge)
+          // 1. Top-Right Soft Mint Circle
           Positioned(
-            top: -65,
+            top: -60,
             right: -60,
             child: Container(
-              width: 270,
-              height: 270,
+              width: 280,
+              height: 280,
               decoration: const BoxDecoration(
-                color: Color(0xFFC3E2A0), // Soft sage pastel
+                color: Color(0xFFC5EBAA),
                 shape: BoxShape.circle,
               ),
             ),
           ),
 
-          // 2. Middle-Left Warm Peach / Sand Organic Circle
+          // 2. Middle-Left Warm Sandy Peach Organic Circle
           Positioned(
-            top: 270,
-            left: -90,
+            top: 260,
+            left: -85,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF6E3BE),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+
+          // 3. Bottom-Right Pastel Mint/Chartreuse Circle
+          Positioned(
+            bottom: -50,
+            right: -65,
             child: Container(
               width: 260,
               height: 260,
               decoration: const BoxDecoration(
-                color: Color(0xFFE8D4AF), // Warm sandy peach
+                color: Color(0xFFD4F49C),
                 shape: BoxShape.circle,
               ),
             ),
           ),
 
-          // 3. Bottom-Right Subtle Soft Lime Glow Circle
-          Positioned(
-            top: 500,
-            right: -80,
-            child: Container(
-              width: 240,
-              height: 240,
-              decoration: const BoxDecoration(
-                color: Color(0xFFCEF17D), // Soft chartreuse accent
-                shape: BoxShape.circle,
+          // 4. Subtle Floating Sparkles matching mockup
+          const Positioned(
+            top: 75,
+            left: 28,
+            child: Text(
+              '✦',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const Positioned(
+            top: 140,
+            right: 40,
+            child: Text(
+              '★',
+              style: TextStyle(
+                fontSize: 10,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const Positioned(
+            bottom: 120,
+            left: 36,
+            child: Text(
+              '✦',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const Positioned(
+            bottom: 80,
+            right: 120,
+            child: Text(
+              '★',
+              style: TextStyle(
+                fontSize: 9,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
 
-          ?child,
+          if (child != null) Positioned.fill(child: child!),
         ],
       ),
     );

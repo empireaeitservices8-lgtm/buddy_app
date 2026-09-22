@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
 import '../../data/models/auth_state.dart';
 import '../../data/repositories/auth_api_repository.dart';
 import '../../data/repositories/user_api_repository.dart';
 import '../../viewmodels/registration_view_model.dart';
 import '../agent/agent_dashboard_screen.dart';
 import '../home/home_dashboard_screen.dart';
-import '../widgets/buddy_app_bar.dart';
+import '../widgets/neo_background.dart';
 import '../widgets/segmented_progress_bar.dart';
 import '../widgets/toast_utils.dart';
 import 'otp_verification_screen.dart';
@@ -116,118 +115,108 @@ class _RegistrationFlowPageState extends State<RegistrationFlowPage> {
             }
           },
           child: Scaffold(
-            backgroundColor: AppColors.background,
-            appBar: BuddyAppBar(title: AppStrings.appName, onBack: _handleBack),
-            body: Stack(
-              children: [
-                // 1. Top-Right Soft Sage Circle
-                Positioned(
-                  top: -65,
-                  right: -60,
-                  child: Container(
-                    width: 270,
-                    height: 270,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFC3E2A0), // Soft sage pastel
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
+            backgroundColor: const Color(0xFFFBF8EE),
+            body: NeoBackground(
+              child: SafeArea(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onHorizontalDragEnd: (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+                    if (velocity > 300) {
+                      _handleBack();
+                    } else if (velocity < -300) {
+                      _handleForwardSwipe();
+                    }
+                  },
+                  child: Stack(
+                    children: [
+                      Column(
+                        children: [
+                          // Top Navigation Row
+                          if (currentStep != RegistrationStep.phoneNumber)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                top: 8.0,
+                              ),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: _handleBack,
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.cardWhite,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.strokeBlack,
+                                          width: 1.8,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.strokeBlack
+                                                .withOpacity(0.15),
+                                            offset: const Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Icon(
+                                        Icons.arrow_back_rounded,
+                                        color: AppColors.strokeBlack,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
 
-                // 2. Middle-Left Warm Peach / Sand Organic Circle
-                Positioned(
-                  top: 270,
-                  left: -90,
-                  child: Container(
-                    width: 260,
-                    height: 260,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE8D4AF), // Warm sandy peach
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
+                          // Dynamic step content with smooth slide transition
+                          Expanded(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 280),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              layoutBuilder: (
+                                Widget? currentChild,
+                                List<Widget> previousChildren,
+                              ) {
+                                return Stack(
+                                  alignment: Alignment.topCenter,
+                                  children: <Widget>[
+                                    ...previousChildren,
+                                    ?currentChild,
+                                  ],
+                                );
+                              },
+                              transitionBuilder:
+                                  (Widget child, Animation<double> animation) {
+                                final inOffset = Tween<Offset>(
+                                  begin: Offset(isForward ? 1.0 : -1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation);
 
-                // 3. Bottom-Right Subtle Soft Lime Glow Circle
-                Positioned(
-                  top: 500,
-                  right: -80,
-                  child: Container(
-                    width: 240,
-                    height: 240,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFCEF17D), // Soft chartreuse accent
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-
-                SafeArea(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onHorizontalDragEnd: (details) {
-                      final velocity = details.primaryVelocity ?? 0;
-                      if (velocity > 300) {
-                        // Swiped Right -> Go Back
-                        _handleBack();
-                      } else if (velocity < -300) {
-                        // Swiped Left -> Advance
-                        _handleForwardSwipe();
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        // Show 3-segment Progress Bar only during Sign Up flow
-                        if (!_viewModel.isLoginMode)
-                          SegmentedProgressBar(
-                            totalSegments: 3,
-                            activeIndex: currentIndex,
-                          ),
-
-                        // Dynamic step content with smooth slide transition
-                        Expanded(
-                          child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            switchInCurve: Curves.easeOutCubic,
-                            switchOutCurve: Curves.easeInCubic,
-                            layoutBuilder:
-                                (
-                                  Widget? currentChild,
-                                  List<Widget> previousChildren,
-                                ) {
-                                  return Stack(
-                                    alignment: Alignment.topCenter,
-                                    children: <Widget>[
-                                      ...previousChildren,
-                                      ?currentChild,
-                                    ],
-                                  );
-                                },
-                            transitionBuilder:
-                                (Widget child, Animation<double> animation) {
-                                  final inOffset = Tween<Offset>(
-                                    begin: Offset(isForward ? 1.0 : -1.0, 0.0),
-                                    end: Offset.zero,
-                                  ).animate(animation);
-
-                                  return SlideTransition(
-                                    position: inOffset,
-                                    child: child,
-                                  );
-                                },
-                            child: SizedBox(
-                              key: ValueKey(currentStep),
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: _buildCurrentStepView(currentStep),
+                                return SlideTransition(
+                                  position: inOffset,
+                                  child: child,
+                                );
+                              },
+                              child: SizedBox(
+                                key: ValueKey(currentStep),
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: _buildCurrentStepView(currentStep),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         );

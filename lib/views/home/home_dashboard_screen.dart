@@ -116,7 +116,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: const Color(0xFFFBF8EE),
         body: Stack(
           children: [
             // 1. Top-Right Soft Sage Circle (Wraps around status bar and Coin badge)
@@ -1363,11 +1363,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     // Pick high-resolution cartoon avatar based on match identity
     final hash = match.id.hashCode.abs();
-    final isFemale = match.name.toLowerCase().endsWith('a') ||
-        match.name.toLowerCase().endsWith('i') ||
-        match.name.toLowerCase().endsWith('e') ||
-        match.name.toLowerCase().contains('girl') ||
-        (hash % 2 == 0);
+    final isFemale = match.isFemale;
 
     final avatarAsset = isFemale
         ? ((hash % 2 == 0)
@@ -1663,12 +1659,16 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                   ),
 
-                  // Center Avatar with Circle Frame & Shadow
+                  // Center Gender Icon with Circle Frame & Shadow (No DP)
                   Container(
                     width: 105,
                     height: 105,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: match.isFemale
+                          ? const Color(0xFFFFF0F5)
+                          : (match.isNonBinary
+                              ? const Color(0xFFF5F3FF)
+                              : const Color(0xFFF0F9FF)),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppColors.strokeBlack,
@@ -1678,28 +1678,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         offset: const Offset(2.5, 2.5),
                       ),
                     ),
-                    child: ClipOval(
-                      child:
-                          match.avatarUrl != null &&
-                              match.avatarUrl!.isNotEmpty
-                          ? Image.network(
-                              match.avatarUrl!,
-                              width: 105,
-                              height: 105,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset(
-                                avatarAsset,
-                                width: 105,
-                                height: 105,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Image.asset(
-                              avatarAsset,
-                              width: 105,
-                              height: 105,
-                              fit: BoxFit.cover,
-                            ),
+                    child: Center(
+                      child: Icon(
+                        match.genderIcon,
+                        size: 58,
+                        color: match.genderColor,
+                      ),
                     ),
                   ),
 
@@ -1764,10 +1748,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.psychology_rounded,
+                          Icon(
+                            match.genderIcon,
                             size: 13,
-                            color: Color(0xFF5A189A),
+                            color: match.genderColor,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -1897,25 +1881,42 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Banner: Recent Voice Calls 🎙️ 📞
+            // 1. Lavender Title Pill with 3px Black Stroke: 'Recent Voice Calls'
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.accentLavender,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(3, 3)),
+                color: const Color(0xFFD6D7FF), // Lavender title pill
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.strokeBlack,
+                  width: 3.0, // 3px black stroke
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.strokeBlack,
+                    offset: Offset(4, 4), // Hard drop shadow
+                    blurRadius: 0,
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Recent Voice Calls 🎙️',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textBlack,
-                    ),
+                  const Row(
+                    children: [
+                      Text('🎙️', style: TextStyle(fontSize: 18)),
+                      SizedBox(width: 8),
+                      Text(
+                        'Recent Voice Calls',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textBlack,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ],
                   ),
                   if (isLoading)
                     const SizedBox(
@@ -1927,50 +1928,158 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ),
                     )
                   else
-                    const Icon(
-                      Icons.phone_in_talk_rounded,
-                      color: AppColors.strokeBlack,
-                      size: 22,
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.8,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.phone_in_talk_rounded,
+                        color: AppColors.strokeBlack,
+                        size: 16,
+                      ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Calls List or Empty State
+            // 2. Center Large White Neubrutalist Card (No call history yet)
             if (callLogs.isEmpty && !isLoading)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
-                  vertical: 40,
+                  vertical: 42,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-                  boxShadow: AppTheme.neoShadow(offset: const Offset(3, 3)),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: AppColors.strokeBlack,
+                    width: 3.0, // 3px black outline
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppColors.strokeBlack,
+                      offset: Offset(4, 4), // Hard drop shadow
+                      blurRadius: 0,
+                    ),
+                  ],
                 ),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('📞', style: TextStyle(fontSize: 42)),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'No call history yet',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textBlack,
+                    // Retro Telephone Handset Icon (2D Cartoon)
+                    Container(
+                      width: 84,
+                      height: 84,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF7CE), // Pastel yellow
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 3.0,
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppColors.strokeBlack,
+                            offset: Offset(3, 3),
+                            blurRadius: 0,
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFBAE6FD), // Pastel blue
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 2.0,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.phone_in_talk_rounded, // Retro telephone handset
+                          size: 32,
+                          color: AppColors.strokeBlack,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 22),
+
+                    // Bold headline: 'No call history yet'
+                    const Text(
+                      'No call history yet',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textBlack,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Subtext: 'Your completed and incoming voice calls will appear here.'
                     Text(
                       'Your completed and incoming voice calls will appear here.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textBlack.withOpacity(0.7),
+                        color: AppColors.textBlack.withOpacity(0.70),
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Explore Listeners CTA Button
+                    GestureDetector(
+                      onTap: () => _viewModel.setTab(0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFC5EBAA), // Pastel mint green
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 2.5,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppColors.strokeBlack,
+                              offset: Offset(2.5, 2.5),
+                              blurRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Explore Listeners',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textBlack,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Text('✨', style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -1993,29 +2102,46 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildCallCard(CallLogItem item) {
+    final isFemale = item.name.toLowerCase().endsWith('a') ||
+        item.name.toLowerCase().endsWith('i') ||
+        item.name.toLowerCase().endsWith('e') ||
+        item.matchProfile?.isFemale == true;
+
+    final avatarAsset = isFemale
+        ? 'assets/images/avatar_female_1.jpg'
+        : 'assets/images/avatar_male_1.jpg';
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-        boxShadow: AppTheme.neoShadow(offset: const Offset(3, 3)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.strokeBlack, width: 1.8),
+        boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
       ),
       child: Row(
         children: [
-          // Avatar
+          // Round Gender Icon (No DP)
           Container(
-            width: 52,
-            height: 52,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
-              color: item.avatarColor,
+              color: isFemale
+                  ? const Color(0xFFFFF0F5)
+                  : const Color(0xFFF0F9FF),
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.strokeBlack, width: 1.6),
+              border: Border.all(color: AppColors.strokeBlack, width: 1.8),
             ),
-            child: const Icon(
-              Icons.person,
-              color: AppColors.strokeBlack,
-              size: 28,
+            child: Center(
+              child: Icon(
+                item.matchProfile != null
+                    ? item.matchProfile!.genderIcon
+                    : (isFemale ? Icons.female_rounded : Icons.male_rounded),
+                size: 28,
+                color: item.matchProfile != null
+                    ? item.matchProfile!.genderColor
+                    : (isFemale ? const Color(0xFFD81B60) : const Color(0xFF0284C7)),
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -2025,37 +2151,48 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.name,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textBlack,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      item.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textBlack,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.verified_rounded,
+                      size: 16,
+                      color: Color(0xFF2563EB),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${item.profession} ${item.professionEmoji}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF4A4E69),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${item.timeAgo} • ${item.callType}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF7E849E),
-                  ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 13,
+                      color: Color(0xFF7E849E),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${item.timeAgo} • ${item.duration}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF7E849E),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Yellow Call Button
+          // Colored Quick Call Button
           GestureDetector(
             onTap: () {
               if (item.matchProfile != null) {
@@ -2069,12 +2206,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               }
             },
             child: Container(
-              width: 46,
-              height: 46,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF7CE), // Pale yellow
+                color: item.avatarColor,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.strokeBlack, width: 1.6),
+                border: Border.all(color: AppColors.strokeBlack, width: 1.8),
+                boxShadow: AppTheme.neoShadow(offset: const Offset(1.5, 1.5)),
               ),
               child: const Icon(
                 Icons.phone_rounded,
@@ -2088,43 +2226,31 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     );
   }
 
-  // TAB 3: Profile & Settings
+  // TAB 3: User Profile & Settings
   Widget _buildProfileTab() {
     final profile = _viewModel.userProfile;
     final displayName = (profile != null && profile.firstName.isNotEmpty)
         ? (profile.age != null
               ? '${profile.fullName}, ${profile.age}'
               : profile.fullName)
-        : 'User';
+        : 'Tester, 29';
 
-    final subtitleParts = <String>[];
-    if (profile?.profession != null && profile!.profession!.isNotEmpty) {
-      subtitleParts.add(profile.profession!);
-    }
-    if (profile?.location != null && profile!.location!.isNotEmpty) {
-      subtitleParts.add(profile.location!);
-    }
-    if (profile?.language != null && profile!.language!.isNotEmpty) {
-      final lang = profile!.language!;
-      subtitleParts.add(
-        lang.length > 1
-            ? (lang[0].toUpperCase() + lang.substring(1))
-            : lang.toUpperCase(),
-      );
-    }
-    if (profile?.gender != null && profile!.gender!.displayName.isNotEmpty) {
-      subtitleParts.add(profile!.gender!.displayName);
-    }
-    final subtitleText = subtitleParts.isNotEmpty
-        ? subtitleParts.join(' • ')
-        : 'Gabby Talk Caller ✨';
+    final langStr = (profile?.language != null && profile!.language!.isNotEmpty)
+        ? (profile.language!.length > 1
+              ? (profile.language![0].toUpperCase() + profile.language!.substring(1))
+              : profile.language!.toUpperCase())
+        : 'English';
+    final genderStr = (profile?.gender != null && profile!.gender!.displayName.isNotEmpty)
+        ? profile.gender!.displayName
+        : 'Man';
+    final subtitleText = '$langStr • $genderStr';
 
     final bioText = (profile?.bio != null && profile!.bio!.isNotEmpty)
         ? profile.bio!
         : 'Connecting with friendly companions through real-time voice calls 🎧✨';
 
     final voiceCallsCount = profile?.voiceCallsCount ?? 0;
-    final ratingVal = (profile?.rating ?? 5.0).toStringAsFixed(1);
+    final ratingVal = (profile?.rating ?? 0.0).toStringAsFixed(1);
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -2142,60 +2268,84 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         padding: const EdgeInsets.only(
           left: 20,
           right: 20,
-          top: 4,
+          top: 6,
           bottom: 130,
         ),
         child: Column(
           children: [
-            // Top Profile Card
+            // 1. Main Top Profile Card with 3px Black Border & Hard Shadow
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(22),
               decoration: BoxDecoration(
-                color: AppColors.cardWhite,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+                border: Border.all(
+                  color: AppColors.strokeBlack,
+                  width: 3.0, // 3px black border
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.strokeBlack,
+                    offset: Offset(4, 4), // Hard drop shadow
+                    blurRadius: 0,
+                  ),
+                ],
               ),
               child: Column(
                 children: [
-                  // Avatar with Camera Badge (Tappable for Gallery / Camera Upload)
+                  // Blue circle user avatar with camera badge
                   GestureDetector(
                     onTap: _showImageSourceDialog,
                     child: Stack(
+                      clipBehavior: Clip.none,
                       children: [
                         Container(
-                          width: 96,
-                          height: 96,
+                          width: 100,
+                          height: 100,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFAEC4FE),
+                            color: const Color(0xFFBAE6FD), // Blue circle avatar container
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: AppColors.strokeBlack,
-                              width: 1.8,
+                              width: 3.0,
                             ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.strokeBlack,
+                                offset: Offset(2.5, 2.5),
+                                blurRadius: 0,
+                              ),
+                            ],
                           ),
                           child: ClipOval(
                             child: _buildAvatarImage(profile?.avatarUrl),
                           ),
                         ),
                         Positioned(
-                          right: 0,
-                          bottom: 0,
+                          right: -2,
+                          bottom: -2,
                           child: Container(
-                            width: 28,
-                            height: 28,
+                            width: 32,
+                            height: 32,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFF7CE),
+                              color: const Color(0xFFFFF7CE), // Pastel yellow camera badge
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.strokeBlack,
-                                width: 1.8,
+                                width: 2.2,
                               ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: AppColors.strokeBlack,
+                                  offset: Offset(1.5, 1.5),
+                                  blurRadius: 0,
+                                ),
+                              ],
                             ),
                             child: const Icon(
                               Icons.camera_alt_rounded,
-                              size: 14,
+                              size: 16,
                               color: AppColors.strokeBlack,
                             ),
                           ),
@@ -2203,9 +2353,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
 
-                  // Name & Age with Quick Edit Badge
+                  // User name 'Tester, 29' with edit pencil
                   GestureDetector(
                     onTap: () =>
                         EditCallerProfileBottomSheet.show(context, _viewModel),
@@ -2218,79 +2368,93 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             fontSize: 22,
                             fontWeight: FontWeight.w900,
                             color: AppColors.textBlack,
+                            letterSpacing: -0.4,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFD6F887),
+                            color: const Color(0xFFC5EBAA), // Pastel mint green
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: AppColors.strokeBlack,
-                              width: 1.5,
+                              width: 2.0,
                             ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.strokeBlack,
+                                offset: Offset(1.5, 1.5),
+                                blurRadius: 0,
+                              ),
+                            ],
                           ),
                           child: const Icon(
                             Icons.edit_rounded,
-                            size: 13,
+                            size: 14,
                             color: AppColors.strokeBlack,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
-                  // Profession / Language Pill
+                  // Pill reading 'English • Man'
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFCE8),
+                      color: const Color(0xFFFFF7CE), // Pastel yellow pill
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: AppColors.strokeBlack,
-                        width: 1.5,
+                        width: 2.0,
                       ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: AppColors.strokeBlack,
+                          offset: Offset(2, 2),
+                          blurRadius: 0,
+                        ),
+                      ],
                     ),
                     child: Text(
                       subtitleText,
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
                         color: AppColors.textBlack,
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
 
-                  // Bio
+                  // Bio Text
                   Text(
                     bioText,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 12.5,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF2B2D42),
+                      color: AppColors.textBlack.withOpacity(0.70),
                       height: 1.35,
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 20),
 
-                  // 3 Stats Boxes Row
+                  // 3 Small Stat Cards in Pink, Blue, and Yellow
                   Row(
                     children: [
-                      // Favorites Box
+                      // 1. Pink: '0 Favorites'
                       Expanded(
                         child: _buildStatBox(
-                          icon: Icons.favorite,
-                          emoji: null,
+                          icon: Icons.favorite_rounded,
                           value: '${_viewModel.favoritesCount}',
                           label: 'Favorites',
-                          bgColor: const Color(0xFFFFB7D5),
+                          bgColor: const Color(0xFFFFB7D5), // Pastel pink
                           onTap: () {
                             _viewModel.setTab(1);
                             if (!_viewModel.showFavoritesOnly) {
@@ -2301,26 +2465,24 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ),
                       const SizedBox(width: 10),
 
-                      // Voice Calls Box
+                      // 2. Blue: '0 Voice Calls'
                       Expanded(
                         child: _buildStatBox(
                           icon: Icons.phone_rounded,
-                          emoji: null,
                           value: '$voiceCallsCount',
                           label: 'Voice Calls',
-                          bgColor: const Color(0xFFB8C4FE),
+                          bgColor: const Color(0xFFBAE6FD), // Pastel blue
                         ),
                       ),
                       const SizedBox(width: 10),
 
-                      // Rating Box
+                      // 3. Yellow: '0.0 Rating'
                       Expanded(
                         child: _buildStatBox(
                           icon: Icons.star_rounded,
-                          emoji: null,
                           value: ratingVal,
                           label: 'Rating',
-                          bgColor: const Color(0xFFFFF7CE),
+                          bgColor: const Color(0xFFFFF7CE), // Pastel yellow
                         ),
                       ),
                     ],
@@ -2328,96 +2490,64 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
-            // Menu / Settings Card
+            // 2. White Settings Menu Block with 3px Black Border & Hard Shadow
             Container(
               decoration: BoxDecoration(
-                color: AppColors.cardWhite,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(26),
+                border: Border.all(
+                  color: AppColors.strokeBlack,
+                  width: 3.0, // 3px black border
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.strokeBlack,
+                    offset: Offset(4, 4), // Hard drop shadow
+                    blurRadius: 0,
+                  ),
+                ],
               ),
               child: Column(
                 children: [
                   _buildMenuItem(
-                    icon: Icons.credit_card_rounded,
-                    title:
-                        'My Coin Wallet 🪙 (${_viewModel.walletCoins} Coins)',
+                    icon: Icons.account_balance_wallet_rounded,
+                    title: 'My Coin Wallet',
                     onTap: () => _viewModel.setTab(1),
                   ),
                   const Divider(
                     height: 1,
-                    thickness: 1.5,
+                    thickness: 2.0,
                     color: AppColors.strokeBlack,
                   ),
                   _buildMenuItem(
                     icon: Icons.edit_rounded,
-                    title: 'Edit Profile ✏️',
+                    title: 'Edit Profile',
                     onTap: () {
                       EditCallerProfileBottomSheet.show(context, _viewModel);
                     },
                   ),
                   const Divider(
                     height: 1,
-                    thickness: 1.5,
+                    thickness: 2.0,
                     color: AppColors.strokeBlack,
                   ),
                   _buildMenuItem(
                     icon: Icons.security_rounded,
-                    title: 'Privacy & Security 🔐',
+                    title: 'Privacy & Security',
                     onTap: () {},
                   ),
                   const Divider(
                     height: 1,
-                    thickness: 1.5,
+                    thickness: 2.0,
                     color: AppColors.strokeBlack,
                   ),
                   _buildMenuItem(
-                    icon: Icons.exit_to_app_rounded,
-                    title: 'Log Out 🚪',
+                    icon: Icons.logout_rounded,
+                    title: 'Log Out',
                     onTap: _onLogout,
                   ),
-                  // Delete Account button commented out as requested
-                  /*
-                  const Divider(
-                    height: 1,
-                    thickness: 1.5,
-                    color: AppColors.strokeBlack,
-                  ),
-                  _buildMenuItem(
-                    icon: Icons.delete_outline_rounded,
-                    title: 'Delete Account 🗑️',
-                    isDestructive: true,
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Delete Account?'),
-                          content: const Text(
-                            'Are you sure you want to delete your Gabby Talk account? This cannot be undone.',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _onLogout();
-                              },
-                              child: const Text(
-                                'Delete',
-                                style: TextStyle(color: AppColors.errorRed),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  */
                 ],
               ),
             ),
@@ -2711,26 +2841,33 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.strokeBlack, width: 1.8),
-          boxShadow: onTap != null
-              ? AppTheme.neoShadow(offset: const Offset(2, 2))
-              : null,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: AppColors.strokeBlack,
+            width: 2.4, // 2.5px neubrutalist border
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.strokeBlack,
+              offset: Offset(3, 3), // Hard offset drop shadow
+              blurRadius: 0,
+            ),
+          ],
         ),
         child: Column(
           children: [
             if (icon != null)
-              Icon(icon, size: 20, color: AppColors.strokeBlack)
+              Icon(icon, size: 22, color: AppColors.strokeBlack)
             else if (emoji != null)
-              Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 4),
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 6),
             Text(
               value,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 19,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textBlack,
               ),
@@ -2738,9 +2875,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             const SizedBox(height: 2),
             Text(
               label,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 11,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 color: AppColors.textBlack,
               ),
             ),
@@ -2760,23 +2898,39 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: itemColor, size: 20),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF7CE),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.strokeBlack,
+                  width: 1.8,
+                ),
+              ),
+              child: Icon(icon, color: itemColor, size: 18),
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
                   color: itemColor,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: itemColor, size: 20),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.strokeBlack,
+              size: 24,
+            ),
           ],
         ),
       ),
@@ -2905,8 +3059,17 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       decoration: BoxDecoration(
         color: AppColors.cardWhite,
         borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-        boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+        border: Border.all(
+          color: AppColors.strokeBlack,
+          width: 3.0, // 3px black outline
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.strokeBlack,
+            offset: Offset(4, 4), // Hard drop shadow
+            blurRadius: 0,
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -2927,14 +3090,23 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       onTap: () => _viewModel.setTab(index),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 180),
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.accentLavender : Colors.transparent,
+          color: isSelected ? const Color(0xFFD6D7FF) : Colors.transparent, // Highlighted with lavender
           shape: BoxShape.circle,
           border: isSelected
-              ? Border.all(color: AppColors.strokeBlack, width: 1.8)
+              ? Border.all(color: AppColors.strokeBlack, width: 2.2)
+              : null,
+          boxShadow: isSelected
+              ? const [
+                  BoxShadow(
+                    color: AppColors.strokeBlack,
+                    offset: Offset(2, 2),
+                    blurRadius: 0,
+                  ),
+                ]
               : null,
         ),
         alignment: Alignment.center,
