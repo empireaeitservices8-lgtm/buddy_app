@@ -450,7 +450,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
             // Main Poster Headline
             const Text(
-              'Choose what kind of listener you are',
+              'What kind of conversations do you enjoy?',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
