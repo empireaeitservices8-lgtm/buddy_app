@@ -8,10 +8,7 @@ import '../widgets/slide_to_action.dart';
 class InterestsView extends StatelessWidget {
   final RegistrationViewModel viewModel;
 
-  const InterestsView({
-    super.key,
-    required this.viewModel,
-  });
+  const InterestsView({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +51,9 @@ class InterestsView extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 10,
                   children: viewModel.availableInterests.map((tag) {
-                    final isSelected = viewModel.selectedInterests.contains(tag);
+                    final isSelected = viewModel.selectedInterests.contains(
+                      tag,
+                    );
                     return GestureDetector(
                       onTap: () => viewModel.toggleInterest(tag),
                       child: AnimatedContainer(
@@ -108,4 +107,3 @@ class InterestsView extends StatelessWidget {
     );
   }
 }
-

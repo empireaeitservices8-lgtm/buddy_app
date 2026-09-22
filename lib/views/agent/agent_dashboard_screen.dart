@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/models/agent_rating_model.dart';
 import '../../data/repositories/auth_api_repository.dart';
 import '../../viewmodels/agent_dashboard_view_model.dart';
 import '../call/audio_call_screen.dart';

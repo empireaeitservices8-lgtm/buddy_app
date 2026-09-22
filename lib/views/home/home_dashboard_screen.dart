@@ -126,8 +126,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               child: Container(
                 width: 270,
                 height: 270,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFC3E2A0), // Soft sage pastel
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC3E2A0).withOpacity(0.45),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -140,8 +140,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               child: Container(
                 width: 260,
                 height: 260,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE8D4AF), // Warm sandy peach
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8D4AF).withOpacity(0.40),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -154,8 +154,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               child: Container(
                 width: 240,
                 height: 240,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFCEF17D), // Soft chartreuse accent
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCEF17D).withOpacity(0.40),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -572,7 +572,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           left: 18,
           right: 18,
           top: 6,
-          bottom: 100,
+          bottom: 120,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1099,7 +1099,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 90),
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 120),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1361,229 +1361,514 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   Widget _buildMatchCard(MatchProfile match) {
     final isFav = _viewModel.isFavorite(match.id);
 
+    // Pick high-resolution cartoon avatar based on match identity
+    final hash = match.id.hashCode.abs();
+    final isFemale = match.name.toLowerCase().endsWith('a') ||
+        match.name.toLowerCase().endsWith('i') ||
+        match.name.toLowerCase().endsWith('e') ||
+        match.name.toLowerCase().contains('girl') ||
+        (hash % 2 == 0);
+
+    final avatarAsset = isFemale
+        ? ((hash % 2 == 0)
+            ? 'assets/images/avatar_female_1.jpg'
+            : 'assets/images/avatar_female_2.jpg')
+        : 'assets/images/avatar_male_1.jpg';
+
+    // Meaningful bio fallback
+    final bioText = (match.bio.trim().isEmpty ||
+            match.bio.trim().toLowerCase() == 'jjjj' ||
+            match.bio.trim().length < 4)
+        ? 'Friendly listener ready for real conversations & emotional support ❤️'
+        : match.bio.trim();
+
     return Container(
-      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: match.cardColor,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-        boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+        boxShadow: AppTheme.neoShadow(offset: const Offset(4, 4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Badges Row: ONLINE pill & Coins rate pill
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Online Pill
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.strokeBlack, width: 1.5),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+          // 1. Top Badges Row
+          Padding(
+            padding: const EdgeInsets.only(left: 14, right: 14, top: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Online & Rating Badge Group
+                Row(
                   children: [
                     Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF00C853), // Bright Green
-                        shape: BoxShape.circle,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardWhite,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF00C853),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          const Text(
+                            'ONLINE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Text(
-                      'ONLINE',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Rate Pill
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.strokeBlack, width: 1.5),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${match.rateCoinsPerSec} Coins / sec',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text('🪙', style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Large Avatar Display Area
-          Container(
-            width: double.infinity,
-            height: 180,
-            decoration: BoxDecoration(
-              color: AppColors.cardWhite,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Soft pastel silhouette avatar
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: match.avatarColor.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-
-                  //   child: _viewModel.userProfile.gender == "male" ?
-                  //   Icon(
-                  //   Icons.face_rounded,
-                  //   size: 72,
-                  //   color: match.avatarColor,
-                  // )
-                  child: _viewModel.userProfile?.gender == Gender.man
-                      ? Image.asset(
-                          'assets/images/Boy.png',
-                          width: 72,
-                          height: 72,
-                        )
-                      : _viewModel.userProfile?.gender == Gender.woman
-                      ? Image.asset(
-                          'assets/images/Girl.png',
-                          width: 72,
-                          height: 72,
-                        )
-                      : Icon(
-                          Icons.face_rounded,
-                          size: 72,
-                          color: match.avatarColor,
-                        ),
-                ),
-                // Sparkle on avatar hair
-                Positioned(
-                  top: 42,
-                  right: 120,
-                  child: SparkleWidget(size: 16, color: match.avatarColor),
-                ),
-                // Favorite Button (Top-Right)
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: GestureDetector(
-                    onTap: () {
-                      final wasFav = _viewModel.isFavorite(match.id);
-                      _viewModel.toggleFavorite(match.id, match);
-                      showNeoToast(
-                        context,
-                        wasFav
-                            ? 'Removed ${match.name} from favorites'
-                            : 'Added ${match.name} to favorites ❤️',
-                      );
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: 40,
-                      height: 40,
                       decoration: BoxDecoration(
-                        color: isFav
-                            ? const Color(0xFFFF4D6D)
-                            : AppColors.cardWhite,
-                        shape: BoxShape.circle,
+                        color: const Color(0xFFFFF2B2),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: AppColors.strokeBlack,
-                          width: 2.0,
-                        ),
-                        boxShadow: AppTheme.neoShadow(
-                          offset: const Offset(2, 2),
+                          width: 1.5,
                         ),
                       ),
-                      child: Icon(
-                        isFav
-                            ? Icons.favorite_rounded
-                            : Icons.favorite_border_rounded,
-                        size: 20,
-                        color: isFav ? Colors.white : AppColors.strokeBlack,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 14,
+                            color: Color(0xFFE67E22),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            match.rating > 0
+                                ? match.rating.toStringAsFixed(1)
+                                : '5.0',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                  ],
+                ),
+
+                // Rate Badge & Favorite Button Group
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardWhite,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${match.rateCoinsPerSec} Coins/s',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          const Text('🪙', style: TextStyle(fontSize: 11)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () {
+                        final wasFav = _viewModel.isFavorite(match.id);
+                        _viewModel.toggleFavorite(match.id, match);
+                        showNeoToast(
+                          context,
+                          wasFav
+                              ? 'Removed ${match.name} from favorites'
+                              : 'Added ${match.name} to favorites ❤️',
+                        );
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: isFav
+                              ? const Color(0xFFFF4D6D)
+                              : AppColors.cardWhite,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 1.5,
+                          ),
+                          boxShadow: AppTheme.neoShadow(
+                            offset: const Offset(1.5, 1.5),
+                          ),
+                        ),
+                        child: Icon(
+                          isFav
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          size: 16,
+                          color: isFav ? Colors.white : AppColors.strokeBlack,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // 2. Beautiful Visual Showcase with Hero Avatar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Container(
+              width: double.infinity,
+              height: 155,
+              decoration: BoxDecoration(
+                color: AppColors.cardWhite,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Subtle pastel background tint
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          colors: [
+                            match.avatarColor.withOpacity(0.18),
+                            AppColors.cardWhite,
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Decorative Corner Pill (Left): Language
+                  Positioned(
+                    top: 8,
+                    left: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardWhite,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('🗣️', style: TextStyle(fontSize: 10)),
+                          const SizedBox(width: 4),
+                          Text(
+                            match.location.contains('Language:')
+                                ? match.location
+                                      .replaceAll('Language:', '')
+                                      .trim()
+                                : 'English',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Decorative Corner Pill (Right): Instant
+                  Positioned(
+                    top: 8,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD6F887),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.2,
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.bolt_rounded,
+                            size: 12,
+                            color: AppColors.strokeBlack,
+                          ),
+                          SizedBox(width: 2),
+                          Text(
+                            'Instant',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Center Avatar with Circle Frame & Shadow
+                  Container(
+                    width: 105,
+                    height: 105,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 2.2,
+                      ),
+                      boxShadow: AppTheme.neoShadow(
+                        offset: const Offset(2.5, 2.5),
+                      ),
+                    ),
+                    child: ClipOval(
+                      child:
+                          match.avatarUrl != null &&
+                              match.avatarUrl!.isNotEmpty
+                          ? Image.network(
+                              match.avatarUrl!,
+                              width: 105,
+                              height: 105,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Image.asset(
+                                avatarAsset,
+                                width: 105,
+                                height: 105,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Image.asset(
+                              avatarAsset,
+                              width: 105,
+                              height: 105,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  ),
+
+                  // Sparkle decoration on top right of avatar
+                  Positioned(
+                    top: 16,
+                    right: 95,
+                    child: SparkleWidget(size: 16, color: match.avatarColor),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // 3. Name, Verified Tag & Topic Chips
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${match.name}${match.age > 0 ? ', ${match.age}' : ''}',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textBlack,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.verified_rounded,
+                      size: 20,
+                      color: Color(0xFF2563EB),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+
+                // Specialty Badges Row
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 3.5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardWhite,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.3,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.psychology_rounded,
+                            size: 13,
+                            color: Color(0xFF5A189A),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            match.profession,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (match.professionCategory.isNotEmpty &&
+                        match.professionCategory != match.profession)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 3.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD1E3),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 1.3,
+                          ),
+                        ),
+                        child: Text(
+                          match.professionCategory,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textBlack,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Bio Speech / Quote Box
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardWhite.withOpacity(0.92),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.4,
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '❝ ',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF2563EB),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          bioText,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textBlack,
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // Name and Age
-          Text(
-            '${match.name} ${match.age}',
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w900,
-              color: AppColors.textBlack,
-              letterSpacing: -0.5,
+          // 4. Slide to Call Action Button
+          Padding(
+            padding: const EdgeInsets.only(left: 14, right: 14, bottom: 14),
+            child: SlideToActionButton(
+              text: 'Slide to Call',
+              icon: Icons.phone_rounded,
+              height: 54,
+              backgroundColor: const Color(0xFFF1FAC0),
+              handleColor: const Color(0xFFD6F887),
+              textColor: AppColors.strokeBlack,
+              iconColor: AppColors.strokeBlack,
+              onCompleted: () => _startCall(match),
             ),
-          ),
-          const SizedBox(height: 4),
-
-          // Location & Profession
-          Text(
-            '📍 ${match.location} • ${match.profession}',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textBlack,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Bio Description
-          Text(
-            match.bio,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textBlack.withOpacity(0.85),
-              height: 1.35,
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          // Slide to Call Button (Lime/Yellow Pill)
-          SlideToActionButton(
-            text: 'Slide to Call',
-            icon: Icons.phone_rounded,
-            height: 58,
-            backgroundColor: const Color(0xFFF1FAC0), // Lime cream background
-            handleColor: const Color(0xFFD6F887), // Bright lime handle
-            textColor: AppColors.strokeBlack,
-            iconColor: AppColors.strokeBlack,
-            onCompleted: () => _startCall(match),
           ),
         ],
       ),

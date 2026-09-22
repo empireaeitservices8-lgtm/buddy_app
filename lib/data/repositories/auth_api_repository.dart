@@ -293,24 +293,37 @@ class AuthApiRepository implements IAuthRepository {
 
           // Save user object if present (e.g. In login responses)
           if (userJson != null) {
-            _currentUser = UserProfile.fromJson(userJson);
+            final parsedProfile = UserProfile.fromJson(userJson);
+            _currentUser = parsedProfile.copyWith(
+              phoneNumber: (parsedProfile.phoneNumber != null &&
+                      parsedProfile.phoneNumber!.isNotEmpty)
+                  ? parsedProfile.phoneNumber
+                  : (cleanDigits.isNotEmpty ? cleanDigits : phoneNumber),
+            );
             try {
-              await _apiService.tokenManager.saveUserData(jsonEncode(userJson));
+              final toSave = Map<String, dynamic>.from(userJson);
+              if (!toSave.containsKey('phone_number') ||
+                  toSave['phone_number'] == null ||
+                  toSave['phone_number'].toString().isEmpty) {
+                toSave['phone_number'] =
+                    cleanDigits.isNotEmpty ? cleanDigits : phoneNumber;
+              }
+              await _apiService.tokenManager.saveUserData(jsonEncode(toSave));
               await _apiService.tokenManager.saveUserRole(role.name);
             } catch (_) {}
-          } else if (rawUserId != null) {
+          } else {
             _currentUser = UserProfile(
-              id: rawUserId.toString(),
-              userId: rawUserId.toString(),
-              phoneNumber: cleanDigits,
+              id: rawUserId?.toString() ?? '',
+              userId: rawUserId?.toString() ?? '',
+              phoneNumber: cleanDigits.isNotEmpty ? cleanDigits : phoneNumber,
               countryCode: _currentUser?.countryCode ?? '+91',
             );
             try {
               await _apiService.tokenManager.saveUserData(
                 jsonEncode({
-                  'id': rawUserId,
-                  'user_id': rawUserId,
-                  'phone_number': cleanDigits,
+                  if (rawUserId != null) 'id': rawUserId,
+                  if (rawUserId != null) 'user_id': rawUserId,
+                  'phone_number': cleanDigits.isNotEmpty ? cleanDigits : phoneNumber,
                 }),
               );
               await _apiService.tokenManager.saveUserRole(role.name);
@@ -400,7 +413,7 @@ class AuthApiRepository implements IAuthRepository {
     required String name,
     required int age,
     required String gender,
-
+    String? phoneNumber,
     String? language,
     String? fcmToken,
   }) async {
@@ -409,14 +422,6 @@ class AuthApiRepository implements IAuthRepository {
           fcmToken ??
           await FcmService.getFcmToken() ??
           await _apiService.tokenManager.getFcmToken();
-
-      //String cleanToken = verificationToken.trim();
-      // if (cleanToken.startsWith('Bearer ')) {
-      //   cleanToken = cleanToken.substring(7).trim();
-      // }
-      // cleanToken = cleanToken.replaceAll('"', '').replaceAll("'", '').trim();
-
-      // If cleanToken was empty, try fetching stored access/verification token
 
       final stored =
           await _apiService.tokenManager.getAccessToken() ??
@@ -443,7 +448,11 @@ class AuthApiRepository implements IAuthRepository {
         parsedUserId = int.tryParse(resolvedUserId.toString());
       }
 
-      if (parsedUserId == null) {
+      String? resolvedPhone = phoneNumber ??
+          _currentUser?.phoneNumber ??
+          currentUser?.phoneNumber;
+
+      if (parsedUserId == null || resolvedPhone == null || resolvedPhone.isEmpty) {
         final storedUserData = await _apiService.tokenManager.getUserData();
         if (storedUserData != null && storedUserData.isNotEmpty) {
           try {
@@ -453,14 +462,24 @@ class AuthApiRepository implements IAuthRepository {
                 map['id'] ??
                 map['user']?['id'] ??
                 map['user']?['user_id'];
-            if (rawId != null) {
+            if (parsedUserId == null && rawId != null) {
               parsedUserId = int.tryParse(rawId.toString());
+            }
+            if (resolvedPhone == null || resolvedPhone.isEmpty) {
+              final rawPhone = map['phone_number'] ??
+                  map['phone'] ??
+                  map['mobile'] ??
+                  map['user']?['phone_number'] ??
+                  map['user']?['phone'];
+              if (rawPhone != null && rawPhone.toString().isNotEmpty) {
+                resolvedPhone = rawPhone.toString();
+              }
             }
           } catch (_) {}
         }
       }
 
-      if (parsedUserId == null) {
+      if (parsedUserId == null || resolvedPhone == null || resolvedPhone.isEmpty) {
         try {
           final parts = stored!.split('.');
           if (parts.length == 3) {
@@ -468,8 +487,14 @@ class AuthApiRepository implements IAuthRepository {
             final payloadStr = utf8.decode(base64Url.decode(normalized));
             final payload = jsonDecode(payloadStr) as Map<String, dynamic>;
             final jwtUserId = payload['user_id'] ?? payload['id'];
-            if (jwtUserId != null) {
+            if (parsedUserId == null && jwtUserId != null) {
               parsedUserId = int.tryParse(jwtUserId.toString());
+            }
+            if (resolvedPhone == null || resolvedPhone.isEmpty) {
+              final jwtPhone = payload['phone_number'] ?? payload['phone'];
+              if (jwtPhone != null && jwtPhone.toString().isNotEmpty) {
+                resolvedPhone = jwtPhone.toString();
+              }
             }
           }
         } catch (_) {}
@@ -480,7 +505,8 @@ class AuthApiRepository implements IAuthRepository {
           'user_id': parsedUserId
         else if (resolvedUserId != null && resolvedUserId.isNotEmpty)
           'user_id': resolvedUserId,
-        // if (cleanToken.isNotEmpty) 'verification_token': cleanToken,
+        if (resolvedPhone != null && resolvedPhone.isNotEmpty)
+          'phone_number': resolvedPhone,
         'name': name.trim(),
         'age': age,
         'gender': gender.trim(),

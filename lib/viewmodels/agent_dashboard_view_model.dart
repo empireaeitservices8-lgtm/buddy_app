@@ -203,6 +203,7 @@ class AgentDashboardViewModel extends BaseViewModel {
       await Future.wait([
         fetchAgentProfile(),
         fetchDashboardData(),
+        fetchAgentRating(),
       ]);
       // Check if the app was launched directly from an incoming call notification
       await checkPendingFcmCall();
@@ -218,6 +219,7 @@ class AgentDashboardViewModel extends BaseViewModel {
     await Future.wait([
       fetchAgentProfile(),
       fetchDashboardData(silent: true),
+      fetchAgentRating(),
     ]);
   }
 
@@ -570,11 +572,58 @@ class AgentDashboardViewModel extends BaseViewModel {
     }
   }
 
-  /// No-op rating fetch (ratings are loaded via profile & dashboard payloads)
+  /// Fetches agent rating breakdown and caller reviews from agent/rating/?agent_id={id}
   Future<void> fetchAgentRating([dynamic targetAgentId]) async {
-    // Suppressed: rating data comes directly from profile/dashboard APIs
-    _isLoadingRating = false;
+    if (!await _ensureAgentRole()) return;
+    _isLoadingRating = true;
     notifyListenersSafely();
+    try {
+      await _loadAuthToken();
+      final options = _authToken != null && _authToken!.isNotEmpty
+          ? Options(headers: {'Authorization': 'Bearer $_authToken'})
+          : null;
+
+      final dynamic agentId = targetAgentId ??
+          _agentProfile?.id ??
+          _agentProfile?.agentId ??
+          _agentProfile?.userId ??
+          _authRepository.currentUser?.id;
+
+      final Map<String, dynamic> queryParams = {};
+      if (agentId != null && agentId.toString().isNotEmpty) {
+        queryParams['agent_id'] = agentId;
+      }
+
+      debugPrint('🌟 [AgentDashboard] Fetching ratings from ${ApiConstants.agentRating} with query: $queryParams');
+
+      final response = await _apiService.get(
+        ApiConstants.agentRating,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+        options: options,
+        requiresAuth: true,
+      );
+
+      debugPrint('🌟 [AgentDashboard] Agent rating response: ${response.rawData}');
+
+      if (response.isSuccess && response.rawData is Map) {
+        final raw = response.rawData as Map<String, dynamic>;
+        final dataJson = raw['data'] is Map<String, dynamic>
+            ? raw['data'] as Map<String, dynamic>
+            : raw;
+
+        _ratingData = AgentRatingData.fromJson(dataJson);
+        if (_ratingData != null) {
+          if (_ratingData!.averageRating > 0) {
+            _rating = _ratingData!.averageRating;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ [AgentDashboard] fetchAgentRating error: $e');
+    } finally {
+      _isLoadingRating = false;
+      notifyListenersSafely();
+    }
   }
 
   /// Automatically turns on duty when entering the screen

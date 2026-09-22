@@ -1,3 +1,4 @@
+import 'package:buddy_app/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
@@ -47,7 +48,34 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+
+          // Header Pill Badge (STEP 1: PROFILE)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.accentButter,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+              boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.face_retouching_natural_rounded,
+                  size: 15,
+                  color: AppColors.strokeBlack,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'YOUR AVATAR & BIO ✨',
+                  style: AppTypography.badgeText.copyWith(letterSpacing: 0.8),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
 
           // Title
           Text(
@@ -56,11 +84,58 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 4),
+          Text(
+            AppStrings.profileSubtitle,
+            style: AppTypography.bodyLarge.copyWith(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF64748B),
+            ),
+          ),
+          const SizedBox(height: 16),
 
-          // Subtitle
-          Text(AppStrings.profileSubtitle, style: AppTypography.bodyLarge),
-          const SizedBox(height: 24),
+          // Dynamic Male / Female Cartoon Avatar Preview
+          Center(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 2.4,
+                    ),
+                    boxShadow: AppTheme.neoShadow(offset: const Offset(3, 3)),
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      vm.selectedGender == Gender.man
+                          ? 'assets/images/avatar_male_1.jpg'
+                          : (vm.selectedGender == Gender.woman
+                              ? 'assets/images/avatar_female_1.jpg'
+                              : 'assets/images/avatar_female_2.jpg'),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                // Sparkle Badge on Avatar
+                const Positioned(
+                  top: 2,
+                  right: 2,
+                  child: Text('✨', style: TextStyle(fontSize: 18)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
 
           // FIRST NAME Field
           NeoTextField(
@@ -94,6 +169,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               _buildGenderPill(
                 gender: Gender.woman,
                 label: AppStrings.genderWoman,
+                activeColor: const Color(0xFFFFD1DC),
                 isSelected: vm.selectedGender == Gender.woman,
                 onTap: () => vm.setGender(Gender.woman),
               ),
@@ -101,6 +177,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               _buildGenderPill(
                 gender: Gender.man,
                 label: AppStrings.genderMan,
+                activeColor: const Color(0xFFBAE6FD),
                 isSelected: vm.selectedGender == Gender.man,
                 onTap: () => vm.setGender(Gender.man),
               ),
@@ -108,6 +185,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               _buildGenderPill(
                 gender: Gender.nonBinary,
                 label: AppStrings.genderNonBinary,
+                activeColor: const Color(0xFFEDE9FE),
                 isSelected: vm.selectedGender == Gender.nonBinary,
                 onTap: () => vm.setGender(Gender.nonBinary),
               ),
@@ -131,25 +209,36 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
   Widget _buildGenderPill({
     required Gender gender,
     required String label,
+    required Color activeColor,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.accentLavender : AppColors.cardWhite,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+            color: isSelected ? activeColor : AppColors.cardWhite,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.strokeBlack,
+              width: isSelected ? 2.2 : 1.8,
+            ),
+            boxShadow: AppTheme.neoShadow(
+              offset: isSelected
+                  ? const Offset(1.5, 1.5)
+                  : const Offset(3.0, 3.0),
+            ),
           ),
           child: Text(
             label,
+            textAlign: TextAlign.center,
             style: AppTypography.titleMedium.copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w900,
               color: AppColors.textBlack,
             ),
           ),

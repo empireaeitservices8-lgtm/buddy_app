@@ -301,16 +301,26 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                           ),
                         ),
 
-                      // Control Dock: Mute, Hang Up, Speaker
+                      // Control Dock: Mute, Hang Up, Speaker (Cartoon Neo-Brutalist Dock)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
+                          horizontal: 24,
+                          vertical: 18,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF222328),
-                          borderRadius: BorderRadius.circular(32),
-                          border: Border.all(color: Colors.white12, width: 1.5),
+                          color: const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(36),
+                          border: Border.all(
+                            color: Colors.white24,
+                            width: 2.0,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.5),
+                              offset: const Offset(4, 4),
+                              blurRadius: 0,
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -322,11 +332,11 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                   : Icons.mic_rounded,
                               label: vm.isMuted ? 'Unmute' : 'Mute',
                               isActive: vm.isMuted,
-                              activeColor: const Color(0xFFFFB7D5),
+                              activeColor: const Color(0xFFFFB8D2),
                               onTap: vm.toggleMute,
                             ),
 
-                            // End Call Button (Prominent Red)
+                            // End Call Button (Cartoon Red Pill with Hard Shadow)
                             GestureDetector(
                               onTap: () async {
                                 await vm.endCall();
@@ -338,19 +348,17 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                 width: 72,
                                 height: 72,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFF3366),
+                                  color: const Color(0xFFFF4D6D),
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: Colors.white,
-                                    width: 2.2,
+                                    width: 2.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(
-                                        0xFFFF3366,
-                                      ).withOpacity(0.45),
-                                      blurRadius: 18,
-                                      offset: const Offset(0, 6),
+                                      color: Colors.black.withOpacity(0.4),
+                                      offset: const Offset(3, 3),
+                                      blurRadius: 0,
                                     ),
                                   ],
                                 ),
@@ -369,7 +377,7 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                   : Icons.volume_off_rounded,
                               label: vm.isSpeakerOn ? 'Speaker' : 'Earpiece',
                               isActive: vm.isSpeakerOn,
-                              activeColor: const Color(0xFFB8C4FE),
+                              activeColor: const Color(0xFFC7D2FE),
                               onTap: vm.toggleSpeaker,
                             ),
                           ],

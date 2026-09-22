@@ -317,7 +317,10 @@ class RegistrationViewModel extends BaseViewModel {
       //     'Verification token is missing. Please verify your phone number again.',
       //   );
       //   return false;
-      // }
+      final cleanDigits = _phoneNumber.replaceAll(RegExp(r'\D'), '');
+      final fullPhone = _phoneNumber.startsWith('+')
+          ? _phoneNumber
+          : '$_countryCode$cleanDigits';
 
       final success = await _authRepository.completeCallerProfile(
         // verificationToken: token,
@@ -325,6 +328,9 @@ class RegistrationViewModel extends BaseViewModel {
         age: _age ?? 20,
         gender: _formatGender(_selectedGender),
         language: 'English',
+        phoneNumber: fullPhone.isNotEmpty
+            ? fullPhone
+            : (_phoneNumber.isNotEmpty ? _phoneNumber : null),
       );
 
       if (success) {
