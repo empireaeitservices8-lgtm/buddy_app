@@ -222,53 +222,18 @@ class MatchProfile {
         (id.hashCode.abs() % 2 == 0);
   }
 
-  bool get isMale {
-    final g = (gender ?? '').trim().toLowerCase();
-    if (g == 'man' ||
-        g == 'male' ||
-        g == 'boy' ||
-        g == 'guy' ||
-        g == 'm') {
-      return true;
-    }
-    if (g == 'woman' ||
-        g == 'female' ||
-        g == 'girl' ||
-        g == 'lady' ||
-        g == 'f' ||
-        g == 'w') {
-      return false;
-    }
-    return !isFemale;
-  }
+  bool get isMale => !isFemale;
 
-  bool get isNonBinary {
-    final g = (gender ?? '').trim().toLowerCase();
-    return g == 'non_binary' ||
-        g == 'non-binary' ||
-        g == 'other' ||
-        g == 'nb';
-  }
+  bool get isNonBinary => false;
 
-  IconData get genderIcon {
-    if (isMale) {
-      return Icons.male_rounded;
-    } else if (isNonBinary) {
-      return Icons.transgender_rounded;
-    } else {
-      return Icons.female_rounded;
-    }
-  }
+  IconData get genderIcon =>
+      isFemale ? Icons.female_rounded : Icons.male_rounded;
 
-  Color get genderColor {
-    if (isMale) {
-      return const Color(0xFF0284C7);
-    } else if (isNonBinary) {
-      return const Color(0xFF7C3AED);
-    } else {
-      return const Color(0xFFD81B60);
-    }
-  }
+  Color get genderColor =>
+      isFemale ? const Color(0xFFD81B60) : const Color(0xFF0284C7);
+
+  String get genderImageAsset =>
+      isFemale ? 'assets/images/Girl.png' : 'assets/images/Boy.png';
 
   factory MatchProfile.fromJson(Map<String, dynamic> json, [int index = 0]) {
     final profObj = json['profession'] is Map
@@ -278,21 +243,31 @@ class MatchProfile {
         ? json['category'] as Map<String, dynamic>
         : null;
 
+    final rawProfStr = (profObj?['name'] ??
+            catObj?['name'] ??
+            json['profession'] ??
+            json['category'])
+        ?.toString()
+        .trim();
+
     final professionName =
-        profObj?['name']?.toString() ??
-        catObj?['name']?.toString() ??
-        json['profession']?.toString() ??
-        json['category']?.toString() ??
-        'Specialist';
+        (rawProfStr != null && rawProfStr.isNotEmpty && rawProfStr.toLowerCase() != 'null')
+            ? rawProfStr
+            : 'Listener';
+
+    final rawCatStr = (json['profession_category'] ??
+            catObj?['name'] ??
+            profObj?['name'] ??
+            catObj?['id'] ??
+            json['category_id'] ??
+            json['category'])
+        ?.toString()
+        .trim();
 
     final categoryName =
-        json['profession_category']?.toString() ??
-        catObj?['name']?.toString() ??
-        profObj?['name']?.toString() ??
-        catObj?['id']?.toString() ??
-        json['category_id']?.toString() ??
-        json['category']?.toString() ??
-        professionName;
+        (rawCatStr != null && rawCatStr.isNotEmpty && rawCatStr.toLowerCase() != 'null')
+            ? rawCatStr
+            : professionName;
 
     final categoryDescription = catObj?['description'] is List
         ? (catObj!['description'] as List).join(', ')
@@ -387,6 +362,8 @@ class MatchProfile {
       location: location,
       profession: professionName,
       professionCategory: categoryName,
+      professionId: professionId,
+      categoryDescription: categoryDescription,
       bio: effectiveBio,
       rateCoinsPerSec: rate,
       isOnline: isOnline,

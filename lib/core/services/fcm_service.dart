@@ -652,6 +652,51 @@ class FcmService {
           data['channel_name'] != null ||
           data['channel'] != null;
 
+      // Check user role: Only agents receive incoming audio call heads-up notifications
+      final userRole = await TokenManager().getUserRole();
+      final isAgent = userRole?.toLowerCase() == 'agent';
+
+      if (!isAgent) {
+        debugPrint(
+          'ℹ️ [FcmService] Current user is not an agent (role: $userRole). Suppressed incoming audio call heads-up notification.',
+        );
+        if (!isCall) {
+          final displayTitle =
+              data['title']?.toString() ?? fallbackTitle ?? 'Notification';
+          final displayBody = data['body']?.toString() ?? fallbackBody ?? '';
+          final notifKey = 'notif_${displayTitle}_$displayBody';
+          if (_isDuplicateNotification(notifKey)) {
+            debugPrint('⏭️ [FcmService] Suppressed duplicate standard notification: $displayTitle');
+            return;
+          }
+          final notifId = DateTime.now().millisecondsSinceEpoch % 100000;
+
+          const standardDetails = AndroidNotificationDetails(
+            'high_importance_channel',
+            'Incoming Calls & Alerts',
+            channelDescription:
+                'High priority notifications for incoming audio calls and critical alerts',
+            icon: '@mipmap/ic_launcher',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true,
+            enableVibration: true,
+          );
+
+          await _localNotifications.show(
+            notifId,
+            displayTitle,
+            displayBody,
+            const NotificationDetails(android: standardDetails),
+            payload: jsonEncode(data),
+          );
+          debugPrint(
+            '🔔 [FcmService] Displayed Foreground Notification: $displayTitle - $displayBody',
+          );
+        }
+        return;
+      }
+
       if (!isCall) {
         final displayTitle =
             data['title']?.toString() ?? fallbackTitle ?? 'Notification';

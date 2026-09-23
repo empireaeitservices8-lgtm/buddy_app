@@ -141,16 +141,14 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                         },
                       ),
 
-                      // Gender Icon Circle (No DP)
+                      // Gender Image Circle (No DP)
                       Container(
                         width: 90,
                         height: 90,
                         decoration: BoxDecoration(
                           color: match.isFemale
                               ? const Color(0xFFFFF0F5)
-                              : (match.isNonBinary
-                                  ? const Color(0xFFF5F3FF)
-                                  : const Color(0xFFF0F9FF)),
+                              : const Color(0xFFF0F9FF),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: isAttended
@@ -168,11 +166,11 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Icon(
-                            match.genderIcon,
-                            size: 50,
-                            color: match.genderColor,
+                        child: ClipOval(
+                          child: Image.asset(
+                            match.genderImageAsset,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.topCenter,
                           ),
                         ),
                       ),

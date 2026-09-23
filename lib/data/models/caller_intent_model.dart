@@ -36,10 +36,15 @@ class CallerIntent {
 
   factory CallerIntent.fromJson(Map<String, dynamic> json) {
     final id = (json['id'] ?? json['category_id'] ?? '').toString();
-    final name = (json['name'] ?? json['title'] ?? json['category_name'] ?? '').toString();
-    final desc = (json['description'] ?? json['tagline'] ?? json['subtitle'] ?? '').toString();
+    final name = (json['name'] ?? json['title'] ?? json['category_name'] ?? '')
+        .toString();
+    final desc =
+        (json['description'] ?? json['tagline'] ?? json['subtitle'] ?? '')
+            .toString();
     final emoji = (json['emoji'] ?? json['icon'] ?? '').toString();
-    final image = (json['image'] ?? json['image_url'] ?? json['image_path'] ?? '').toString();
+    final image =
+        (json['image'] ?? json['image_url'] ?? json['image_path'] ?? '')
+            .toString();
 
     // Match with default local high-res asset templates by id, name, or slug
     CallerIntent? matched;
@@ -53,14 +58,21 @@ class CallerIntent {
     }
 
     return CallerIntent(
-      id: id.isNotEmpty ? id : (matched?.id ?? name.toLowerCase().replaceAll(' ', '_')),
+      id: id.isNotEmpty
+          ? id
+          : (matched?.id ?? name.toLowerCase().replaceAll(' ', '_')),
       title: name.isNotEmpty ? name : (matched?.title ?? 'Category'),
       emoji: emoji.isNotEmpty ? emoji : (matched?.emoji ?? '💬'),
-      description: desc.isNotEmpty ? desc : (matched?.description ?? 'Connect and talk'),
-      targetCategory: name.isNotEmpty ? name : (matched?.targetCategory ?? 'General'),
+      description: desc.isNotEmpty
+          ? desc
+          : (matched?.description ?? 'Connect and talk'),
+      targetCategory: name.isNotEmpty
+          ? name
+          : (matched?.targetCategory ?? 'General'),
       badgeColor: matched?.badgeColor ?? const Color(0xFF7367F0),
       imagePath: image.isNotEmpty ? image : (matched?.imagePath ?? ''),
-      listenerStrengths: matched?.listenerStrengths ?? const ['Listening', 'Companionship'],
+      listenerStrengths:
+          matched?.listenerStrengths ?? const ['Listening', 'Companionship'],
       ageRange: matched?.ageRange ?? '20–50',
       languages: matched?.languages ?? 'English / Hindi',
       profession: matched?.profession ?? 'Professional',
@@ -216,5 +228,3 @@ const List<CallerIntent> defaultCallerIntents = [
     imagePath: 'assets/images/categories/casual.png',
   ),
 ];
-
-

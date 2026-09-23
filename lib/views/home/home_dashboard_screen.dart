@@ -1099,7 +1099,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 120),
+        padding: const EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 4,
+          bottom: 120,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1301,7 +1306,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: matches.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 20),
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   return _buildMatchCard(matches[index]);
                 },
@@ -1367,12 +1372,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     final avatarAsset = isFemale
         ? ((hash % 2 == 0)
-            ? 'assets/images/avatar_female_1.jpg'
-            : 'assets/images/avatar_female_2.jpg')
+              ? 'assets/images/avatar_female_1.jpg'
+              : 'assets/images/avatar_female_2.jpg')
         : 'assets/images/avatar_male_1.jpg';
 
     // Meaningful bio fallback
-    final bioText = (match.bio.trim().isEmpty ||
+    final bioText =
+        (match.bio.trim().isEmpty ||
             match.bio.trim().toLowerCase() == 'jjjj' ||
             match.bio.trim().length < 4)
         ? 'Friendly listener ready for real conversations & emotional support ❤️'
@@ -1460,7 +1466,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           Text(
                             match.rating > 0
                                 ? match.rating.toStringAsFixed(1)
-                                : '5.0',
+                                : '0',
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w900,
@@ -1548,14 +1554,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 7),
 
           // 2. Beautiful Visual Showcase with Hero Avatar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Container(
               width: double.infinity,
-              height: 155,
+              height: 135,
               decoration: BoxDecoration(
                 color: AppColors.cardWhite,
                 borderRadius: BorderRadius.circular(22),
@@ -1659,16 +1665,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                   ),
 
-                  // Center Gender Icon with Circle Frame & Shadow (No DP)
+                  // Center Gender Image with Circle Frame & Shadow (No DP)
                   Container(
-                    width: 105,
-                    height: 105,
+                    width: 104,
+                    height: 104,
                     decoration: BoxDecoration(
                       color: match.isFemale
                           ? const Color(0xFFFFF0F5)
-                          : (match.isNonBinary
-                              ? const Color(0xFFF5F3FF)
-                              : const Color(0xFFF0F9FF)),
+                          : const Color(0xFFF0F9FF),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppColors.strokeBlack,
@@ -1678,26 +1682,28 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         offset: const Offset(2.5, 2.5),
                       ),
                     ),
-                    child: Center(
-                      child: Icon(
-                        match.genderIcon,
-                        size: 58,
-                        color: match.genderColor,
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Image.asset(
+                          match.genderImageAsset,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
 
                   // Sparkle decoration on top right of avatar
                   Positioned(
-                    top: 16,
-                    right: 95,
+                    top: 12,
+                    right: 90,
                     child: SparkleWidget(size: 16, color: match.avatarColor),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // 3. Name, Verified Tag & Topic Chips
           Padding(
@@ -1725,7 +1731,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 5),
 
                 // Specialty Badges Row
                 Wrap(
@@ -1748,10 +1754,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            match.genderIcon,
-                            size: 13,
-                            color: match.genderColor,
+                          ClipOval(
+                            child: Image.asset(
+                              match.genderImageAsset,
+                              width: 16,
+                              height: 16,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -1791,14 +1801,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
 
                 // Bio Speech / Quote Box
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 8,
+                    vertical: 7,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.cardWhite.withOpacity(0.92),
@@ -1838,15 +1848,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // 4. Slide to Call Action Button
           Padding(
-            padding: const EdgeInsets.only(left: 14, right: 14, bottom: 14),
+            padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
             child: SlideToActionButton(
               text: 'Slide to Call',
               icon: Icons.phone_rounded,
-              height: 54,
+              height: 48,
               backgroundColor: const Color(0xFFF1FAC0),
               handleColor: const Color(0xFFD6F887),
               textColor: AppColors.strokeBlack,
@@ -2008,7 +2018,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         ),
                         alignment: Alignment.center,
                         child: const Icon(
-                          Icons.phone_in_talk_rounded, // Retro telephone handset
+                          Icons
+                              .phone_in_talk_rounded, // Retro telephone handset
                           size: 32,
                           color: AppColors.strokeBlack,
                         ),
@@ -2102,7 +2113,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildCallCard(CallLogItem item) {
-    final isFemale = item.name.toLowerCase().endsWith('a') ||
+    final isFemale =
+        item.name.toLowerCase().endsWith('a') ||
         item.name.toLowerCase().endsWith('i') ||
         item.name.toLowerCase().endsWith('e') ||
         item.matchProfile?.isFemale == true;
@@ -2121,7 +2133,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       ),
       child: Row(
         children: [
-          // Round Gender Icon (No DP)
+          // Round Gender Image (No DP)
           Container(
             width: 50,
             height: 50,
@@ -2132,15 +2144,17 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.strokeBlack, width: 1.8),
             ),
-            child: Center(
-              child: Icon(
-                item.matchProfile != null
-                    ? item.matchProfile!.genderIcon
-                    : (isFemale ? Icons.female_rounded : Icons.male_rounded),
-                size: 28,
-                color: item.matchProfile != null
-                    ? item.matchProfile!.genderColor
-                    : (isFemale ? const Color(0xFFD81B60) : const Color(0xFF0284C7)),
+            child: ClipOval(
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: Image.asset(
+                  item.matchProfile != null
+                      ? item.matchProfile!.genderImageAsset
+                      : (isFemale
+                            ? 'assets/images/Girl.png'
+                            : 'assets/images/Boy.png'),
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -2237,10 +2251,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     final langStr = (profile?.language != null && profile!.language!.isNotEmpty)
         ? (profile.language!.length > 1
-              ? (profile.language![0].toUpperCase() + profile.language!.substring(1))
+              ? (profile.language![0].toUpperCase() +
+                    profile.language!.substring(1))
               : profile.language!.toUpperCase())
         : 'English';
-    final genderStr = (profile?.gender != null && profile!.gender!.displayName.isNotEmpty)
+    final genderStr =
+        (profile?.gender != null && profile!.gender!.displayName.isNotEmpty)
         ? profile.gender!.displayName
         : 'Man';
     final subtitleText = '$langStr • $genderStr';
@@ -2304,7 +2320,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           width: 100,
                           height: 100,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFBAE6FD), // Blue circle avatar container
+                            color: const Color(
+                              0xFFBAE6FD,
+                            ), // Blue circle avatar container
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: AppColors.strokeBlack,
@@ -2329,7 +2347,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFF7CE), // Pastel yellow camera badge
+                              color: const Color(
+                                0xFFFFF7CE,
+                              ), // Pastel yellow camera badge
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.strokeBlack,
@@ -2908,10 +2928,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFFFF7CE),
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.strokeBlack,
-                  width: 1.8,
-                ),
+                border: Border.all(color: AppColors.strokeBlack, width: 1.8),
               ),
               child: Icon(icon, color: itemColor, size: 18),
             ),
@@ -3094,7 +3111,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD6D7FF) : Colors.transparent, // Highlighted with lavender
+          color: isSelected
+              ? const Color(0xFFD6D7FF)
+              : Colors.transparent, // Highlighted with lavender
           shape: BoxShape.circle,
           border: isSelected
               ? Border.all(color: AppColors.strokeBlack, width: 2.2)

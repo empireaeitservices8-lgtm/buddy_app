@@ -777,23 +777,7 @@ class HomeViewModel extends BaseViewModel {
       notifyListenersSafely();
     }
     try {
-      // 1. Fetch conversation categories: GET /api/conversation-categories/?category_ids=1,2,3&available_only=true
-      try {
-        final targetCategoryIds = _selectedIntentIds.isNotEmpty
-            ? _selectedIntentIds.toList()
-            : null;
-        final dynamicCats = await _userRepository.getConversationCategories(
-          categoryIds: targetCategoryIds,
-          availableOnly: true,
-        );
-        if (dynamicCats.isNotEmpty) {
-          if (targetCategoryIds == null || targetCategoryIds.isEmpty) {
-            _dynamicCallerIntents = dynamicCats;
-          }
-        }
-      } catch (_) {}
-
-      // 2. Discover available agents: GET /api/agents/discover/?conversation_categories=1,2,3&available_only=true
+      // 1. Discover available agents: GET /api/agents/discover/?conversation_categories=1,2,3&available_only=true
       try {
         final targetCategoryIds = _selectedIntentIds.isNotEmpty
             ? _selectedIntentIds.toList()
