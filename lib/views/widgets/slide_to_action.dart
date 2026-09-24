@@ -128,114 +128,123 @@ class _SlideToActionButtonState extends State<SlideToActionButton>
     }
   }
 
+  final GlobalKey _buttonKey = GlobalKey();
+
+  double _getMaxDrag(double handleSize) {
+    final renderBox = _buttonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && renderBox.hasSize) {
+      return (renderBox.size.width - handleSize - 12).clamp(0.0, double.infinity);
+    }
+    final screenWidth = MediaQuery.maybeSizeOf(context)?.width ?? 360.0;
+    return (screenWidth - 48.0 - handleSize - 12).clamp(0.0, double.infinity);
+  }
+
   @override
   Widget build(BuildContext context) {
     final handleSize = widget.height - 12;
+    final maxDrag = _getMaxDrag(handleSize);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxDrag = (constraints.maxWidth - handleSize - 12).clamp(
-          0.0,
-          double.infinity,
-        );
-
-        return GestureDetector(
-          // Allow tapping anywhere on the bar to trigger the slide completion
-          onTap: () {
-            if (!widget.isLoading && !_isFinished) {
-              _completeSlide(maxDrag);
-            }
-          },
-          child: Container(
-            width: double.infinity,
-            height: widget.height,
-            decoration: BoxDecoration(
-              color: widget.backgroundColor,
-              borderRadius: BorderRadius.circular(widget.height / 2),
-              border: Border.all(
-                color: AppColors.strokeBlack,
-                width: AppTheme.strokeWidth,
-              ),
-            ),
-            child: Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                // Center Label with subtle fade on drag
-                Center(
-                  child: widget.isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.accentLavender,
-                            ),
-                          ),
-                        )
-                      : Opacity(
-                          opacity: maxDrag > 0
-                              ? (1.0 - (_dragValue / maxDrag)).clamp(0.15, 1.0)
-                              : 1.0,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 54.0,
-                            ),
-                            child: Text(
-                              widget.text,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTypography.buttonText.copyWith(
-                                color: widget.textColor,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
+    return GestureDetector(
+      key: _buttonKey,
+      // Allow tapping anywhere on the bar to trigger the slide completion
+      onTap: () {
+        if (!widget.isLoading && !_isFinished) {
+          _completeSlide(_getMaxDrag(handleSize));
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: widget.backgroundColor,
+          borderRadius: BorderRadius.circular(widget.height / 2),
+          border: Border.all(
+            color: AppColors.strokeBlack,
+            width: AppTheme.strokeWidth,
+          ),
+          boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+        ),
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            // Center Label with subtle fade on drag
+            Center(
+              child: widget.isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.accentLavender,
                         ),
-                ),
-
-                // Draggable handle
-                if (!widget.isLoading)
-                  Positioned(
-                    left: 6 + _dragValue,
-                    child: GestureDetector(
-                      onHorizontalDragUpdate: (details) =>
-                          _onDragUpdate(details, maxDrag),
-                      onHorizontalDragEnd: (details) =>
-                          _onDragEnd(details, maxDrag),
-                      child: Container(
-                        width: handleSize,
-                        height: handleSize,
-                        decoration: BoxDecoration(
-                          color: widget.handleColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.strokeBlack,
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.strokeBlack.withOpacity(0.2),
-                              offset: const Offset(1, 2),
-                              blurRadius: 3,
-                            ),
-                          ],
+                      ),
+                    )
+                  : Opacity(
+                      opacity: maxDrag > 0
+                          ? (1.0 - (_dragValue / maxDrag)).clamp(0.15, 1.0)
+                          : 1.0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 52.0,
+                          right: 20.0,
                         ),
-                        child: Icon(
-                          widget.icon,
-                          color: widget.iconColor,
-                          size: 22,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            widget.text,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            style: AppTypography.buttonText.copyWith(
+                              color: widget.textColor,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14.5,
+                              letterSpacing: 0.4,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
             ),
-          ),
-        );
-      },
+
+            // Draggable handle
+            if (!widget.isLoading)
+              Positioned(
+                left: 6 + _dragValue,
+                child: GestureDetector(
+                  onHorizontalDragUpdate: (details) =>
+                      _onDragUpdate(details, _getMaxDrag(handleSize)),
+                  onHorizontalDragEnd: (details) =>
+                      _onDragEnd(details, _getMaxDrag(handleSize)),
+                  child: Container(
+                    width: handleSize,
+                    height: handleSize,
+                    decoration: BoxDecoration(
+                      color: widget.handleColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.strokeBlack.withOpacity(0.2),
+                          offset: const Offset(1, 2),
+                          blurRadius: 3,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      widget.icon,
+                      color: widget.iconColor,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

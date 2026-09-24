@@ -164,8 +164,8 @@ class CallApiRepository implements ICallRepository {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined') {
-        validStatus = 'rejected';
+      } else if (validStatus == 'declined' || validStatus == 'rejected') {
+        validStatus = 'reject';
       }
       final response = await _apiService.post(
         ApiConstants.updateCallStatus(callId),
@@ -185,8 +185,7 @@ class CallApiRepository implements ICallRepository {
   Future<Map<String, dynamic>> getCallStatus({
     required int callId,
   }) async {
-    // No-op: API does not support empty-status polling.
-    // Call transitions are managed on demand via explicit accept/reject/end events.
+    // Backend endpoint calls/<id>/status/ is POST only.
     return {'success': true};
   }
 }

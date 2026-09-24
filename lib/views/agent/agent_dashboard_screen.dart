@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
 import '../../core/theme/app_theme.dart';
-import '../../data/models/agent_rating_model.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../../data/repositories/auth_api_repository.dart';
 import '../../viewmodels/agent_dashboard_view_model.dart';
 import '../call/audio_call_screen.dart';
@@ -27,29 +27,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
   late final TextEditingController _bioController;
   bool _isAcceptingCall = false;
 
-  final List<String> _professionsList = [
-    'Friendly Chat, Emotional Support',
-    'Relationship & Dating Advice',
-    'Life Coaching & Motivation',
-    'Software Engineer',
-    'Doctor',
-    'Lawyer',
-    'Writer',
-    'Chef',
-    'Photographer',
-    'Marketing Specialist',
-    'Journalist',
-    'Pilot',
-  ];
 
-  List<String> get _effectiveProfessionsList {
-    final list = List<String>.from(_professionsList);
-    if (_viewModel.selectedProfession.trim().isNotEmpty &&
-        !list.contains(_viewModel.selectedProfession.trim())) {
-      list.insert(0, _viewModel.selectedProfession.trim());
-    }
-    return list;
-  }
 
   @override
   void initState() {
@@ -251,298 +229,10 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
               );
             },
           ),
-
-          // Full-Screen Incoming Caller Overlay (Triggered by FCM Notification)
-          _buildIncomingCallFullScreenOverlay(),
         ],
       ),
     );
   }
-
-  // Full-Screen Incoming Caller Overlay Widget
-  Widget _buildIncomingCallFullScreenOverlay() {
-    return ListenableBuilder(
-      listenable: _viewModel,
-      builder: (context, _) {
-        if (!_viewModel.hasIncomingCall) return const SizedBox.shrink();
-
-        return Container(
-          color: Colors.black.withOpacity(0.88),
-          width: double.infinity,
-          height: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Top Live Incoming Call Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF4D6D),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white, width: 2.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFF4D6D).withOpacity(0.5),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.phone_in_talk_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'INCOMING AUDIO CALL 🔔',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 12,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Center: Caller Profile & Topic
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Concentric Ring Glowing Avatar
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFFFFD1E3),
-                        border: Border.all(color: Colors.white, width: 3.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFFB7D5).withOpacity(0.4),
-                            blurRadius: 28,
-                            spreadRadius: 8,
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text('🎧', style: TextStyle(fontSize: 52)),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Caller Name
-                    Text(
-                      _viewModel.callerName,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Topic / Category badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentLavender,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 1.8,
-                        ),
-                        boxShadow: AppTheme.neoShadow(
-                          offset: const Offset(2, 2),
-                        ),
-                      ),
-                      child: Text(
-                        _viewModel.callTopic,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textBlack,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Earning Rate Notice
-                    Text(
-                      'Rate: ${_viewModel.selectedRate} Coins / sec',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF06D6A0),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Bottom Action Buttons: Decline (Red) & Accept (Green)
-                Row(
-                  children: [
-                    // Decline Call Button
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () async {
-                          await _viewModel.declineCall();
-                        },
-                        child: Container(
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEF476F),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(color: Colors.white, width: 2.2),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFEF476F).withOpacity(0.4),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.call_end_rounded,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Decline',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-
-                    // Accept Call Button
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _isAcceptingCall
-                            ? null
-                            : () async {
-                                setState(() {
-                                  _isAcceptingCall = true;
-                                });
-                                try {
-                                  final callModel = await _viewModel
-                                      .acceptCall();
-                                  if (callModel != null && mounted) {
-                                    await AudioCallScreen.start(
-                                      context,
-                                      callModel,
-                                    );
-                                    if (mounted) {
-                                      _viewModel.refresh();
-                                    }
-                                  }
-                                } finally {
-                                  if (mounted) {
-                                    setState(() {
-                                      _isAcceptingCall = false;
-                                    });
-                                  }
-                                }
-                              },
-                        child: Container(
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF06D6A0),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(color: Colors.white, width: 2.2),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF06D6A0).withOpacity(0.5),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: _isAcceptingCall
-                              ? const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      'Connecting...',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.call_rounded,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Accept',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   // Top App Bar: GABBY TALK AGENT + DUTY TOGGLE
   Widget _buildAgentTopBar() {
     return Padding(
@@ -550,37 +240,31 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Brand Logo: GabbyTalk AGENT
+          // Brand Logo: GabbyTalk [AGENT]
           Row(
             children: [
               RichText(
-                text: TextSpan(
-                  style: AppTypography.brandLogo.copyWith(
-                    fontSize: 24,
+                text: const TextSpan(
+                  style: TextStyle(
+                    fontSize: 22,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
+                    fontFamily: 'Roboto',
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: 'Gabby',
-                      style: TextStyle(color: Color(0xFF0F3064)),
+                      style: TextStyle(color: CartoonColors.primary),
                     ),
                     TextSpan(
-                      text: 'Talk ',
-                      style: TextStyle(color: Color(0xFF00A79D)),
+                      text: 'Talk',
+                      style: TextStyle(color: Color(0xFF00C4B4)),
                     ),
                   ],
                 ),
               ),
-              const Text(
-                'AGENT',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                  color: Color(0xFFFF8DA1), // Pink highlight
-                ),
-              ),
+              const SizedBox(width: 6),
+              CartoonBadge.agent(),
             ],
           ),
 
@@ -590,15 +274,15 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
               GestureDetector(
                 onTap: () => _viewModel.refresh(),
                 child: Container(
-                  padding: const EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: AppColors.cardWhite,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppColors.strokeBlack,
-                      width: 1.8,
+                      width: 2.5,
                     ),
-                    boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
+                    boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
                   ),
                   child: const Icon(
                     Icons.refresh_rounded,
@@ -614,26 +298,26 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   opacity: _viewModel.isTogglingDuty ? 0.6 : 1.0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 7,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: AppColors.strokeBlack,
-                        width: 1.8,
+                        width: 2.5,
                       ),
-                      boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
+                      boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          width: 8,
-                          height: 8,
+                          width: 9,
+                          height: 9,
                           decoration: BoxDecoration(
                             color: _viewModel.isDutyOn
-                                ? const Color(0xFF22C55E)
+                                ? AppColors.successGreen
                                 : AppColors.errorRed,
                             shape: BoxShape.circle,
                           ),
@@ -644,6 +328,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w900,
+                            letterSpacing: 0.4,
                             color: AppColors.textBlack,
                           ),
                         ),
@@ -659,7 +344,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
     );
   }
 
-  // Shared Agent Profile Card (Lavender)
+  // Shared Agent Profile Card (Soft Lavender #E8EBFD)
   Widget _buildAgentProfileCard() {
     return GestureDetector(
       onTap: () {
@@ -671,12 +356,12 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: AppColors.accentLavender,
+          color: const Color(0xFFE8EBFD), // Soft Lavender
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-          boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+          border: Border.all(color: AppColors.strokeBlack, width: 3.0),
+          boxShadow: AppTheme.neoShadow(offset: const Offset(4.0, 4.0)),
         ),
         child: Column(
           children: [
@@ -685,14 +370,14 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
               children: [
                 // Avatar with Profile Image or Headset Icon
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFCE8),
+                    color: const Color(0xFFFFF3C4), // Light Yellow
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppColors.strokeBlack,
-                      width: 1.8,
+                      width: 2.5,
                     ),
                   ),
                   child: ClipOval(
@@ -705,13 +390,13 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => const Icon(
                               Icons.headset_mic_rounded,
-                              size: 26,
+                              size: 28,
                               color: AppColors.strokeBlack,
                             ),
                           )
                         : const Icon(
                             Icons.headset_mic_rounded,
-                            size: 26,
+                            size: 28,
                             color: AppColors.strokeBlack,
                           ),
                   ),
@@ -725,41 +410,46 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                     children: [
                       Row(
                         children: [
-                          Text(
-                            _viewModel.agentName,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                              color: AppColors.textBlack,
+                          Flexible(
+                            child: Text(
+                              _viewModel.agentName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.3,
+                                color: AppColors.textBlack,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5),
                           const Icon(
-                            Icons.check_circle_rounded,
-                            size: 16,
-                            color: AppColors.strokeBlack,
+                            Icons.verified_rounded,
+                            size: 18,
+                            color: Color(0xFF2563EB), // Verified check
                           ),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 1.5,
+                              horizontal: 7,
+                              vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.cardWhite,
+                              color: const Color(0xFFFFF3C4), // Light Yellow PRO pill
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: AppColors.strokeBlack,
-                                width: 1.4,
+                                width: 1.8,
                               ),
                             ),
                             child: const Text(
                               'PRO',
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: 9.5,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 0.5,
+                                color: AppColors.textBlack,
                               ),
                             ),
                           ),
@@ -770,7 +460,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                         _viewModel.profession,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           color: AppColors.textBlack.withOpacity(0.85),
                         ),
                       ),
@@ -778,23 +468,21 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   ),
                 ),
 
-                // Catchy Neo Rating Badge (Yellow Amber Glow)
+                // Catchy Neo Rating Badge (Yellow Amber #FFF3C4)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 11,
+                    horizontal: 10,
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(
-                      0xFFFFDE59,
-                    ), // Rich golden sunshine yellow
+                    color: const Color(0xFFFFF3C4), // Light Yellow
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: AppColors.strokeBlack,
                       width: 2.0,
                     ),
                     boxShadow: AppTheme.neoShadow(
-                      offset: const Offset(2.2, 2.2),
+                      offset: const Offset(2.0, 2.0),
                     ),
                   ),
                   child: Row(
@@ -802,8 +490,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                     children: [
                       const Icon(
                         Icons.star_rounded,
-                        size: 18,
-                        color: AppColors.strokeBlack,
+                        size: 16,
+                        color: Color(0xFFE67E22),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -832,16 +520,16 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                 ),
               ],
             ),
+            const SizedBox(height: 14),
+
+            // Solid Charcoal Divider
+            Container(
+              height: 1.5,
+              color: AppColors.strokeBlack.withOpacity(0.2),
+            ),
             const SizedBox(height: 12),
 
-            // Thin Divider
-            Container(
-              height: 1.2,
-              color: AppColors.strokeBlack.withOpacity(0.25),
-            ),
-            const SizedBox(height: 10),
-
-            // 3 Metric Counters
+            // 3-Column Metric Counters
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -850,32 +538,32 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   '${_viewModel.todayEarned} 🪙',
                 ),
                 Container(
-                  height: 24,
-                  width: 1.2,
-                  color: AppColors.strokeBlack.withOpacity(0.25),
+                  height: 26,
+                  width: 1.5,
+                  color: AppColors.strokeBlack.withOpacity(0.2),
                 ),
                 _buildMetricColumn(
                   'TOTAL CALLS',
                   '${_viewModel.totalCalls} 📞',
                 ),
                 Container(
-                  height: 24,
-                  width: 1.2,
-                  color: AppColors.strokeBlack.withOpacity(0.25),
+                  height: 26,
+                  width: 1.5,
+                  color: AppColors.strokeBlack.withOpacity(0.2),
                 ),
                 _buildMetricColumn('DUTY TIME', '${_viewModel.dutyTime} ⏱️'),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
-            // Catchy View Profile & Reviews Action Banner
+            // View Profile & Caller Reviews Pill Button
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFCE8),
+                color: const Color(0xFFFFF3C4), // Light Yellow
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.strokeBlack, width: 1.6),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
+                border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+                boxShadow: AppTheme.neoShadow(offset: const Offset(2.0, 2.0)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -884,31 +572,25 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   const Icon(
                     Icons.stars_rounded,
                     size: 15,
-                    color: Color(0xFFFF9F1C),
+                    color: Color(0xFFE67E22),
                   ),
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
                       _viewModel.ratingData != null &&
                               _viewModel.ratingData!.totalReviews > 0
-                          ? '⭐ VIEW ${_viewModel.rating.toStringAsFixed(1)} RATING & ${_viewModel.ratingData!.totalReviews} REVIEWS'
-                          : '⭐ VIEW PROFILE & CALLER REVIEWS',
+                          ? '⭐ VIEW ${_viewModel.rating.toStringAsFixed(1)} RATING & ${_viewModel.ratingData!.totalReviews} REVIEWS →'
+                          : '⭐ VIEW PROFILE & CALLER REVIEWS →',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 0.4,
+                        letterSpacing: 0.3,
                         color: AppColors.textBlack,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 13,
-                    color: AppColors.strokeBlack,
                   ),
                 ],
               ),
@@ -958,7 +640,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
           left: 20,
           right: 20,
           top: 4,
-          bottom: 100,
+          bottom: 130,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1398,7 +1080,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
           left: 20,
           right: 20,
           top: 4,
-          bottom: 100,
+          bottom: 130,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1481,64 +1163,63 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   ),
                   const SizedBox(height: 18),
 
-                  // SERVICE CATEGORY & PROFESSION
+                  // SERVICE CATEGORY & PROFESSION (VIEW ONLY)
                   const Text(
-                    'SERVICE CATEGORY & PROFESSION',
+                    'SERVICE PROFESSION',
                     style: AppTypography.labelUppercase,
                   ),
                   const SizedBox(height: 8),
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 4,
+                      vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
+                      color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: AppColors.strokeBlack,
                         width: 2.0,
                       ),
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: Builder(
-                        builder: (context) {
-                          final professions = _effectiveProfessionsList;
-                          final currentValue =
-                              professions.contains(
-                                _viewModel.selectedProfession,
-                              )
-                              ? _viewModel.selectedProfession
-                              : (professions.isNotEmpty
-                                    ? professions.first
-                                    : null);
-
-                          return DropdownButton<String>(
-                            value: currentValue,
-                            isExpanded: true,
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: AppColors.strokeBlack,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.work_outline_rounded,
+                          size: 20,
+                          color: AppColors.textBlack,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _viewModel.profession.isNotEmpty ? _viewModel.profession : 'General',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 15,
+                              color: AppColors.textBlack,
                             ),
-                            items: professions.map((String p) {
-                              return DropdownMenuItem<String>(
-                                value: p,
-                                child: Text(
-                                  p,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 15,
-                                    color: AppColors.textBlack,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (String? val) {
-                              if (val != null) _viewModel.setProfession(val);
-                            },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE2E8F0),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'Assigned',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -1812,7 +1493,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
           left: 20,
           right: 20,
           top: 4,
-          bottom: 100,
+          bottom: 130,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

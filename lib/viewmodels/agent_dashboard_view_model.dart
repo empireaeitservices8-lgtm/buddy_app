@@ -8,6 +8,7 @@ import '../core/network/api_service.dart';
 import '../core/network/token_manager.dart';
 import '../core/services/agora_service.dart';
 import '../core/services/fcm_service.dart';
+import '../core/services/incoming_call_manager.dart';
 import '../data/models/agent_dashboard_model.dart';
 import '../data/models/agent_rating_model.dart';
 import '../data/models/call_model.dart';
@@ -63,7 +64,7 @@ class AgentDashboardViewModel extends BaseViewModel {
   // Agent Profile Stats
   String _agentName = 'Listener';
   // ignore: unused_field
-  String _profession = 'Friendly Chat, Emotional Support';
+  String _profession = 'General';
   int _selectedRate = 5; // 5, 10, 15
   int _todayEarned = 0;
   int _totalCalls = 0;
@@ -72,13 +73,14 @@ class AgentDashboardViewModel extends BaseViewModel {
 
   // Duty Form Configuration
   String _displayName = 'Listener';
-  String _selectedProfession = 'Friendly Chat, Emotional Support';
+  String _selectedProfession = 'General';
   String _languages = 'English, Spanish';
   String _bio = '';
 
   // Active incoming call
   bool _hasIncomingCall = false;
   IncomingCallData? _incomingCallData;
+  Timer? _incomingCallPollTimer;
   StreamSubscription? _fcmCallSubscription;
   StreamSubscription? _fcmTapSubscription;
   StreamSubscription? _fcmNativeSubscription;
@@ -203,8 +205,8 @@ class AgentDashboardViewModel extends BaseViewModel {
       await Future.wait([
         fetchAgentProfile(),
         fetchDashboardData(),
-        fetchAgentRating(),
       ]);
+      await fetchAgentRating();
       // Check if the app was launched directly from an incoming call notification
       await checkPendingFcmCall();
     } finally {
@@ -219,8 +221,8 @@ class AgentDashboardViewModel extends BaseViewModel {
     await Future.wait([
       fetchAgentProfile(),
       fetchDashboardData(silent: true),
-      fetchAgentRating(),
     ]);
+    await fetchAgentRating();
   }
 
   /// Checks for any pending incoming call from FCM background/notification taps
@@ -444,6 +446,7 @@ class AgentDashboardViewModel extends BaseViewModel {
           debugPrint(
             '📞 [AgentDashboard] Incoming call received via FCM foreground: ${_incomingCallData!.callerName} (ID: ${_incomingCallData!.callId}, Channel: ${_incomingCallData!.channelName})',
           );
+          _startIncomingCallVerification(parsed);
           notifyListenersSafely();
         }
       }
@@ -465,6 +468,7 @@ class AgentDashboardViewModel extends BaseViewModel {
           debugPrint(
             '📞 [AgentDashboard] Notification tap → incoming call from: ${_incomingCallData!.callerName} (ID: ${_incomingCallData!.callId})',
           );
+          _startIncomingCallVerification(parsed);
           notifyListenersSafely();
         }
       }
@@ -485,6 +489,7 @@ class AgentDashboardViewModel extends BaseViewModel {
           debugPrint(
             '📞 [AgentDashboard] Native Android Intent → incoming call from: ${_incomingCallData!.callerName} (ID: ${_incomingCallData!.callId})',
           );
+          _startIncomingCallVerification(parsed);
           notifyListenersSafely();
         }
       }
@@ -494,6 +499,85 @@ class AgentDashboardViewModel extends BaseViewModel {
     _fcmTokenSubscription = FcmService.onTokenRefreshStream.listen((newToken) {
       debugPrint('🔄 [AgentDashboard] New FCM token received, syncing to backend: $newToken');
       syncFcmTokenToBackend(newToken);
+    });
+  }
+
+  void _startIncomingCallVerification(IncomingCallData callData) {
+    _incomingCallPollTimer?.cancel();
+    int elapsedMs = 0;
+    _incomingCallPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
+      elapsedMs += 1500;
+      if (!_hasIncomingCall || _incomingCallData == null || _incomingCallData?.callId != callData.callId) {
+        timer.cancel();
+        _incomingCallPollTimer = null;
+        return;
+      }
+      if (elapsedMs >= 45000) {
+        timer.cancel();
+        _incomingCallPollTimer = null;
+        dismissIncomingCall(reason: 'Incoming call timed out after 45s');
+        return;
+      }
+
+      // Check backend to verify if caller cancelled or call was ended
+      try {
+        await _loadAuthToken();
+        final options = _authToken != null && _authToken!.isNotEmpty
+            ? Options(headers: {'Authorization': 'Bearer $_authToken'})
+            : null;
+
+        final response = await _apiService.get(
+          ApiConstants.agentDashboard,
+          options: options,
+          requiresAuth: true,
+        );
+
+        if (response.isSuccess && response.rawData is Map) {
+          final raw = response.rawData as Map<String, dynamic>;
+          final dataJson = raw['data'] is Map<String, dynamic>
+              ? raw['data'] as Map<String, dynamic>
+              : raw;
+
+          Map<String, dynamic>? activeCallMap;
+          for (final key in [
+            'incoming_call',
+            'active_call',
+            'pending_call',
+            'call',
+            'current_call',
+            'call_request',
+            'latest_call',
+          ]) {
+            if (dataJson[key] is Map<String, dynamic>) {
+              activeCallMap = dataJson[key] as Map<String, dynamic>;
+              break;
+            } else if (dataJson[key] is Map) {
+              activeCallMap = Map<String, dynamic>.from(dataJson[key] as Map);
+              break;
+            }
+          }
+
+          if (activeCallMap != null) {
+            final activeCallId = activeCallMap['id'] ?? activeCallMap['call_id'];
+            final status = activeCallMap['status']?.toString().toLowerCase() ?? '';
+            final isCancelled = status == 'cancelled' ||
+                status == 'cancel' ||
+                status == 'rejected' ||
+                status == 'reject' ||
+                status == 'completed' ||
+                status == 'ended' ||
+                status == 'missed';
+
+            if (isCancelled || (activeCallId != null && activeCallId.toString() != callData.callId.toString())) {
+              debugPrint('📞 [AgentDashboard] Call #${callData.callId} is no longer active on server ($status). Dismissing incoming call.');
+              timer.cancel();
+              _incomingCallPollTimer = null;
+              dismissIncomingCall(reason: 'Caller cancelled or call ended');
+              return;
+            }
+          }
+        }
+      } catch (_) {}
     });
   }
 
@@ -584,15 +668,21 @@ class AgentDashboardViewModel extends BaseViewModel {
           : null;
 
       final dynamic agentId = targetAgentId ??
-          _agentProfile?.id ??
-          _agentProfile?.agentId ??
           _agentProfile?.userId ??
-          _authRepository.currentUser?.id;
+          _dashboardData?.profile?.userId ??
+          _agentProfile?.agentId ??
+          _dashboardData?.profile?.agentId ??
+          _agentProfile?.id ??
+          _dashboardData?.profile?.id;
 
-      final Map<String, dynamic> queryParams = {};
-      if (agentId != null && agentId.toString().isNotEmpty) {
-        queryParams['agent_id'] = agentId;
+      if (agentId == null || agentId.toString().isEmpty) {
+        debugPrint('⚠️ [AgentDashboard] Skipping fetchAgentRating: Agent user_id not yet loaded.');
+        return;
       }
+
+      final Map<String, dynamic> queryParams = {
+        'agent_id': agentId,
+      };
 
       debugPrint('🌟 [AgentDashboard] Fetching ratings from ${ApiConstants.agentRating} with query: $queryParams');
 
@@ -793,6 +883,7 @@ class AgentDashboardViewModel extends BaseViewModel {
               if (parsed.isValid) {
                 _incomingCallData = parsed;
                 _hasIncomingCall = true;
+                IncomingCallManager.instance.triggerIncomingCall(parsed);
                 debugPrint(
                   '📞 [AgentDashboard] Active incoming call detected from dashboard sync: ${_incomingCallData!.callerName} (ID: ${_incomingCallData!.callId}, Channel: ${_incomingCallData!.channelName})',
                 );
@@ -811,6 +902,7 @@ class AgentDashboardViewModel extends BaseViewModel {
           final c = _dashboardData!.calls;
 
           if (p != null) {
+            _agentProfile = p;
             final effectiveName =
                 (p.displayName != null && p.displayName!.isNotEmpty)
                 ? p.displayName!
@@ -821,7 +913,10 @@ class AgentDashboardViewModel extends BaseViewModel {
                             : 'Listener'));
             _agentName = effectiveName;
             _displayName = effectiveName;
-            if (p.profession != null && p.profession!.isNotEmpty) {
+            if (p.professionName != null && p.professionName!.isNotEmpty) {
+              _profession = p.professionName!;
+              _selectedProfession = p.professionName!;
+            } else if (p.profession != null && p.profession!.isNotEmpty) {
               _profession = p.profession!;
               _selectedProfession = p.profession!;
             }
@@ -993,6 +1088,8 @@ class AgentDashboardViewModel extends BaseViewModel {
       isOutgoing: false,
     );
 
+    _incomingCallPollTimer?.cancel();
+    _incomingCallPollTimer = null;
     _hasIncomingCall = false;
     _incomingCallData = null;
     FcmService.cancelCallNotification(callData.callId);
@@ -1002,6 +1099,8 @@ class AgentDashboardViewModel extends BaseViewModel {
 
   /// Dismisses an incoming ringing call when cancelled by caller or rejected
   void dismissIncomingCall({String? reason}) {
+    _incomingCallPollTimer?.cancel();
+    _incomingCallPollTimer = null;
     final callId = _incomingCallData?.callId;
     if (callId != null) {
       FcmService.cancelCallNotification(callId);
@@ -1012,18 +1111,20 @@ class AgentDashboardViewModel extends BaseViewModel {
     notifyListenersSafely();
   }
 
-  /// Declines the incoming call, notifies backend of 'rejected' status, and dismisses the alert.
+  /// Declines the incoming call, notifies backend of 'reject' status, and dismisses the alert.
   Future<void> declineCall() async {
-    final callId = _incomingCallData?.callId;
-    if (callId != null) {
-      FcmService.cancelCallNotification(callId);
+    _incomingCallPollTimer?.cancel();
+    _incomingCallPollTimer = null;
+    final targetCallId = _incomingCallData?.callId;
+    if (targetCallId != null) {
+      FcmService.cancelCallNotification(targetCallId);
     }
     _hasIncomingCall = false;
     _incomingCallData = null;
     notifyListenersSafely();
 
-    if (callId != null && callId > 0) {
-      await _updateCallStatusOnServer(callId: callId, status: 'rejected');
+    if (targetCallId != null && targetCallId > 0) {
+      await _updateCallStatusOnServer(callId: targetCallId, status: 'reject');
     }
   }
 
@@ -1040,8 +1141,8 @@ class AgentDashboardViewModel extends BaseViewModel {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined') {
-        validStatus = 'rejected';
+      } else if (validStatus == 'declined' || validStatus == 'rejected') {
+        validStatus = 'reject';
       }
 
       final response = await _apiService.post(
@@ -1051,7 +1152,7 @@ class AgentDashboardViewModel extends BaseViewModel {
         requiresAuth: true,
       );
       debugPrint(
-        '📞 [AgentDashboard] Call status updated: call_id=$callId, status=$validStatus, res=${response.rawData}',
+        '📞 [AgentDashboard] Call status updated: endpoint=${ApiConstants.updateCallStatus(callId)}, status=$validStatus, res=${response.rawData}',
       );
       if (response.isSuccess && response.rawData is Map) {
         return response.rawData as Map<String, dynamic>;
@@ -1247,6 +1348,7 @@ class AgentDashboardViewModel extends BaseViewModel {
 
   @override
   void dispose() {
+    _incomingCallPollTimer?.cancel();
     _fcmCallSubscription?.cancel();
     _fcmTapSubscription?.cancel();
     _fcmNativeSubscription?.cancel();

@@ -445,7 +445,7 @@ class _CoinsStoreScreenState extends State<CoinsStoreScreen> {
               left: 20,
               right: 20,
               top: 10,
-              bottom: widget.isTab ? 95 : 24,
+              bottom: widget.isTab ? 130 : 32,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

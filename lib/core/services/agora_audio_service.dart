@@ -28,6 +28,7 @@ class AgoraAudioService implements IAgoraAudioService {
   RtcEngine? _engine;
   bool _isInitialized = false;
   bool _isPlayingRingtone = false;
+  bool _shouldPlayRingtone = false;
   static const int _ringtoneSoundId = 201;
   static const int _beepSoundId = 202;
 
@@ -80,7 +81,7 @@ class AgoraAudioService implements IAgoraAudioService {
           onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
             debugPrint('[AgoraAudioService] onJoinChannelSuccess: ${connection.channelId}, uid: ${connection.localUid}');
             try {
-              _engine?.setEnableSpeakerphone(true);
+              _engine?.setEnableSpeakerphone(false);
             } catch (_) {}
             if (!_joinSuccessController.isClosed) {
               _joinSuccessController.add(true);
@@ -132,7 +133,7 @@ class AgoraAudioService implements IAgoraAudioService {
         await _engine!.muteAllRemoteAudioStreams(false);
       } catch (_) {}
       try {
-        await _engine!.setDefaultAudioRouteToSpeakerphone(true);
+        await _engine!.setDefaultAudioRouteToSpeakerphone(false);
       } catch (_) {}
       try {
         await _engine!.setAudioProfile(
@@ -152,13 +153,18 @@ class AgoraAudioService implements IAgoraAudioService {
 
   @override
   Future<void> playRingtone() async {
+    _shouldPlayRingtone = true;
     if (_isPlayingRingtone) return;
     try {
       final ringtonePath = await CallSoundHelper.getRingtonePath();
+      if (!_shouldPlayRingtone) {
+        debugPrint('📞 [AgoraAudioService] Ringtone cancelled before playback began');
+        return;
+      }
       if (ringtonePath == null || ringtonePath.isEmpty) return;
 
       _isPlayingRingtone = true;
-      if (_engine != null) {
+      if (_engine != null && _shouldPlayRingtone) {
         await _engine!.stopAllEffects();
         await _engine!.playEffect(
           soundId: _ringtoneSoundId,
@@ -172,9 +178,10 @@ class AgoraAudioService implements IAgoraAudioService {
       }
     } catch (e) {
       debugPrint('⚠️ [AgoraAudioService] playRingtone error: $e');
+      if (!_shouldPlayRingtone) return;
       try {
         final ringtonePath = await CallSoundHelper.getRingtonePath();
-        if (ringtonePath != null && _engine != null) {
+        if (ringtonePath != null && _engine != null && _shouldPlayRingtone) {
           await _engine!.startAudioMixing(
             filePath: ringtonePath,
             loopback: true,
@@ -187,15 +194,20 @@ class AgoraAudioService implements IAgoraAudioService {
 
   @override
   Future<void> stopRingtone() async {
-    if (!_isPlayingRingtone) return;
+    _shouldPlayRingtone = false;
     _isPlayingRingtone = false;
     try {
       if (_engine != null) {
-        await _engine!.stopEffect(_ringtoneSoundId);
-        await _engine!.stopAllEffects();
+        try {
+          await _engine!.stopEffect(_ringtoneSoundId);
+        } catch (_) {}
+        try {
+          await _engine!.stopAllEffects();
+        } catch (_) {}
         try {
           await _engine?.stopAudioMixing();
         } catch (_) {}
+        debugPrint('📞 [AgoraAudioService] Ringtone stopped completely');
       }
     } catch (e) {
       debugPrint('⚠️ [AgoraAudioService] stopRingtone error: $e');
@@ -245,7 +257,7 @@ class AgoraAudioService implements IAgoraAudioService {
         await _engine!.muteAllRemoteAudioStreams(false);
       } catch (_) {}
       try {
-        await _engine!.setDefaultAudioRouteToSpeakerphone(true);
+        await _engine!.setDefaultAudioRouteToSpeakerphone(false);
       } catch (_) {}
 
       const options = ChannelMediaOptions(

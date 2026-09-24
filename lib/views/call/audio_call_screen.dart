@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/app_colors.dart';
 import '../../data/models/call_model.dart';
 import '../../viewmodels/call_view_model.dart';
 import '../home/widgets/agent_rating_bottom_sheet.dart';
@@ -51,10 +50,10 @@ class _AudioCallScreenState extends State<AudioCallScreen>
     super.initState();
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1600),
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+    _pulseAnimation = Tween<double>(begin: 155.0, end: 185.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
@@ -71,8 +70,12 @@ class _AudioCallScreenState extends State<AudioCallScreen>
       builder: (context, vm, child) {
         final call = vm.callModel ?? widget.callModel;
         final targetName = call.isOutgoing
-            ? call.receiverName
-            : call.callerName;
+            ? (call.receiverName.isNotEmpty ? call.receiverName : 'Tester')
+            : (call.callerName.isNotEmpty ? call.callerName : 'Caller');
+
+        final initialLetter = targetName.trim().isNotEmpty
+            ? targetName.trim()[0].toUpperCase()
+            : 'T';
 
         // Auto-close on ended
         if (call.status == CallStatus.ended && !_hasPopped) {
@@ -84,442 +87,439 @@ class _AudioCallScreenState extends State<AudioCallScreen>
           });
         }
 
+        final statusBadgeText = call.status == CallStatus.connected
+            ? 'ON CALL'
+            : (call.status == CallStatus.calling
+                ? 'CALLING...'
+                : (call.status == CallStatus.ringing ? 'RINGING...' : 'ON CALL'));
+
         return Scaffold(
-          backgroundColor: const Color(0xFF131316),
+          backgroundColor: const Color(0xFFF9F8F3), // Soft Cream Canvas
           body: SafeArea(
             child: Stack(
               children: [
-                // Background Soft Ambient Glow
+                // Top-Right Pastel Lime Blob
                 Positioned(
-                  top: -80,
-                  right: -60,
+                  top: -30,
+                  right: -30,
                   child: Container(
-                    width: 250,
-                    height: 250,
-                    decoration: BoxDecoration(
-                      // ignore: deprecated_member_use
-                      color: const Color(0xFF6366F1).withOpacity(0.18),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 60,
-                  left: -50,
-                  child: Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF06D6A0).withOpacity(0.12),
+                    width: 260,
+                    height: 260,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFD4F19C), // Pastel Lime
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
 
-                // Main Call Layout
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 16.0,
+                // Middle-Left Soft Beige Blob
+                Positioned(
+                  bottom: 120,
+                  left: -50,
+                  child: Container(
+                    width: 220,
+                    height: 220,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEFE2C6), // Soft Beige Blob
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      // Top Bar with Minimize / Secure Badge
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.of(context).maybePop(),
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: Colors.white24,
-                                width: 1.2,
-                              ),
-                            ),
-                            child: const Row(
+                ),
+
+                // Main Content Layer
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final avatarSize = (constraints.maxHeight * 0.17).clamp(80.0, 135.0);
+                    final ringSize = avatarSize * 1.15;
+                    final pulseSize = _pulseAnimation.value.clamp(avatarSize * 1.15, avatarSize * 1.37);
+
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(
-                                  Icons.lock_outline_rounded,
-                                  color: Color(0xFF06D6A0),
-                                  size: 14,
+                                Column(
+                                  children: [
+                                    const SizedBox(height: 16),
+                                    // Header Bar: Gabby Talk Logo + Status Badge
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        RichText(
+                                          text: const TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: 'Gabby ',
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Color(0xFFFF8A9A), // Pink Accent
+                                                  fontFamily: 'Inter',
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: 'Talk',
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Color(0xFF00C4B4), // Teal Accent
+                                                  fontFamily: 'Inter',
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Status Pill Badge (ON CALL)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: const Color(0xFF1E2022),
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            statusBadgeText,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF1E2022),
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 5),
-                                Text(
-                                  'End-to-End Encrypted',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
+
+                                const SizedBox(height: 20),
+
+                                // Center Profile: Pulse Rings + Avatar
+                                Center(
+                                  child: AnimatedBuilder(
+                                    animation: _pulseAnimation,
+                                    builder: (context, child) {
+                                      return Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          // Outer Concentric Pulse Ring
+                                          Container(
+                                            width: pulseSize,
+                                            height: pulseSize,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE8EBFD)
+                                                  .withValues(alpha: 0.45),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          // Middle Ring
+                                          Container(
+                                            width: ringSize,
+                                            height: ringSize,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE8EBFD)
+                                                  .withValues(alpha: 0.65),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          // Main Cartoon Neubrutal Avatar
+                                          Container(
+                                            width: avatarSize,
+                                            height: avatarSize,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE8EBFD), // Soft Lavender Fill
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: const Color(0xFF1E2022),
+                                                width: 3.5,
+                                              ),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Color(0xFF1E2022),
+                                                  offset: Offset(0, 4),
+                                                  blurRadius: 0,
+                                                ),
+                                              ],
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              initialLetter,
+                                              style: TextStyle(
+                                                fontSize: avatarSize * 0.4,
+                                                fontWeight: FontWeight.w900,
+                                                color: const Color(0xFF1E2022),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ),
+
+                                const SizedBox(height: 18),
+
+                                // Caller Name & Verified Badges
+                                Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            targetName,
+                                            style: const TextStyle(
+                                              fontSize: 26,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF1E2022),
+                                              letterSpacing: -0.5,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        const Icon(
+                                          Icons.check_circle,
+                                          color: Color(0xFF38BDF8),
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: const Color(0xFF1E2022),
+                                              width: 1.8,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'PRO',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF1E2022),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    // Subtitle Tag
+                                    const Text(
+                                      'Friendly Chat · Emotional Support',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 12),
+
+                                    // Star Rating Pill
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFF3C4), // Light Yellow
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: const Color(0xFF1E2022),
+                                          width: 2,
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0xFF1E2022),
+                                            offset: Offset(2, 2),
+                                            blurRadius: 0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.star_rounded,
+                                            size: 18,
+                                            color: Color(0xFF1E2022),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            '5.0',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF1E2022),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    if (call.status == CallStatus.connected) ...[
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        vm.formattedDuration,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF00C4B4),
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Bottom Action Controls: Mute, End Call, Speaker
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 32.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      // Mute Button
+                                      GestureDetector(
+                                        onTap: vm.toggleMute,
+                                        child: Container(
+                                          width: 58,
+                                          height: 58,
+                                          decoration: BoxDecoration(
+                                            color: vm.isMuted
+                                                ? const Color(0xFFFFD1DC)
+                                                : Colors.white,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: const Color(0xFF1E2022),
+                                              width: 2.5,
+                                            ),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color(0xFF1E2022),
+                                                offset: Offset(2, 2),
+                                                blurRadius: 0,
+                                              ),
+                                            ],
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Icon(
+                                            vm.isMuted
+                                                ? Icons.mic_off_rounded
+                                                : Icons.mic_rounded,
+                                            color: const Color(0xFF1E2022),
+                                            size: 26,
+                                          ),
+                                        ),
+                                      ),
+
+                                      // End Call Button (Red Neubrutal)
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await vm.endCall();
+                                          if (mounted && Navigator.of(context).canPop()) {
+                                            Navigator.of(context).pop();
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 72,
+                                          height: 72,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFF5252), // Red Accent
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: const Color(0xFF1E2022),
+                                              width: 3.2,
+                                            ),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color(0xFF1E2022),
+                                                offset: Offset(3.5, 3.5),
+                                                blurRadius: 0,
+                                              ),
+                                            ],
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: const Icon(
+                                            Icons.call_end_rounded,
+                                            color: Colors.white,
+                                            size: 34,
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Speakerphone Button
+                                      GestureDetector(
+                                        onTap: vm.toggleSpeaker,
+                                        child: Container(
+                                          width: 58,
+                                          height: 58,
+                                          decoration: BoxDecoration(
+                                            color: vm.isSpeakerOn
+                                                ? const Color(0xFFD4F19C)
+                                                : Colors.white,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: const Color(0xFF1E2022),
+                                              width: 2.5,
+                                            ),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color(0xFF1E2022),
+                                                offset: Offset(2, 2),
+                                                blurRadius: 0,
+                                              ),
+                                            ],
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Icon(
+                                            vm.isSpeakerOn
+                                                ? Icons.volume_up_rounded
+                                                : Icons.volume_down_rounded,
+                                            color: const Color(0xFF1E2022),
+                                            size: 26,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 40),
-                        ],
-                      ),
-                      const Spacer(),
-
-                      // Animated Avatar with Pulse Rings
-                      AnimatedBuilder(
-                        animation: _pulseAnimation,
-                        builder: (context, child) {
-                          final isConnected =
-                              call.status == CallStatus.connected;
-                          final scale = isConnected
-                              ? _pulseAnimation.value
-                              : 1.0;
-
-                          return Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Pulse ring 2
-                              if (isConnected)
-                                Transform.scale(
-                                  scale: scale * 1.22,
-                                  child: Container(
-                                    width: 150,
-                                    height: 150,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: const Color(
-                                          0xFFB8C4FE,
-                                        ).withOpacity(0.2),
-                                        width: 2.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                              // Pulse ring 1
-                              if (isConnected)
-                                Transform.scale(
-                                  scale: scale * 1.1,
-                                  child: Container(
-                                    width: 140,
-                                    height: 140,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: const Color(
-                                        0xFFB8C4FE,
-                                      ).withOpacity(0.15),
-                                    ),
-                                  ),
-                                ),
-
-                              // Main Avatar Box
-                              Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: AppColors.accentLavender,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: AppColors.strokeBlack,
-                                    width: 3.0,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.4),
-                                      blurRadius: 18,
-                                      offset: const Offset(0, 8),
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.headset_mic_rounded,
-                                  size: 60,
-                                  color: AppColors.strokeBlack,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 28),
-
-                      // User Name
-                      Text(
-                        targetName,
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(height: 8),
-
-                      // Call Status & Duration
-                      _buildStatusIndicator(call, vm),
-                      const Spacer(),
-
-                      // Remote Muted Notice
-                      if (vm.isRemoteAudioMuted &&
-                          call.status == CallStatus.connected)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white10,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.mic_off,
-                                size: 14,
-                                color: Colors.orangeAccent,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Remote participant is muted',
-                                style: TextStyle(
-                                  color: Colors.orangeAccent,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      // Control Dock: Mute, Hang Up, Speaker (Cartoon Neo-Brutalist Dock)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 18,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(36),
-                          border: Border.all(
-                            color: Colors.white24,
-                            width: 2.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
-                              offset: const Offset(4, 4),
-                              blurRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            // Mute Button
-                            _buildControlButton(
-                              icon: vm.isMuted
-                                  ? Icons.mic_off_rounded
-                                  : Icons.mic_rounded,
-                              label: vm.isMuted ? 'Unmute' : 'Mute',
-                              isActive: vm.isMuted,
-                              activeColor: const Color(0xFFFFB8D2),
-                              onTap: vm.toggleMute,
-                            ),
-
-                            // End Call Button (Cartoon Red Pill with Hard Shadow)
-                            GestureDetector(
-                              onTap: () async {
-                                await vm.endCall();
-                                if (mounted && Navigator.of(context).canPop()) {
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              child: Container(
-                                width: 72,
-                                height: 72,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFF4D6D),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2.5,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.4),
-                                      offset: const Offset(3, 3),
-                                      blurRadius: 0,
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.call_end_rounded,
-                                  color: Colors.white,
-                                  size: 34,
-                                ),
-                              ),
-                            ),
-
-                            // Speakerphone Button
-                            _buildControlButton(
-                              icon: vm.isSpeakerOn
-                                  ? Icons.volume_up_rounded
-                                  : Icons.volume_off_rounded,
-                              label: vm.isSpeakerOn ? 'Speaker' : 'Earpiece',
-                              isActive: vm.isSpeakerOn,
-                              activeColor: const Color(0xFFC7D2FE),
-                              onTap: vm.toggleSpeaker,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildStatusIndicator(CallModel call, CallViewModel vm) {
-    switch (call.status) {
-      case CallStatus.calling:
-        return Text(
-          call.isOutgoing ? 'Calling...' : 'Connecting...',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFFFFD166),
-          ),
-        );
-      case CallStatus.ringing:
-        return Text(
-          call.isOutgoing ? 'Ringing...' : 'Connecting...',
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFFFFD166),
-          ),
-        );
-      case CallStatus.connected:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Color(0xFF06D6A0),
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              vm.formattedDuration,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF06D6A0),
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        );
-      case CallStatus.reconnecting:
-        return const Text(
-          'Reconnecting...',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFFFFB7D5),
-          ),
-        );
-      case CallStatus.ended:
-        return const Text(
-          'Call Ended',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Colors.white54,
-          ),
-        );
-      case CallStatus.error:
-        return Text(
-          vm.errorMessage ?? 'Connection Failed',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFFFF3366),
-          ),
-        );
-      case CallStatus.idle:
-      // ignore: unreachable_switch_default
-      default:
-        return const Text(
-          'Connecting to Agora RTC...',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white54,
-          ),
-        );
-    }
-  }
-
-  Widget _buildControlButton({
-    required IconData icon,
-    required String label,
-    required bool isActive,
-    required Color activeColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: isActive ? activeColor : const Color(0xFF2E2F35),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isActive ? AppColors.strokeBlack : Colors.white12,
-                width: 1.5,
-              ),
-            ),
-            child: Icon(
-              icon,
-              color: isActive ? AppColors.strokeBlack : Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

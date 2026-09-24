@@ -137,7 +137,9 @@ class UserProfile {
       lastName: lName,
       email: map['email']?.toString(),
       bio: map['bio']?.toString(),
-      profession: map['profession']?.toString(),
+      profession: map['profession_name']?.toString() ??
+          map['profession']?.toString() ??
+          map['conversation_category']?.toString(),
       location: map['location']?.toString(),
       language: map['language']?.toString(),
       age: map['age'] is int

@@ -109,28 +109,44 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
     });
 
     try {
+      final parsedUserId = int.tryParse(widget.agentId) ?? widget.agentId;
       final payload = {
+        'user_id': parsedUserId,
+        'agent_id': parsedUserId,
+        'agent_user_id': parsedUserId,
         'rating': _selectedRating,
         if (_selectedTags.isNotEmpty) 'tags': _selectedTags.toList(),
         if (_commentController.text.trim().isNotEmpty)
           'comment': _commentController.text.trim(),
+        if (widget.callId != null && widget.callId! > 0)
+          'call_id': widget.callId,
       };
 
+      debugPrint('⭐ [AgentRatingBottomSheet] Submitting rating payload with user_id=$parsedUserId: $payload');
+
+      // 1. Submit to agent/rating/ (main rating endpoint with user_id)
+      final res = await ApiService().post(
+        ApiConstants.submitRating,
+        data: payload,
+        requiresAuth: true,
+      );
+
+      // 2. Fallback to review endpoint if not handled by primary
       final targetId = widget.agentId.isNotEmpty
           ? widget.agentId
           : (widget.callId != null && widget.callId! > 0
               ? widget.callId.toString()
               : '');
 
-      if (targetId.isNotEmpty) {
+      if (!res.isSuccess && targetId.isNotEmpty) {
         await ApiService().post(
           ApiConstants.reviewCall(targetId),
           data: payload,
           requiresAuth: true,
         );
       }
-    } catch (_) {
-      // Graceful fallback if offline
+    } catch (e) {
+      debugPrint('⚠️ [AgentRatingBottomSheet] Rating submission note: $e');
     } finally {
       if (mounted) {
         setState(() {

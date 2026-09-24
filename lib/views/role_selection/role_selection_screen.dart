@@ -171,17 +171,20 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: GridView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                      child: LayoutBuilder(
+                        builder: (context, gridConstraints) {
+                          final ratio = (gridConstraints.maxWidth / (gridConstraints.maxHeight / 2))
+                              .clamp(0.85, 1.15);
+                          return GridView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               crossAxisSpacing: 14,
                               mainAxisSpacing: 14,
-                              childAspectRatio: 0.88,
+                              childAspectRatio: ratio,
                             ),
-                        itemCount: _categories.length,
-                        itemBuilder: (context, index) {
+                            itemCount: _categories.length,
+                            itemBuilder: (context, index) {
                           final item = _categories[index];
                           final isSelected = _selectedCategoryIndex == index;
 
@@ -279,9 +282,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                             ),
                           );
                         },
-                      ),
-                    ),
+                      );
+                    },
                   ),
+                ),
+              ),
 
                   // Subtext
                   Padding(

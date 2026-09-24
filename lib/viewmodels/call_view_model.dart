@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../core/constants/agora_constants.dart';
 import '../core/constants/api_constants.dart';
 import '../core/network/api_service.dart';
@@ -13,10 +12,11 @@ class CallViewModel extends BaseViewModel {
 
   CallModel? _callModel;
   bool _isMuted = false;
-  bool _isSpeakerOn = true;
+  bool _isSpeakerOn = false;
   bool _isRemoteAudioMuted = false;
   int _durationSeconds = 0;
   Timer? _durationTimer;
+  Timer? _callStatusPollTimer;
 
   StreamSubscription<bool>? _joinSub;
   StreamSubscription<int>? _userJoinedSub;
@@ -58,6 +58,8 @@ class CallViewModel extends BaseViewModel {
 
     _userJoinedSub = _audioService.onUserJoinedStream.listen((remoteUid) {
       _audioService.stopRingtone();
+      _callStatusPollTimer?.cancel();
+      _callStatusPollTimer = null;
       _wasConnected = true;
       _callModel = _callModel?.copyWith(status: CallStatus.connected);
       _startDurationTimer();
@@ -66,6 +68,8 @@ class CallViewModel extends BaseViewModel {
 
     _userOfflineSub = _audioService.onUserOfflineStream.listen((remoteUid) {
       _audioService.stopRingtone();
+      _callStatusPollTimer?.cancel();
+      _callStatusPollTimer = null;
       endCall(reason: 'Call Ended');
     });
 
@@ -76,6 +80,8 @@ class CallViewModel extends BaseViewModel {
 
     _errorSub = _audioService.onErrorStream.listen((errorMsg) {
       _audioService.stopRingtone();
+      _callStatusPollTimer?.cancel();
+      _callStatusPollTimer = null;
       setError(errorMsg);
       _callModel = _callModel?.copyWith(status: CallStatus.error);
       notifyListenersSafely();
@@ -88,8 +94,10 @@ class CallViewModel extends BaseViewModel {
       status: model.isOutgoing ? CallStatus.calling : CallStatus.ringing,
     );
     _isMuted = false;
-    _isSpeakerOn = true;
+    _isSpeakerOn = false;
     _durationSeconds = 0;
+    _callStatusPollTimer?.cancel();
+    _callStatusPollTimer = null;
     clearError();
     notifyListenersSafely();
 
@@ -111,8 +119,14 @@ class CallViewModel extends BaseViewModel {
     );
 
     if (success) {
+      if (_callModel?.status == CallStatus.ended) {
+        await _audioService.stopRingtone();
+        await _audioService.leaveChannel();
+        return;
+      }
       if (model.isOutgoing) {
         await _audioService.playRingtone();
+        _startOutgoingCallPolling(int.tryParse(model.callId));
       } else {
         _wasConnected = true;
         _callModel = _callModel?.copyWith(status: CallStatus.connected);
@@ -124,6 +138,26 @@ class CallViewModel extends BaseViewModel {
       setError('Could not connect to voice channel.');
       notifyListenersSafely();
     }
+  }
+
+  void _startOutgoingCallPolling(int? callId) {
+    _callStatusPollTimer?.cancel();
+    int ticks = 0;
+    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
+      ticks++;
+      if (_wasConnected || _callModel?.status == CallStatus.connected || _callModel?.status == CallStatus.ended) {
+        timer.cancel();
+        _callStatusPollTimer = null;
+        return;
+      }
+      if (ticks >= 30) {
+        timer.cancel();
+        _callStatusPollTimer = null;
+        await _audioService.stopRingtone();
+        endCall(reason: 'No response from recipient');
+        return;
+      }
+    });
   }
 
   /// Answers an incoming call
@@ -176,8 +210,11 @@ class CallViewModel extends BaseViewModel {
 
   /// Ends the voice call and cleans up resources
   Future<void> endCall({String? reason}) async {
+    _callStatusPollTimer?.cancel();
+    _callStatusPollTimer = null;
     _durationTimer?.cancel();
     _durationTimer = null;
+    await _audioService.stopRingtone();
     await _audioService.leaveChannel();
 
     final callIdStr = _callModel?.callId;
@@ -190,7 +227,7 @@ class CallViewModel extends BaseViewModel {
           data: {
             'status': wasConnected
                 ? 'completed'
-                : (_callModel?.isOutgoing == true ? 'cancelled' : 'rejected'),
+                : (_callModel?.isOutgoing == true ? 'cancelled' : 'reject'),
           },
           requiresAuth: true,
         );
@@ -205,6 +242,7 @@ class CallViewModel extends BaseViewModel {
 
   @override
   void dispose() {
+    _callStatusPollTimer?.cancel();
     _durationTimer?.cancel();
     _joinSub?.cancel();
     _userJoinedSub?.cancel();

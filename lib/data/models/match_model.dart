@@ -156,6 +156,7 @@ class ProfessionCategory {
 
 class MatchProfile {
   final String id;
+  final String? userId;
   final String name;
   final int age;
   final String location;
@@ -177,6 +178,7 @@ class MatchProfile {
 
   const MatchProfile({
     required this.id,
+    this.userId,
     required this.name,
     required this.age,
     required this.location,
@@ -243,9 +245,11 @@ class MatchProfile {
         ? json['category'] as Map<String, dynamic>
         : null;
 
-    final rawProfStr = (profObj?['name'] ??
+    final rawProfStr = (json['profession_name'] ??
+            profObj?['name'] ??
             catObj?['name'] ??
             json['profession'] ??
+            json['conversation_category'] ??
             json['category'])
         ?.toString()
         .trim();
@@ -253,9 +257,11 @@ class MatchProfile {
     final professionName =
         (rawProfStr != null && rawProfStr.isNotEmpty && rawProfStr.toLowerCase() != 'null')
             ? rawProfStr
-            : 'Listener';
+            : 'General';
 
-    final rawCatStr = (json['profession_category'] ??
+    final rawCatStr = (json['profession_name'] ??
+            json['profession_category'] ??
+            json['conversation_category'] ??
             catObj?['name'] ??
             profObj?['name'] ??
             catObj?['id'] ??
@@ -280,22 +286,19 @@ class MatchProfile {
         profObj?['id']?.toString() ?? catObj?['id']?.toString();
 
     final rawBio = json['bio']?.toString() ?? '';
-    final interestsList = json['interests'] is List
-        ? (json['interests'] as List).map((e) => e.toString()).toList()
-        : <String>[];
-
-    final effectiveBio = rawBio.isNotEmpty
-        ? rawBio
-        : (interestsList.isNotEmpty
-              ? 'Interests: ${interestsList.join(" • ")}'
-              : 'Verified professional listener available for calls ✨');
-
-    final language = json['language']?.toString();
-    final location =
-        json['location']?.toString() ??
-        (language != null && language.isNotEmpty
-            ? 'Language: $language'
-            : 'Online');
+    final interestsRaw = json['interests'];
+    final interestsList = <String>[];
+    if (interestsRaw is List) {
+      for (final item in interestsRaw) {
+        if (item is Map) {
+          final name = (item['name'] ?? item['title'] ?? item['label'])?.toString();
+          if (name != null && name.trim().isNotEmpty) interestsList.add(name.trim());
+        } else if (item != null) {
+          final str = item.toString().trim();
+          if (str.isNotEmpty && str.toLowerCase() != 'null') interestsList.add(str);
+        }
+      }
+    }
 
     // Parse conversation categories from discover API
     final convCatIds = <String>[];
@@ -314,6 +317,27 @@ class MatchProfile {
         }
       }
     }
+
+    if (interestsList.isEmpty && convCatNames.isNotEmpty) {
+      interestsList.addAll(convCatNames);
+    }
+    if (interestsList.isEmpty && json['conversation_category'] != null) {
+      final str = json['conversation_category'].toString().trim();
+      if (str.isNotEmpty && str.toLowerCase() != 'null') interestsList.add(str);
+    }
+
+    final effectiveBio = rawBio.isNotEmpty
+        ? rawBio
+        : (interestsList.isNotEmpty
+              ? interestsList.join(" • ")
+              : 'Available for calls ✨');
+
+    final language = json['language']?.toString();
+    final location =
+        json['location']?.toString() ??
+        (language != null && language.isNotEmpty
+            ? 'Language: $language'
+            : 'Online');
 
     const cardColors = [
       Color(0xFFB8C4FE),
@@ -350,8 +374,16 @@ class MatchProfile {
         (json['user'] is Map ? json['user']['gender']?.toString() : null) ??
         (json['profile'] is Map ? json['profile']['gender']?.toString() : null);
 
+    final rawUserId = (json['user_id'] ??
+        json['userId'] ??
+        json['agent_id'] ??
+        json['agent_user_id'] ??
+        (json['user'] is Map ? json['user']['id'] : null))?.toString();
+    final effectiveId = rawUserId ?? json['id']?.toString() ?? '';
+
     return MatchProfile(
-      id: json['id']?.toString() ?? '',
+      id: effectiveId,
+      userId: rawUserId ?? json['id']?.toString(),
       name:
           json['name']?.toString() ??
           json['username']?.toString() ??
@@ -454,6 +486,7 @@ class CallLogItem {
   final String timeAgo;
   final String callType; // "Incoming", "Outgoing", "Missed"
   final String duration;
+  final String status;
   final Color avatarColor;
   final MatchProfile? matchProfile;
 
@@ -465,6 +498,7 @@ class CallLogItem {
     required this.timeAgo,
     required this.callType,
     required this.duration,
+    this.status = '',
     this.avatarColor = const Color(0xFFAEC4FE),
     this.matchProfile,
   });
@@ -551,6 +585,7 @@ class CallLogItem {
       timeAgo: timeAgo,
       callType: callType,
       duration: durationFormatted,
+      status: status ?? '',
       avatarColor: avatarColors[colorIndex],
       matchProfile: MatchProfile(
         id:

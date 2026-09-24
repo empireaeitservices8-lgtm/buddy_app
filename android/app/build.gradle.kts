@@ -9,7 +9,6 @@ plugins {
 android {
     namespace = "com.gabby.talk"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

@@ -37,7 +37,6 @@ class HomeViewModel extends BaseViewModel {
 
   // Wallet & Coin History
   int _walletCoins = 0;
-  bool _isLoadingWallet = false;
   bool _isLoadingCoinHistory = false;
   CoinHistoryResponse? _coinHistory;
 
@@ -60,13 +59,15 @@ class HomeViewModel extends BaseViewModel {
   bool _isSpeakerOn = true;
   Timer? _callTimer;
   Timer? _callStatusPollTimer;
+  int _callSessionCounter = 0;
   StreamSubscription<int?>? _remoteUserSub;
   StreamSubscription<String>? _fcmTokenSubscription;
+  StreamSubscription? _fcmMessageSubscription;
 
   // Caller Intent Multi-Selection (What do you need right now?)
   // Caller Intent Multi-Selection (What do you need right now?)
   final Set<String> _selectedIntentIds = {};
-  List<CallerIntent> _dynamicCallerIntents = [];
+  final List<CallerIntent> _dynamicCallerIntents = [];
   Set<String> get selectedIntentIds => _selectedIntentIds;
   List<CallerIntent> get callerIntents => _dynamicCallerIntents.isNotEmpty
       ? _dynamicCallerIntents
@@ -963,6 +964,7 @@ class HomeViewModel extends BaseViewModel {
 
   // Live Call Controls with Agora RTC & Backend Call Request
   Future<void> startCall(MatchProfile match, {bool isVideo = false}) async {
+    final int currentSession = ++_callSessionCounter;
     _activeCallMatch = match;
     _isCallAttended = false;
     _wasLastCallConnected = false;
@@ -994,6 +996,15 @@ class HomeViewModel extends BaseViewModel {
       final callResponse = await _callRepository.requestCall(
         agentUserId: match.id,
       );
+
+      // Check if user cancelled call while network request was pending
+      if (_activeCallMatch == null || _callSessionCounter != currentSession) {
+        debugPrint('📞 [HomeVM] Call cancelled while requesting call from server');
+        await _agoraService.stopRingtone();
+        await _agoraService.leaveCall();
+        return;
+      }
+
       _lastCallRequest = callResponse;
       notifyListenersSafely();
 
@@ -1042,6 +1053,11 @@ class HomeViewModel extends BaseViewModel {
       // Clean up previous call session before joining
       await _agoraService.leaveCall();
 
+      if (_activeCallMatch == null || _callSessionCounter != currentSession) {
+        debugPrint('📞 [HomeVM] Call cancelled before joining channel');
+        return;
+      }
+
       // 3. Join Agora Channel (Starts in Ringing / Calling state)
       bool joinSuccess = false;
       if (isVideo) {
@@ -1058,9 +1074,23 @@ class HomeViewModel extends BaseViewModel {
         );
       }
 
+      // Check again after joining Agora
+      if (_activeCallMatch == null || _callSessionCounter != currentSession) {
+        debugPrint('📞 [HomeVM] Call cancelled after joining Agora - leaving immediately');
+        await _agoraService.stopRingtone();
+        await _agoraService.leaveCall();
+        return;
+      }
+
       if (joinSuccess) {
         // Start playing ringtone while waiting for agent to answer
         await _agoraService.playRingtone();
+
+        // Start call status polling to detect if agent declines or ends call
+        final activeCallId = callResponse.callId > 0
+            ? callResponse.callId
+            : int.tryParse(match.id);
+        _startCallStatusPolling(activeCallId);
       }
 
       // If remote UID is already joined upon channel entry
@@ -1085,6 +1115,61 @@ class HomeViewModel extends BaseViewModel {
       _remoteUserSub = null;
       notifyListenersSafely();
     }
+  }
+
+  void _startCallStatusPolling(int? callId) {
+    _callStatusPollTimer?.cancel();
+    int pollElapsedTicks = 0;
+    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
+      pollElapsedTicks++;
+      if (_isCallAttended || _activeCallMatch == null) {
+        timer.cancel();
+        _callStatusPollTimer = null;
+        return;
+      }
+
+      // Timeout after 45 seconds (30 ticks * 1.5s = 45s)
+      if (pollElapsedTicks >= 30) {
+        timer.cancel();
+        _callStatusPollTimer = null;
+        debugPrint('📞 [HomeVM] Call timed out after 45s without answer from listener.');
+        setError('No answer from listener. Please try again.');
+        endCall(status: 'cancelled');
+        return;
+      }
+
+      // Poll call history to check if agent declined or call was rejected/cancelled/completed
+      if (callId != null && callId > 0) {
+        try {
+          final history = await _userRepository.getCallHistory();
+          if (history.isNotEmpty) {
+            final targetLog = history.firstWhere(
+              (log) => log.id == callId.toString(),
+              orElse: () => history.first,
+            );
+            if (targetLog.id == callId.toString()) {
+              final status = targetLog.status.toUpperCase();
+              if (status == 'REJECT' ||
+                  status == 'REJECTED' ||
+                  status == 'DECLINED' ||
+                  status == 'CANCELLED' ||
+                  status == 'COMPLETED' ||
+                  status == 'ENDED' ||
+                  status == 'MISSED') {
+                debugPrint('📞 [HomeVM] Call #$callId status changed to $status on server. Dismissing calling screen.');
+                timer.cancel();
+                _callStatusPollTimer = null;
+                if (status == 'REJECT' || status == 'REJECTED' || status == 'DECLINED') {
+                  setError('Call declined by listener.');
+                }
+                endCall(status: status.toLowerCase());
+                return;
+              }
+            }
+          }
+        } catch (_) {}
+      }
+    });
   }
 
   /// Triggered strictly when the remote agent attends/answers the call
@@ -1140,6 +1225,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> endCall({String status = 'cancelled'}) async {
+    _callSessionCounter++;
     _callTimer?.cancel();
     _callTimer = null;
     _callStatusPollTimer?.cancel();
@@ -1356,6 +1442,24 @@ class HomeViewModel extends BaseViewModel {
         FcmService.sendFcmTokenToBackend(newToken);
       });
 
+      // Listen for call cancellation/rejection messages while on home dashboard
+      _fcmMessageSubscription?.cancel();
+      _fcmMessageSubscription = FcmService.onMessageStream.listen((message) {
+        final data = message.data;
+        if (isCallCancellationPayload(
+          data,
+          title: message.notification?.title,
+          body: message.notification?.body,
+        )) {
+          _agoraService.stopRingtone();
+          if (_activeCallMatch != null) {
+            debugPrint('🛑 [HomeVM] Call cancellation/rejection received via FCM -> ending call');
+            setError('Call was declined or ended.');
+            endCall(status: 'rejected');
+          }
+        }
+      });
+
       await Future.wait([
         fetchCategories(silent: false, force: true),
         fetchUserProfile(silent: true, force: true),
@@ -1390,6 +1494,7 @@ class HomeViewModel extends BaseViewModel {
     _callStatusPollTimer?.cancel();
     _remoteUserSub?.cancel();
     _fcmTokenSubscription?.cancel();
+    _fcmMessageSubscription?.cancel();
     super.dispose();
   }
 }

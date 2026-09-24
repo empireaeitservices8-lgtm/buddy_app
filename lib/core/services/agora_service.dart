@@ -28,6 +28,7 @@ class AgoraService {
   RtcEngine? _engine;
   bool _isInitialized = false;
   bool _isPlayingRingtone = false;
+  bool _shouldPlayRingtone = false;
   static const int _ringtoneSoundId = 101;
   static const int _beepSoundId = 102;
 
@@ -37,7 +38,7 @@ class AgoraService {
   int? _localUid;
   int? _remoteUid;
   bool _isLocalMuted = false;
-  bool _isSpeakerPhoneOn = true;
+  bool _isSpeakerPhoneOn = false;
   bool _isVideoEnabled = false;
 
   final StreamController<AgoraCallState> _callStateController =
@@ -62,6 +63,7 @@ class AgoraService {
 
   Stream<AgoraCallState> get callStateStream => _callStateController.stream;
   Stream<int?> get remoteUserJoinedStream => _remoteUserJoinedController.stream;
+  Stream<int?> get onRemoteUserJoined => remoteUserJoinedStream;
   Stream<bool> get remoteAudioStateStream => _remoteAudioStateController.stream;
 
   /// Initializes the Agora RTC Engine instance with the configured App ID.
@@ -89,7 +91,7 @@ class AgoraService {
         await _engine!.muteAllRemoteAudioStreams(false);
       } catch (_) {}
       try {
-        await _engine!.setDefaultAudioRouteToSpeakerphone(true);
+        await _engine!.setDefaultAudioRouteToSpeakerphone(false);
       } catch (_) {}
       try {
         await _engine!.setAudioProfile(
@@ -156,9 +158,9 @@ class AgoraService {
         await _engine!.muteAllRemoteAudioStreams(false);
       } catch (_) {}
       try {
-        await _engine!.setDefaultAudioRouteToSpeakerphone(true);
+        await _engine!.setDefaultAudioRouteToSpeakerphone(false);
       } catch (_) {}
-      _isSpeakerPhoneOn = true;
+      _isSpeakerPhoneOn = false;
       _isLocalMuted = false;
 
       const options = ChannelMediaOptions(
@@ -237,13 +239,18 @@ class AgoraService {
 
   /// Plays continuous ringback tone while waiting for the remote participant to answer
   Future<void> playRingtone() async {
+    _shouldPlayRingtone = true;
     if (_isPlayingRingtone) return;
     try {
       final ringtonePath = await CallSoundHelper.getRingtonePath();
+      if (!_shouldPlayRingtone) {
+        debugPrint('📞 [AgoraService] Ringtone cancelled before playback began');
+        return;
+      }
       if (ringtonePath == null || ringtonePath.isEmpty) return;
 
       _isPlayingRingtone = true;
-      if (_engine != null) {
+      if (_engine != null && _shouldPlayRingtone) {
         await _engine!.stopAllEffects();
         await _engine!.playEffect(
           soundId: _ringtoneSoundId,
@@ -258,10 +265,11 @@ class AgoraService {
       }
     } catch (e) {
       debugPrint('⚠️ [AgoraService] playRingtone error: $e');
+      if (!_shouldPlayRingtone) return;
       // Fallback to startAudioMixing if effect manager fails
       try {
         final ringtonePath = await CallSoundHelper.getRingtonePath();
-        if (ringtonePath != null && _engine != null) {
+        if (ringtonePath != null && _engine != null && _shouldPlayRingtone) {
           await _engine!.startAudioMixing(
             filePath: ringtonePath,
             loopback: true,
@@ -276,16 +284,20 @@ class AgoraService {
 
   /// Stops the ringback tone immediately (e.g. when answered or call ends)
   Future<void> stopRingtone() async {
-    if (!_isPlayingRingtone) return;
+    _shouldPlayRingtone = false;
     _isPlayingRingtone = false;
     try {
       if (_engine != null) {
-        await _engine!.stopEffect(_ringtoneSoundId);
-        await _engine!.stopAllEffects();
         try {
-          await _engine?.stopAudioMixing();
+          await _engine!.stopEffect(_ringtoneSoundId);
         } catch (_) {}
-        debugPrint('📞 [AgoraService] Ringtone stopped');
+        try {
+          await _engine!.stopAllEffects();
+        } catch (_) {}
+        try {
+          await _engine!.stopAudioMixing();
+        } catch (_) {}
+        debugPrint('📞 [AgoraService] Ringtone stopped completely');
       }
     } catch (e) {
       debugPrint('⚠️ [AgoraService] stopRingtone error: $e');
@@ -388,7 +400,7 @@ class AgoraService {
           debugPrint('[AgoraService] onJoinChannelSuccess: ${connection.channelId}, uid: ${connection.localUid}');
           _localUid = connection.localUid;
           try {
-            _engine?.setEnableSpeakerphone(true);
+            _engine?.setEnableSpeakerphone(_callType == AgoraCallType.video);
           } catch (_) {}
           _setCallState(AgoraCallState.connected);
         },

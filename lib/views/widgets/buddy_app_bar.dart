@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_typography.dart';
-import 'sparkle_widget.dart';
+import '../../core/theme/cartoon_theme.dart';
 
+/// Reusable Cartoon App Bar
 class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onBack;
   final bool showSparkle;
   final bool showBack;
+  final Widget? trailing;
 
   const BuddyAppBar({
     super.key,
@@ -15,6 +15,7 @@ class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.showSparkle = true,
     this.showBack = true,
+    this.trailing,
   });
 
   @override
@@ -22,40 +23,70 @@ class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
     return SafeArea(
       bottom: false,
       child: Container(
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        height: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             if (showBack)
-              InkWell(
+              GestureDetector(
                 onTap: onBack ?? () => Navigator.maybePop(context),
-                borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.all(6),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: CartoonColors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: CartoonColors.ink,
+                      width: CartoonDimensions.borderWidthThin,
+                    ),
+                    boxShadow: CartoonDimensions.shadowSmall(
+                      offset: const Offset(2, 2),
+                    ),
+                  ),
+                  alignment: Alignment.center,
                   child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 22,
-                    color: AppColors.strokeBlack,
+                    Icons.arrow_back_rounded,
+                    size: 20,
+                    color: CartoonColors.ink,
                   ),
                 ),
               )
             else
-              const SizedBox(width: 34),
+              const SizedBox(width: 40),
             Text(
               title,
-              style: AppTypography.titleLarge.copyWith(
+              style: const TextStyle(
+                fontFamily: CartoonTextTheme.fontFamily,
                 fontWeight: FontWeight.w900,
                 fontSize: 20,
+                color: CartoonColors.ink,
+                letterSpacing: -0.3,
               ),
             ),
-            if (showSparkle)
-              const SparkleWidget(
-                size: 20,
-                color: AppColors.strokeBlack,
+            if (trailing != null)
+              trailing!
+            else if (showSparkle)
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: CartoonColors.yellowSoft,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: CartoonColors.ink,
+                    width: CartoonDimensions.borderWidthThin,
+                  ),
+                  boxShadow: CartoonDimensions.shadowSmall(
+                    offset: const Offset(2, 2),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: const Text('✨', style: TextStyle(fontSize: 16)),
               )
             else
-              const SizedBox(width: 34),
+              const SizedBox(width: 40),
           ],
         ),
       ),
@@ -63,5 +94,6 @@ class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(56);
+  Size get preferredSize => const Size.fromHeight(60);
 }
+

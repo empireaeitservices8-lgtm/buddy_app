@@ -12,20 +12,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
 import '../constants/api_constants.dart';
 import '../network/token_manager.dart';
+import 'agora_service.dart';
 
 final FlutterLocalNotificationsPlugin _localNotifications =
     FlutterLocalNotificationsPlugin();
 
 const AndroidNotificationChannel
-_highImportanceChannel = AndroidNotificationChannel(
-  'high_importance_channel',
-  'Incoming Calls & Alerts',
+_incomingCallsChannel = AndroidNotificationChannel(
+  'incoming_calls_channel_v2',
+  'Incoming Audio Calls',
   description:
-      'High priority notifications for incoming audio calls and critical alerts',
+      'High priority notifications for incoming audio calls with ringtone',
   importance: Importance.max,
   playSound: true,
   enableVibration: true,
   showBadge: true,
+  audioAttributesUsage: AudioAttributesUsage.notificationRingtone,
+);
+
+const AndroidNotificationChannel
+_messagesChannel = AndroidNotificationChannel(
+  'messages_channel_v2',
+  'Messages & Updates',
+  description:
+      'Standard notifications for text messages, alerts, and call status updates',
+  importance: Importance.high,
+  playSound: true,
+  enableVibration: true,
+  showBadge: true,
+  audioAttributesUsage: AudioAttributesUsage.notification,
 );
 
 /// Helper to determine if a push payload represents a call cancellation, rejection, or end event.
@@ -198,12 +213,13 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       const initSettings = InitializationSettings(android: androidInit);
       await _localNotifications.initialize(initSettings);
 
-      // Explicitly create notification channel with max priority on Android OS
+      // Explicitly create notification channels on Android OS
       final androidPlugin = _localNotifications
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      await androidPlugin?.createNotificationChannel(_highImportanceChannel);
+      await androidPlugin?.createNotificationChannel(_incomingCallsChannel);
+      await androidPlugin?.createNotificationChannel(_messagesChannel);
 
       if (isCall) {
         final rawCaller =
@@ -229,10 +245,10 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
             (message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch) % 100000;
 
         const androidDetails = AndroidNotificationDetails(
-          'high_importance_channel',
-          'Incoming Calls & Alerts',
+          'incoming_calls_channel_v2',
+          'Incoming Audio Calls',
           channelDescription:
-              'High priority notifications for incoming audio calls and critical alerts',
+              'High priority notifications for incoming audio calls with ringtone',
           icon: '@mipmap/ic_launcher',
           importance: Importance.max,
           priority: Priority.max,
@@ -263,15 +279,16 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
             (message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch) % 100000;
 
         const standardDetails = AndroidNotificationDetails(
-          'high_importance_channel',
-          'Incoming Calls & Alerts',
+          'messages_channel_v2',
+          'Messages & Updates',
           channelDescription:
-              'High priority notifications for incoming audio calls and critical alerts',
+              'Standard notifications for text messages, alerts, and call status updates',
           icon: '@mipmap/ic_launcher',
-          importance: Importance.max,
+          importance: Importance.high,
           priority: Priority.high,
           playSound: true,
           enableVibration: true,
+          audioAttributesUsage: AudioAttributesUsage.notification,
         );
 
         await _localNotifications.show(
@@ -282,7 +299,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
           payload: jsonEncode(data),
         );
         debugPrint(
-          '🔔 [FCM Background] Displayed Standard Notification: ${data['title']} - ${data['body']}',
+          '🔔 [FCM Background] Displayed Standard Message Notification: ${data['title']} - ${data['body']}',
         );
       }
     } catch (notifErr) {
@@ -436,11 +453,11 @@ class FcmService {
         '🔔 [FCM] Notification authorization status: ${settings.authorizationStatus}',
       );
 
-      // 4. Foreground presentation options (iOS/macOS & modern Android)
+      // 4. Foreground presentation options (suppress OS heads-up while app is open)
       await messaging.setForegroundNotificationPresentationOptions(
-        alert: true,
-        badge: true,
-        sound: true,
+        alert: false,
+        badge: false,
+        sound: false,
       );
 
       // 5. Fetch & persist FCM Token
@@ -475,7 +492,8 @@ class FcmService {
         debugPrint('📦 [FCM Foreground Data]: ${message.data}');
         _onMessageController.add(message);
 
-        // Show heads-up alert for calls in foreground
+        // In foreground, the in-app UI handles the incoming call/screen directly.
+        // If this message represents a cancellation, cancel any active notification.
         final Map<String, dynamic> data = {};
         if (message.data.isNotEmpty) {
           data.addAll(message.data);
@@ -500,21 +518,17 @@ class FcmService {
             }
           }
         }
-        if (message.notification != null) {
-          if (!data.containsKey('title') &&
-              message.notification!.title != null) {
-            data['title'] = message.notification!.title;
-          }
-          if (!data.containsKey('body') && message.notification!.body != null) {
-            data['body'] = message.notification!.body;
-          }
-        }
-        if (data.isNotEmpty || message.notification != null) {
-          await showIncomingCallNotification(
-            data,
-            fallbackTitle: message.notification?.title,
-            fallbackBody: message.notification?.body,
-          );
+        if (isCallCancellationPayload(
+          data,
+          title: message.notification?.title,
+          body: message.notification?.body,
+        )) {
+          final callId =
+              int.tryParse(
+                data['call_id']?.toString() ?? data['id']?.toString() ?? '',
+              ) ?? 0;
+          await AgoraService().stopRingtone();
+          await cancelCallNotification(callId);
         }
       });
 
@@ -554,12 +568,13 @@ class FcmService {
         },
       );
 
-      // Create high-importance channel with max priority on Android OS
+      // Create notification channels on Android OS
       final androidPlugin = _localNotifications
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      await androidPlugin?.createNotificationChannel(_highImportanceChannel);
+      await androidPlugin?.createNotificationChannel(_incomingCallsChannel);
+      await androidPlugin?.createNotificationChannel(_messagesChannel);
 
       // Check if app was launched directly by tapping a local notification
       final launchDetails = await _localNotifications
@@ -618,6 +633,7 @@ class FcmService {
 
       if (isCancelled) {
         debugPrint('🛑 [FcmService] Call cancelled or ended in foreground: $data');
+        await AgoraService().stopRingtone();
         if (callId > 0) {
           await cancelCallNotification(callId);
         } else {
@@ -672,15 +688,16 @@ class FcmService {
           final notifId = DateTime.now().millisecondsSinceEpoch % 100000;
 
           const standardDetails = AndroidNotificationDetails(
-            'high_importance_channel',
-            'Incoming Calls & Alerts',
+            'messages_channel_v2',
+            'Messages & Updates',
             channelDescription:
-                'High priority notifications for incoming audio calls and critical alerts',
+                'Standard notifications for text messages, alerts, and call status updates',
             icon: '@mipmap/ic_launcher',
-            importance: Importance.max,
+            importance: Importance.high,
             priority: Priority.high,
             playSound: true,
             enableVibration: true,
+            audioAttributesUsage: AudioAttributesUsage.notification,
           );
 
           await _localNotifications.show(
@@ -709,15 +726,16 @@ class FcmService {
         final notifId = DateTime.now().millisecondsSinceEpoch % 100000;
 
         const standardDetails = AndroidNotificationDetails(
-          'high_importance_channel',
-          'Incoming Calls & Alerts',
+          'messages_channel_v2',
+          'Messages & Updates',
           channelDescription:
-              'High priority notifications for incoming audio calls and critical alerts',
+              'Standard notifications for text messages, alerts, and call status updates',
           icon: '@mipmap/ic_launcher',
-          importance: Importance.max,
+          importance: Importance.high,
           priority: Priority.high,
           playSound: true,
           enableVibration: true,
+          audioAttributesUsage: AudioAttributesUsage.notification,
         );
 
         await _localNotifications.show(
@@ -759,10 +777,10 @@ class FcmService {
       }
 
       const androidDetails = AndroidNotificationDetails(
-        'high_importance_channel',
-        'Incoming Calls & Alerts',
+        'incoming_calls_channel_v2',
+        'Incoming Audio Calls',
         channelDescription:
-            'High priority notifications for incoming audio calls and critical alerts',
+            'High priority notifications for incoming audio calls with ringtone',
         icon: '@mipmap/ic_launcher',
         importance: Importance.max,
         priority: Priority.max,

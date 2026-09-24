@@ -270,39 +270,27 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Phone + Heart Logo Icon
+              // Gabby Talk Official Brand Logo Icon
               Container(
-                width: 38,
-                height: 38,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2563EB), Color(0xFFE11D48)],
-                    begin: Alignment.bottomLeft,
-                    end: Alignment.topRight,
-                  ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2563EB).withOpacity(0.25),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+                  border: Border.all(
+                    color: AppColors.strokeBlack,
+                    width: 1.8,
+                  ),
+                  boxShadow: AppTheme.neoShadow(
+                    offset: const Offset(1.5, 1.5),
+                  ),
                 ),
-                child: const Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(Icons.phone_rounded, color: Colors.white, size: 20),
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: Icon(
-                        Icons.favorite_rounded,
-                        color: Color(0xFFFFD1DC),
-                        size: 10,
-                      ),
-                    ),
-                  ],
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/gabby_talk_logo.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -352,16 +340,16 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Your voice ',
+                    'You talk... ',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: const Color(0xFF0F2444).withOpacity(0.85),
                     ),
                   ),
                   const Text(
-                    'matters! ❤️',
+                    'We connect ❤️',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w900,
@@ -448,27 +436,27 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           children: [
             const SizedBox(height: 4),
 
-            // Main Poster Headline
+            // Main Poster Headline matching image
             const Text(
-              'Choose what kind of listener you are',
+              'What would you like to talk about today?',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 21,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF0F2444),
                 letterSpacing: -0.4,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 5),
 
-            // Poster Subtitle
+            // Poster Subtitle matching image
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Share your interests, background and what you enjoy — and be part of someone’s story.',
+                'Choose a category that feels right for you.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12.0,
+                  fontSize: 13.5,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF475569),
                   height: 1.25,
@@ -500,7 +488,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
             const SizedBox(height: 22),
 
-            // Bottom Poster Taglines with Decorative Wings
+            // Bottom Poster Tagline matching image
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Column(
@@ -509,40 +497,53 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 20,
+                        width: 24,
                         height: 1.5,
                         color: const Color(0xFF94A3B8),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       const Flexible(
                         child: Text(
-                          'Different people  •  Different stories  •  Same goal',
+                          "There's always someone here for you",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 13.0,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF334155),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Container(
-                        width: 20,
+                        width: 24,
                         height: 1.5,
                         color: const Color(0xFF94A3B8),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 3),
-                  const Text(
-                    '— to make you feel better. ❤️ —',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF64748B),
-                    ),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 16,
+                        height: 1.5,
+                        color: const Color(0xFFCBD5E1),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.favorite_rounded,
+                        color: Color(0xFFF15B70),
+                        size: 13,
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 16,
+                        height: 1.5,
+                        color: const Color(0xFFCBD5E1),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -577,87 +578,43 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Navigation & Title Bar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: _viewModel.goBackInExplore,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.strokeBlack,
-                        width: 2.0,
-                      ),
-                      boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.arrow_back_rounded,
-                          size: 16,
-                          color: AppColors.strokeBlack,
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          'Back',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textBlack,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+            // Top Navigation: Back Button
+            GestureDetector(
+              onTap: _viewModel.goBackInExplore,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 7,
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                decoration: BoxDecoration(
+                  color: AppColors.cardWhite,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.strokeBlack,
+                    width: 2.0,
                   ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFC3E2A0),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
+                  boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.arrow_back_rounded,
+                      size: 16,
                       color: AppColors.strokeBlack,
-                      width: 1.8,
                     ),
-                    boxShadow: AppTheme.neoShadow(
-                      offset: const Offset(1.5, 1.5),
+                    SizedBox(width: 5),
+                    Text(
+                      'Back',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.textBlack,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 7,
-                        height: 7,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF15803D),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${matches.length} ${matches.length == 1 ? "Listener" : "Listeners"} Online',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F2444),
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -1366,23 +1323,18 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   Widget _buildMatchCard(MatchProfile match) {
     final isFav = _viewModel.isFavorite(match.id);
 
-    // Pick high-resolution cartoon avatar based on match identity
-    final hash = match.id.hashCode.abs();
-    final isFemale = match.isFemale;
-
-    final avatarAsset = isFemale
-        ? ((hash % 2 == 0)
-              ? 'assets/images/avatar_female_1.jpg'
-              : 'assets/images/avatar_female_2.jpg')
-        : 'assets/images/avatar_male_1.jpg';
-
-    // Meaningful bio fallback
-    final bioText =
-        (match.bio.trim().isEmpty ||
-            match.bio.trim().toLowerCase() == 'jjjj' ||
-            match.bio.trim().length < 4)
-        ? 'Friendly listener ready for real conversations & emotional support ❤️'
-        : match.bio.trim();
+    // Display ONLY the agent's interests in the interest box
+    final String interestDisplay = match.interests.isNotEmpty
+        ? match.interests.join(' • ')
+        : (match.conversationCategoryNames.isNotEmpty
+            ? match.conversationCategoryNames.join(' • ')
+            : (match.professionCategory.isNotEmpty &&
+                    match.professionCategory != 'General' &&
+                    match.professionCategory != match.profession
+                ? match.professionCategory
+                : (match.bio.trim().isNotEmpty && match.bio.trim().length > 3
+                    ? match.bio.trim()
+                    : match.profession)));
 
     return Container(
       decoration: BoxDecoration(
@@ -1733,82 +1685,52 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
                 const SizedBox(height: 5),
 
-                // Specialty Badges Row
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 3.5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 1.3,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ClipOval(
-                            child: Image.asset(
-                              match.genderImageAsset,
-                              width: 16,
-                              height: 16,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            match.profession,
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textBlack,
-                            ),
-                          ),
-                        ],
-                      ),
+                // Profession Badge (Only show the profession, e.g. Doctor)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 3.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardWhite,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.3,
                     ),
-                    if (match.professionCategory.isNotEmpty &&
-                        match.professionCategory != match.profession)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 9,
-                          vertical: 3.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFD1E3),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.strokeBlack,
-                            width: 1.3,
-                          ),
-                        ),
-                        child: Text(
-                          match.professionCategory,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textBlack,
-                          ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ClipOval(
+                        child: Image.asset(
+                          match.genderImageAsset,
+                          width: 16,
+                          height: 16,
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
                         ),
                       ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        match.profession,
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textBlack,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 6),
 
-                // Bio Speech / Quote Box
+                // Interests Box with "Interests" heading & all user interests
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 7,
+                    horizontal: 10,
+                    vertical: 6,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.cardWhite.withOpacity(0.92),
@@ -1819,26 +1741,41 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                   ),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        '❝ ',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF2563EB),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 2.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD1E3),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 1.1,
+                          ),
+                        ),
+                        child: const Text(
+                          'Interests',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textBlack,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          bioText,
+                          interestDisplay,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                             color: AppColors.textBlack,
-                            height: 1.3,
+                            height: 1.25,
                           ),
                         ),
                       ),
@@ -1886,7 +1823,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           left: 20,
           right: 20,
           top: 8,
-          bottom: 100,
+          bottom: 130,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
