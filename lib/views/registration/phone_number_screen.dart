@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:buddy_app/views/widgets/slide_to_action.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
@@ -22,10 +23,7 @@ class CountryItem {
 class PhoneNumberView extends StatefulWidget {
   final RegistrationViewModel viewModel;
 
-  const PhoneNumberView({
-    super.key,
-    required this.viewModel,
-  });
+  const PhoneNumberView({super.key, required this.viewModel});
 
   @override
   State<PhoneNumberView> createState() => _PhoneNumberViewState();
@@ -113,7 +111,8 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                 separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final country = _supportedCountries[index];
-                  final isSelected = country.code == _selectedCountry.code &&
+                  final isSelected =
+                      country.code == _selectedCountry.code &&
                       country.name == _selectedCountry.name;
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
@@ -128,7 +127,9 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                       country.name,
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                        fontWeight: isSelected
+                            ? FontWeight.w800
+                            : FontWeight.w600,
                         color: AppColors.textBlack,
                       ),
                     ),
@@ -137,7 +138,9 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
-                        color: isSelected ? const Color(0xFF00A79D) : AppColors.textSecondary,
+                        color: isSelected
+                            ? const Color(0xFF00A79D)
+                            : AppColors.textSecondary,
                       ),
                     ),
                     onTap: () {
@@ -165,7 +168,11 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
       return;
     }
     if (_selectedCountry.code == '+91' && phone.length != 10) {
-      showNeoToast(context, 'Please enter a valid 10-digit mobile number', isError: true);
+      showNeoToast(
+        context,
+        'Please enter a valid 10-digit mobile number',
+        isError: true,
+      );
       return;
     }
     if (phone.length < 7) {
@@ -187,7 +194,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 130),
 
           // Header Title
           Text(
@@ -217,9 +224,12 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
           const SizedBox(height: 18),
 
           // Center Animated Mascot with Phone Handset
-          const GabbyMascotWidget(
-            pose: MascotPose.phoneCall,
-            size: 200,
+          ClipOval(
+            child: Image.asset(
+              "assets/images/welcome.jpeg",
+              width: 210,
+              fit: BoxFit.contain,
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -229,10 +239,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
             decoration: BoxDecoration(
               color: AppColors.cardWhite,
               borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: AppColors.strokeBlack,
-                width: 2.2,
-              ),
+              border: Border.all(color: AppColors.strokeBlack, width: 2.2),
               boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -339,62 +346,88 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 35),
+
+          vm.isLoading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(
+                    left: 14,
+                    right: 14,
+                    bottom: 10,
+                  ),
+                  child: SlideToActionButton(
+                    text: 'Send Verification Code',
+                    icon: Icons.message,
+                    height: 70,
+                    backgroundColor: const Color(0xFFF1FAC0),
+                    handleColor: const Color(0xFFD6F887),
+                    textColor: AppColors.strokeBlack,
+                    iconColor: AppColors.strokeBlack,
+                    onCompleted: () => _handleSendCode(),
+                    // onCompleted: () => _startCall(match),
+                  ),
+                ),
 
           // Send Verification Code CTA Button (Teal Pill Button)
-          GestureDetector(
-            onTap: vm.isLoading ? null : _handleSendCode,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: double.infinity,
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF2DD4BF), Color(0xFF00A79D)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                  color: AppColors.strokeBlack,
-                  width: 2.2,
-                ),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
-              ),
-              child: Center(
-                child: vm.isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.4,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Send Verification Code',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(
-                            Icons.mark_email_read_rounded,
-                            size: 19,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-              ),
-            ),
-          ),
-
+          // GestureDetector(
+          //   onTap: vm.isLoading ? null : _handleSendCode,
+          //   child: AnimatedContainer(
+          //     duration: const Duration(milliseconds: 150),
+          //     width: double.infinity,
+          //     height: 56,
+          //     decoration: BoxDecoration(
+          //       gradient: const LinearGradient(
+          //         colors: [Color(0xFF2DD4BF), Color(0xFF00A79D)],
+          //         begin: Alignment.topCenter,
+          //         end: Alignment.bottomCenter,
+          //       ),
+          //       borderRadius: BorderRadius.circular(28),
+          //       border: Border.all(color: AppColors.strokeBlack, width: 2.2),
+          //       boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+          //     ),
+          //     child: Center(
+          //       child: vm.isLoading
+          //           ? const SizedBox(
+          //               width: 22,
+          //               height: 22,
+          //               child: CircularProgressIndicator(
+          //                 strokeWidth: 2.4,
+          //                 valueColor: AlwaysStoppedAnimation<Color>(
+          //                   Colors.white,
+          //                 ),
+          //               ),
+          //             )
+          //           : Row(
+          //               mainAxisAlignment: MainAxisAlignment.center,
+          //               children: const [
+          //                 Text(
+          //                   'Send Verification Code',
+          //                   style: TextStyle(
+          //                     fontSize: 16,
+          //                     fontWeight: FontWeight.w900,
+          //                     color: Colors.white,
+          //                     letterSpacing: 0.2,
+          //                   ),
+          //                 ),
+          //                 SizedBox(width: 8),
+          //                 Icon(
+          //                   Icons.mark_email_read_rounded,
+          //                   size: 19,
+          //                   color: Colors.white,
+          //                 ),
+          //               ],
+          //             ),
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: 20),
         ],
       ),
