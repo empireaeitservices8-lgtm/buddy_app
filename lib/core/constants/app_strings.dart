@@ -2,7 +2,7 @@ class AppStrings {
   AppStrings._();
 
   // App General
-  static const String appName = 'Gabby Talk';
+  static const String appName = 'Gaby Talk';
   static const String tagline = 'Real People • Meaningful Conversations';
 
   // Splash

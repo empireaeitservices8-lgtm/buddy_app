@@ -168,7 +168,7 @@ class _SplashScreenState extends State<SplashScreen>
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(32),
                             child: Image.asset(
-                              'assets/images/app_icon.png',
+                              'assets/images/app_icon2.png',
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -185,7 +185,7 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                             children: const [
                               TextSpan(
-                                text: 'Gabby',
+                                text: 'Gaby',
                                 style: TextStyle(color: Color(0xFFFF6B6B)),
                               ),
                               TextSpan(

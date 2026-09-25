@@ -73,19 +73,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                         // Center Animated Mascot inside dark-bordered circular cartoon container
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          width: MediaQuery.sizeOf(context).width * 0.8,
+                          height: 400,
                           decoration: BoxDecoration(
-                            color: CartoonColors.cardWhite,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: CartoonColors.charcoal,
-                              width: CartoonTheme.borderWidth,
+                              color: Colors.transparent,
+                              width: CartoonTheme.borderWidth * 2,
                             ),
-                            boxShadow: CartoonTheme.shadow(offset: const Offset(4, 4)),
                           ),
-                          child: GabbyMascotWidget(
-                            pose: MascotPose.phoneCall,
-                            size: mascotSize,
+                          child: ClipOval(
+                            child: Image.asset(
+                              "assets/images/welcome.jpeg",
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
 
@@ -168,7 +169,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
             children: [
               TextSpan(
-                text: 'Gabby',
+                text: 'Gaby',
                 style: TextStyle(color: Color(0xFFFF6B6B)),
               ),
               TextSpan(

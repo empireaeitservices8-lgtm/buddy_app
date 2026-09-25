@@ -218,7 +218,7 @@ class OtpVerificationView extends StatelessWidget {
             ),
             children: const [
               TextSpan(
-                text: 'Gabby',
+                text: 'Gaby',
                 style: TextStyle(color: Color(0xFFFF6B6B)),
               ),
               TextSpan(

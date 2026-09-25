@@ -307,7 +307,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       ),
                       children: const [
                         TextSpan(
-                          text: 'GABBY ',
+                          text: 'GABY ',
                           style: TextStyle(color: Color(0xFF0F2444)),
                         ),
                         TextSpan(
