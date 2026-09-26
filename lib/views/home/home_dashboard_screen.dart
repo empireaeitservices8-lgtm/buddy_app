@@ -445,9 +445,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             const SizedBox(height: 5),
 
             // Poster Subtitle matching image
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Text(
                 'Choose a category that feels right for you.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -458,7 +458,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 5),
+            Align(
+              alignment: Alignment.topRight,
+                child: TextButton(onPressed: (){
+                  _viewModel.selectAllIntents();
+                }, child: Text("Select All"))),
             const SizedBox(height: 14),
+
+
 
             // 2-Column Grid matching the 3D card layout
             GridView.builder(

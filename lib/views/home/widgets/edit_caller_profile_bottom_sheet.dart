@@ -229,7 +229,7 @@ class _EditCallerProfileBottomSheetState
                   children: [
                     // 1. NAME FIELD
                     NeoTextField(
-                      label: 'YOUR NAME / CALLER NAME',
+                      label: "USERNAME",
                       hintText: 'e.g. Alex, Maya',
                       controller: _nameController,
                     ),

@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../data/models/user_profile.dart';
 import '../../viewmodels/registration_view_model.dart';
 import '../widgets/segmented_progress_bar.dart';
+import '../widgets/slide_to_action.dart';
 
 class ProfileDetailsView extends StatefulWidget {
   final RegistrationViewModel viewModel;
@@ -88,7 +89,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
           const SegmentedProgressBar(
             totalSegments: 3,
             activeIndex: 2,
-            label: 'PROGRESS BAR',
+            label: 'USERNAME',
           ),
 
           const SizedBox(height: 16),
@@ -125,15 +126,15 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'FIRST NAME',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.8,
-                          color: AppColors.textBlack,
-                        ),
-                      ),
+                      // const Text(
+                      //   'FIRST NAME',
+                      //   style: TextStyle(
+                      //     fontSize: 11,
+                      //     fontWeight: FontWeight.w900,
+                      //     letterSpacing: 0.8,
+                      //     color: AppColors.textBlack,
+                      //   ),
+                      // ),
                       const SizedBox(height: 4),
                       TextField(
                         controller: _nameController,
@@ -288,7 +289,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               Expanded(
                 child: _buildGenderCard(
                   gender: Gender.woman,
-                  title: 'Woman',
+                  title: 'Female',
                   iconText: '🪞',
                   selectedColor: const Color(0xFFFDA4AF),
                   isSelected: vm.selectedGender == Gender.woman,
@@ -299,7 +300,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               Expanded(
                 child: _buildGenderCard(
                   gender: Gender.man,
-                  title: 'Man',
+                  title: 'Male',
                   iconText: '👔',
                   selectedColor: const Color(0xFFBAE6FD),
                   isSelected: vm.selectedGender == Gender.man,
@@ -323,59 +324,94 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
           const SizedBox(height: 30),
 
           // CONTINUE CTA Button (Coral/Orange Pill)
-          GestureDetector(
-            onTap: vm.isLoading
-                ? null
-                : () {
-                    vm.setFirstName(_nameController.text.trim());
-                    vm.setAge(_ageController.text.trim());
-                    vm.submitFirstDetails();
-                  },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: double.infinity,
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFF8B77), Color(0xFFFF6B6B)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
-              ),
-              child: Center(
-                child: vm.isLoading
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.4,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'CONTINUE',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: 0.6,
+
+          vm.isLoading
+              ? Center(
+                child: const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                strokeWidth: 2.4,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                             ),
                           ),
-                          SizedBox(width: 8),
-                          Text('🚀', style: TextStyle(fontSize: 18)),
-                        ],
-                      ),
-              ),
+              )
+              : Padding(
+            padding: const EdgeInsets.only(
+              left: 14,
+              right: 14,
+              bottom: 10,
+            ),
+            child: SlideToActionButton(
+              text: 'CONTINUE',
+              icon: Icons.check,
+              height: 70,
+              backgroundColor: const Color(0xFFF1FAC0),
+              handleColor: const Color(0xFFD6F887),
+              textColor: AppColors.strokeBlack,
+              iconColor: AppColors.strokeBlack,
+              onCompleted: () {
+                vm.setFirstName(_nameController.text.trim());
+                vm.setAge(_ageController.text.trim());
+                vm.submitFirstDetails();
+              },
+              // onCompleted: () => _startCall(match),
             ),
           ),
+          //
+          // GestureDetector(
+          //   onTap: vm.isLoading
+          //       ? null
+          //       : () {
+          //           vm.setFirstName(_nameController.text.trim());
+          //           vm.setAge(_ageController.text.trim());
+          //           vm.submitFirstDetails();
+          //         },
+          //   child: AnimatedContainer(
+          //     duration: const Duration(milliseconds: 150),
+          //     width: double.infinity,
+          //     height: 56,
+          //     decoration: BoxDecoration(
+          //       gradient: const LinearGradient(
+          //         colors: [Color(0xFFFF8B77), Color(0xFFFF6B6B)],
+          //         begin: Alignment.topCenter,
+          //         end: Alignment.bottomCenter,
+          //       ),
+          //       borderRadius: BorderRadius.circular(28),
+          //       border: Border.all(color: AppColors.strokeBlack, width: 2.2),
+          //       boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+          //     ),
+          //     child: Center(
+          //       child: vm.isLoading
+          //           ? const SizedBox(
+          //               width: 22,
+          //               height: 22,
+          //               child: CircularProgressIndicator(
+          //                 strokeWidth: 2.4,
+          //                 valueColor: AlwaysStoppedAnimation<Color>(
+          //                   Colors.white,
+          //                 ),
+          //               ),
+          //             )
+          //           : Row(
+          //               mainAxisAlignment: MainAxisAlignment.center,
+          //               children: const [
+          //                 Text(
+          //                   'CONTINUE',
+          //                   style: TextStyle(
+          //                     fontSize: 16,
+          //                     fontWeight: FontWeight.w900,
+          //                     color: Colors.white,
+          //                     letterSpacing: 0.6,
+          //                   ),
+          //                 ),
+          //                 SizedBox(width: 8),
+          //                 Text('🚀', style: TextStyle(fontSize: 18)),
+          //               ],
+          //             ),
+          //     ),
+          //   ),
+          // ),
 
           const SizedBox(height: 24),
         ],
