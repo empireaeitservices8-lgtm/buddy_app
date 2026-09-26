@@ -461,12 +461,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             const SizedBox(height: 5),
             Align(
               alignment: Alignment.topRight,
-                child: TextButton(onPressed: (){
+              child: TextButton(
+                onPressed: () {
                   _viewModel.selectAllIntents();
-                }, child: Text("Select All"))),
+                },
+                child: Text("Select All"),
+              ),
+            ),
             const SizedBox(height: 14),
-
-
 
             // 2-Column Grid matching the 3D card layout
             GridView.builder(
@@ -1343,107 +1345,102 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           : match.profession)));
 
     return Container(
+      height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
         color: match.cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.strokeBlack, width: 1.2),
         boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. Top Badges Row
-          Padding(
-            padding: const EdgeInsets.only(left: 14, right: 14, top: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 3, left: 2, right: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Top Badges Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Online & Rating Badge Group
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 1.5,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardWhite,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF00C853),
+                          shape: BoxShape.circle,
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 7,
-                            height: 7,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF00C853),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          const Text(
-                            'ONLINE',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                              color: AppColors.textBlack,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF2B2),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 1.5,
+                      const SizedBox(width: 5),
+                      const Text(
+                        'ONLINE',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.5,
+                          color: AppColors.textBlack,
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            size: 14,
-                            color: Color(0xFFE67E22),
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            match.rating > 0
-                                ? match.rating.toStringAsFixed(1)
-                                : '0',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textBlack,
-                            ),
-                          ),
-                        ],
-                      ),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF2B2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.5,
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 14,
+                        color: Color(0xFFE67E22),
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        match.rating > 0
+                            ? match.rating.toStringAsFixed(1)
+                            : '0',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textBlack,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 7),
-          // Rate Badge & Favorite Button Group
-          Padding(
-            padding: const EdgeInsets.only(left: 14, right: 14, top: 1),
-            child: Row(
+            const SizedBox(height: 7),
+            // Rate Badge & Favorite Button Group
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -1514,302 +1511,302 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 10),
-          // 2. Beautiful Visual Showcase with Hero Avatar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Container(
-              width: double.infinity,
-              height: 135,
-              decoration: BoxDecoration(
-                color: AppColors.cardWhite,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Subtle pastel background tint
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          colors: [
-                            match.avatarColor.withOpacity(0.18),
-                            AppColors.cardWhite,
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+            const SizedBox(height: 5),
+            // 2. Beautiful Visual Showcase with Hero Avatar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Container(
+                width: double.infinity,
+                height: 135,
+                decoration: BoxDecoration(
+                  color: AppColors.cardWhite,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Subtle pastel background tint
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: LinearGradient(
+                            colors: [
+                              match.avatarColor.withOpacity(0.18),
+                              AppColors.cardWhite,
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  // Decorative Corner Pill (Left): Language
-                  Positioned(
-                    top: 8,
-                    left: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
+                    // Decorative Corner Pill (Left): Language
+                    Positioned(
+                      top: 8,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardWhite,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('🗣️', style: TextStyle(fontSize: 8)),
+                            const SizedBox(width: 4),
+                            Text(
+                              match.location.contains('Language:')
+                                  ? match.location
+                                        .replaceAll('Language:', '')
+                                        .trim()
+                                  : 'English',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textBlack,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                    ),
+
+                    // Decorative Corner Pill (Right): Instant
+                    // Positioned(
+                    //   top: 12,
+                    //   right: 10,
+                    //   child: Container(
+                    //     padding: const EdgeInsets.symmetric(
+                    //       horizontal: 8,
+                    //       vertical: 3,
+                    //     ),
+                    //     decoration: BoxDecoration(
+                    //       color: const Color(0xFFD6F887),
+                    //       borderRadius: BorderRadius.circular(10),
+                    //       border: Border.all(
+                    //         color: AppColors.strokeBlack,
+                    //         width: 1.2,
+                    //       ),
+                    //     ),
+                    //     child: const Row(
+                    //       mainAxisSize: MainAxisSize.min,
+                    //       children: [
+                    //         Icon(
+                    //           Icons.bolt_rounded,
+                    //           size: 12,
+                    //           color: AppColors.strokeBlack,
+                    //         ),
+                    //         SizedBox(width: 2),
+                    //         Text(
+                    //           'Instant',
+                    //           style: TextStyle(
+                    //             fontSize: 10,
+                    //             fontWeight: FontWeight.w900,
+                    //             color: AppColors.textBlack,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+
+                    // Center Gender Image with Circle Frame & Shadow (No DP)
+                    Container(
+                      width: 70,
+                      height: 70,
                       decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(10),
+                        color: match.isFemale
+                            ? const Color(0xFFFFF0F5)
+                            : const Color(0xFFF0F9FF),
+                        shape: BoxShape.circle,
                         border: Border.all(
                           color: AppColors.strokeBlack,
-                          width: 1.2,
+                          width: 2.2,
+                        ),
+                        boxShadow: AppTheme.neoShadow(
+                          offset: const Offset(2.5, 2.5),
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text('🗣️', style: TextStyle(fontSize: 8)),
-                          const SizedBox(width: 4),
-                          Text(
-                            match.location.contains('Language:')
-                                ? match.location
-                                      .replaceAll('Language:', '')
-                                      .trim()
-                                : 'English',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textBlack,
-                            ),
+                      child: ClipOval(
+                        child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Image.asset(
+                            match.genderImageAsset,
+                            fit: BoxFit.contain,
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Decorative Corner Pill (Right): Instant
-                  // Positioned(
-                  //   top: 12,
-                  //   right: 10,
-                  //   child: Container(
-                  //     padding: const EdgeInsets.symmetric(
-                  //       horizontal: 8,
-                  //       vertical: 3,
+                    // Sparkle decoration on top right of avatar
+                    // Positioned(
+                    //   top: 12,
+                    //   right: 90,
+                    //   child: SparkleWidget(size: 16, color: match.avatarColor),
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // 3. Name, Verified Tag & Topic Chips
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${match.name}${match.age > 0 ? ', ${match.age}' : ''}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textBlack,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Icons.verified_rounded,
+                        size: 15,
+                        color: Color(0xFF2563EB),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+
+                  // Profession Badge (Only show the profession, e.g. Doctor)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 3.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardWhite,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 1.3,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipOval(
+                          child: Image.asset(
+                            match.genderImageAsset,
+                            width: 16,
+                            height: 16,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.topCenter,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          match.profession,
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textBlack,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Interests Box with "Interests" heading & all user interests
+                  // Container(
+                  //   width: double.infinity,
+                  //   padding: const EdgeInsets.symmetric(
+                  //     horizontal: 10,
+                  //     vertical: 6,
+                  //   ),
+                  //   decoration: BoxDecoration(
+                  //     color: AppColors.cardWhite.withOpacity(0.92),
+                  //     borderRadius: BorderRadius.circular(14),
+                  //     border: Border.all(
+                  //       color: AppColors.strokeBlack,
+                  //       width: 1.4,
                   //     ),
-                  //     decoration: BoxDecoration(
-                  //       color: const Color(0xFFD6F887),
-                  //       borderRadius: BorderRadius.circular(10),
-                  //       border: Border.all(
-                  //         color: AppColors.strokeBlack,
-                  //         width: 1.2,
-                  //       ),
-                  //     ),
-                  //     child: const Row(
-                  //       mainAxisSize: MainAxisSize.min,
-                  //       children: [
-                  //         Icon(
-                  //           Icons.bolt_rounded,
-                  //           size: 12,
-                  //           color: AppColors.strokeBlack,
+                  //   ),
+                  //   child: Row(
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       Container(
+                  //         padding: const EdgeInsets.symmetric(
+                  //           horizontal: 7,
+                  //           vertical: 2.5,
                   //         ),
-                  //         SizedBox(width: 2),
-                  //         Text(
-                  //           'Instant',
+                  //         decoration: BoxDecoration(
+                  //           color: const Color(0xFFFFD1E3),
+                  //           borderRadius: BorderRadius.circular(8),
+                  //           border: Border.all(
+                  //             color: AppColors.strokeBlack,
+                  //             width: 1.1,
+                  //           ),
+                  //         ),
+                  //         child: const Text(
+                  //           'Interests',
                   //           style: TextStyle(
-                  //             fontSize: 10,
+                  //             fontSize: 10.5,
                   //             fontWeight: FontWeight.w900,
                   //             color: AppColors.textBlack,
                   //           ),
                   //         ),
-                  //       ],
-                  //     ),
+                  //       ),
+                  //       const SizedBox(width: 8),
+                  //       Expanded(
+                  //         child: Text(
+                  //           interestDisplay,
+                  //           maxLines: 2,
+                  //           overflow: TextOverflow.ellipsis,
+                  //           style: const TextStyle(
+                  //             fontSize: 12,
+                  //             fontWeight: FontWeight.w800,
+                  //             color: AppColors.textBlack,
+                  //             height: 1.25,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
                   //   ),
-                  // ),
-
-                  // Center Gender Image with Circle Frame & Shadow (No DP)
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: match.isFemale
-                          ? const Color(0xFFFFF0F5)
-                          : const Color(0xFFF0F9FF),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.strokeBlack,
-                        width: 2.2,
-                      ),
-                      boxShadow: AppTheme.neoShadow(
-                        offset: const Offset(2.5, 2.5),
-                      ),
-                    ),
-                    child: ClipOval(
-                      child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Image.asset(
-                          match.genderImageAsset,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Sparkle decoration on top right of avatar
-                  // Positioned(
-                  //   top: 12,
-                  //   right: 90,
-                  //   child: SparkleWidget(size: 16, color: match.avatarColor),
                   // ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 2),
 
-          // 3. Name, Verified Tag & Topic Chips
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${match.name}${match.age > 0 ? ', ${match.age}' : ''}',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textBlack,
-                        letterSpacing: -0.4,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(
-                      Icons.verified_rounded,
-                      size: 15,
-                      color: Color(0xFF2563EB),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-
-                // Profession Badge (Only show the profession, e.g. Doctor)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 9,
-                    vertical: 3.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardWhite,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AppColors.strokeBlack,
-                      width: 1.3,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          match.genderImageAsset,
-                          width: 16,
-                          height: 16,
-                          fit: BoxFit.cover,
-                          alignment: Alignment.topCenter,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        match.profession,
-                        style: const TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textBlack,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 4),
-
-                // Interests Box with "Interests" heading & all user interests
-                // Container(
-                //   width: double.infinity,
-                //   padding: const EdgeInsets.symmetric(
-                //     horizontal: 10,
-                //     vertical: 6,
-                //   ),
-                //   decoration: BoxDecoration(
-                //     color: AppColors.cardWhite.withOpacity(0.92),
-                //     borderRadius: BorderRadius.circular(14),
-                //     border: Border.all(
-                //       color: AppColors.strokeBlack,
-                //       width: 1.4,
-                //     ),
-                //   ),
-                //   child: Row(
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     children: [
-                //       Container(
-                //         padding: const EdgeInsets.symmetric(
-                //           horizontal: 7,
-                //           vertical: 2.5,
-                //         ),
-                //         decoration: BoxDecoration(
-                //           color: const Color(0xFFFFD1E3),
-                //           borderRadius: BorderRadius.circular(8),
-                //           border: Border.all(
-                //             color: AppColors.strokeBlack,
-                //             width: 1.1,
-                //           ),
-                //         ),
-                //         child: const Text(
-                //           'Interests',
-                //           style: TextStyle(
-                //             fontSize: 10.5,
-                //             fontWeight: FontWeight.w900,
-                //             color: AppColors.textBlack,
-                //           ),
-                //         ),
-                //       ),
-                //       const SizedBox(width: 8),
-                //       Expanded(
-                //         child: Text(
-                //           interestDisplay,
-                //           maxLines: 2,
-                //           overflow: TextOverflow.ellipsis,
-                //           style: const TextStyle(
-                //             fontSize: 12,
-                //             fontWeight: FontWeight.w800,
-                //             color: AppColors.textBlack,
-                //             height: 1.25,
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-              ],
+            // 4. Slide to Call Action Button
+            Padding(
+              padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
+              child: SlideToActionButton(
+                text: 'Slide to Call',
+                icon: Icons.phone_rounded,
+                height: 35,
+                backgroundColor: const Color(0xFFF1FAC0),
+                handleColor: const Color(0xFFD6F887),
+                textColor: AppColors.strokeBlack,
+                iconColor: AppColors.strokeBlack,
+                onCompleted: () => _startCall(match),
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-
-          // 4. Slide to Call Action Button
-          Padding(
-            padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
-            child: SlideToActionButton(
-              text: 'Slide to Call',
-              icon: Icons.phone_rounded,
-              height: 35,
-              backgroundColor: const Color(0xFFF1FAC0),
-              handleColor: const Color(0xFFD6F887),
-              textColor: AppColors.strokeBlack,
-              iconColor: AppColors.strokeBlack,
-              onCompleted: () => _startCall(match),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
