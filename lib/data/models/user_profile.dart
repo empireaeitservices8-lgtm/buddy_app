@@ -6,9 +6,9 @@ enum Gender {
   String get displayName {
     switch (this) {
       case Gender.woman:
-        return 'Woman';
+        return 'Female';
       case Gender.man:
-        return 'Man';
+        return 'Male';
       case Gender.nonBinary:
         return 'Non-Binary';
     }
@@ -95,35 +95,42 @@ class UserProfile {
     this.role,
   });
 
-  String get fullPhoneNumber => phoneNumber.startsWith('+') ? phoneNumber : '$countryCode $phoneNumber';
-  String get fullName => lastName != null && lastName!.isNotEmpty ? '$firstName $lastName' : firstName;
+  String get fullPhoneNumber =>
+      phoneNumber.startsWith('+') ? phoneNumber : '$countryCode $phoneNumber';
+  String get fullName => lastName != null && lastName!.isNotEmpty
+      ? '$firstName $lastName'
+      : firstName;
 
   /// Factory constructor to parse JSON maps from API responses (supports direct and wrapped envelopes)
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     final map = (json['data'] is Map<String, dynamic>)
         ? json['data'] as Map<String, dynamic>
         : (json['profile'] is Map<String, dynamic>
-            ? json['profile'] as Map<String, dynamic>
-            : (json['user'] is Map<String, dynamic>
-                ? json['user'] as Map<String, dynamic>
-                : json));
+              ? json['profile'] as Map<String, dynamic>
+              : (json['user'] is Map<String, dynamic>
+                    ? json['user'] as Map<String, dynamic>
+                    : json));
 
-    final rawName = map['display_name']?.toString() ??
+    final rawName =
+        map['display_name']?.toString() ??
         map['name']?.toString() ??
         map['first_name']?.toString() ??
         map['username']?.toString() ??
         map['listener_id']?.toString() ??
         '';
     final nameParts = rawName.trim().split(' ');
-    final fName = map['first_name']?.toString() ??
+    final fName =
+        map['first_name']?.toString() ??
         map['name']?.toString() ??
         map['display_name']?.toString() ??
         (nameParts.isNotEmpty ? nameParts.first : '');
-    final lName = map['last_name']?.toString() ??
+    final lName =
+        map['last_name']?.toString() ??
         (nameParts.length > 1 ? nameParts.sublist(1).join(' ') : null);
 
     final roleUpper = (map['role'] ?? json['role'])?.toString().toUpperCase();
-    final isAgentUser = map['is_agent'] == true ||
+    final isAgentUser =
+        map['is_agent'] == true ||
         json['is_agent'] == true ||
         roleUpper == 'AGENT' ||
         roleUpper == 'LISTENER';
@@ -131,13 +138,15 @@ class UserProfile {
     return UserProfile(
       id: map['id']?.toString(),
       userId: map['user_id']?.toString() ?? map['id']?.toString(),
-      phoneNumber: map['phone_number']?.toString() ?? map['phone']?.toString() ?? '',
+      phoneNumber:
+          map['phone_number']?.toString() ?? map['phone']?.toString() ?? '',
       countryCode: map['country_code']?.toString() ?? '+1',
       firstName: fName.isNotEmpty ? fName : rawName,
       lastName: lName,
       email: map['email']?.toString(),
       bio: map['bio']?.toString(),
-      profession: map['profession_name']?.toString() ??
+      profession:
+          map['profession_name']?.toString() ??
           map['profession']?.toString() ??
           map['conversation_category']?.toString(),
       location: map['location']?.toString(),
@@ -146,7 +155,8 @@ class UserProfile {
           ? map['age'] as int
           : (map['age'] != null ? int.tryParse(map['age'].toString()) : null),
       gender: Gender.fromString(map['gender']?.toString()),
-      avatarUrl: map['profile_picture']?.toString() ??
+      avatarUrl:
+          map['profile_picture']?.toString() ??
           map['profile_picture_url']?.toString() ??
           map['avatar_url']?.toString() ??
           map['avatar']?.toString() ??
@@ -155,18 +165,26 @@ class UserProfile {
       interests: map['interests'] is List
           ? (map['interests'] as List).map((e) {
               if (e is Map) {
-                return (e['name'] ?? e['title'] ?? e['label'] ?? e.toString()).toString();
+                return (e['name'] ?? e['title'] ?? e['label'] ?? e.toString())
+                    .toString();
               }
               return e.toString();
             }).toList()
           : (map['interest_names'] is List
-              ? (map['interest_names'] as List).map((e) => e.toString()).toList()
-              : const []),
+                ? (map['interest_names'] as List)
+                      .map((e) => e.toString())
+                      .toList()
+                : const []),
       voiceCallsCount: map['voice_calls_count'] is int
           ? map['voice_calls_count'] as int
           : (map['total_calls'] is int
-              ? map['total_calls'] as int
-              : (int.tryParse(map['voice_calls_count']?.toString() ?? map['total_calls']?.toString() ?? '') ?? 0)),
+                ? map['total_calls'] as int
+                : (int.tryParse(
+                        map['voice_calls_count']?.toString() ??
+                            map['total_calls']?.toString() ??
+                            '',
+                      ) ??
+                      0)),
       rating: map['rating'] is num
           ? (map['rating'] as num).toDouble()
           : (double.tryParse(map['rating']?.toString() ?? '') ?? 5.0),
@@ -262,5 +280,6 @@ class UserProfile {
   }
 
   @override
-  String toString() => 'UserProfile(id: $id, name: $fullName, phone: $fullPhoneNumber, age: $age)';
+  String toString() =>
+      'UserProfile(id: $id, name: $fullName, phone: $fullPhoneNumber, age: $age)';
 }
