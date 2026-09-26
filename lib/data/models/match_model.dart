@@ -235,7 +235,7 @@ class MatchProfile {
       isFemale ? const Color(0xFFD81B60) : const Color(0xFF0284C7);
 
   String get genderImageAsset =>
-      isFemale ? 'assets/images/Girl.png' : 'assets/images/Boy.png';
+      isFemale ? 'assets/images/Girl2.png' : 'assets/images/Boy2.png';
 
   factory MatchProfile.fromJson(Map<String, dynamic> json, [int index = 0]) {
     final profObj = json['profession'] is Map
