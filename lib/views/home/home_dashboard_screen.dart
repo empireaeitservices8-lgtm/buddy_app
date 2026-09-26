@@ -277,13 +277,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.strokeBlack,
-                    width: 1.8,
-                  ),
-                  boxShadow: AppTheme.neoShadow(
-                    offset: const Offset(1.5, 1.5),
-                  ),
+                  border: Border.all(color: AppColors.strokeBlack, width: 1.8),
+                  boxShadow: AppTheme.neoShadow(offset: const Offset(1.5, 1.5)),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -589,10 +584,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.cardWhite,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.strokeBlack,
-                    width: 2.0,
-                  ),
+                  border: Border.all(color: AppColors.strokeBlack, width: 2.0),
                   boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
                 ),
                 child: const Row(
@@ -989,11 +981,16 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               )
             else
-              ListView.separated(
+              GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: matches.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 18),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 14,
+                  childAspectRatio: 0.55,
+                ),
                 itemBuilder: (context, index) {
                   return _buildMatchCard(matches[index]);
                 },
@@ -1327,30 +1324,31 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     final String interestDisplay = match.interests.isNotEmpty
         ? match.interests.join(' • ')
         : (match.conversationCategoryNames.isNotEmpty
-            ? match.conversationCategoryNames.join(' • ')
-            : (match.professionCategory.isNotEmpty &&
-                    match.professionCategory != 'General' &&
-                    match.professionCategory != match.profession
-                ? match.professionCategory
-                : (match.bio.trim().isNotEmpty && match.bio.trim().length > 3
-                    ? match.bio.trim()
-                    : match.profession)));
+              ? match.conversationCategoryNames.join(' • ')
+              : (match.professionCategory.isNotEmpty &&
+                        match.professionCategory != 'General' &&
+                        match.professionCategory != match.profession
+                    ? match.professionCategory
+                    : (match.bio.trim().isNotEmpty &&
+                              match.bio.trim().length > 3
+                          ? match.bio.trim()
+                          : match.profession)));
 
     return Container(
       decoration: BoxDecoration(
         color: match.cardColor,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-        boxShadow: AppTheme.neoShadow(offset: const Offset(4, 4)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.strokeBlack, width: 1.2),
+        boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. Top Badges Row
           Padding(
-            padding: const EdgeInsets.only(left: 14, right: 14, top: 14),
+            padding: const EdgeInsets.only(left: 14, right: 14, top: 4),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Online & Rating Badge Group
                 Row(
@@ -1395,8 +1393,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: 4,
+                        vertical: 2,
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFF2B2),
@@ -1430,84 +1428,86 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                   ],
                 ),
-
-                // Rate Badge & Favorite Button Group
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${match.rateCoinsPerSec} Coins/s',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textBlack,
-                            ),
-                          ),
-                          const SizedBox(width: 3),
-                          const Text('🪙', style: TextStyle(fontSize: 11)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        final wasFav = _viewModel.isFavorite(match.id);
-                        _viewModel.toggleFavorite(match.id, match);
-                        showNeoToast(
-                          context,
-                          wasFav
-                              ? 'Removed ${match.name} from favorites'
-                              : 'Added ${match.name} to favorites ❤️',
-                        );
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: isFav
-                              ? const Color(0xFFFF4D6D)
-                              : AppColors.cardWhite,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.strokeBlack,
-                            width: 1.5,
-                          ),
-                          boxShadow: AppTheme.neoShadow(
-                            offset: const Offset(1.5, 1.5),
-                          ),
-                        ),
-                        child: Icon(
-                          isFav
-                              ? Icons.favorite_rounded
-                              : Icons.favorite_border_rounded,
-                          size: 16,
-                          color: isFav ? Colors.white : AppColors.strokeBlack,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
           const SizedBox(height: 7),
-
+          // Rate Badge & Favorite Button Group
+          Padding(
+            padding: const EdgeInsets.only(left: 14, right: 14, top: 1),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardWhite,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${match.rateCoinsPerSec} Coins/s',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textBlack,
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      const Text('🪙', style: TextStyle(fontSize: 11)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    final wasFav = _viewModel.isFavorite(match.id);
+                    _viewModel.toggleFavorite(match.id, match);
+                    showNeoToast(
+                      context,
+                      wasFav
+                          ? 'Removed ${match.name} from favorites'
+                          : 'Added ${match.name} to favorites ❤️',
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isFav
+                          ? const Color(0xFFFF4D6D)
+                          : AppColors.cardWhite,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 1.5,
+                      ),
+                      boxShadow: AppTheme.neoShadow(
+                        offset: const Offset(1.5, 1.5),
+                      ),
+                    ),
+                    child: Icon(
+                      isFav
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      size: 16,
+                      color: isFav ? Colors.white : AppColors.strokeBlack,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
           // 2. Beautiful Visual Showcase with Hero Avatar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -1559,7 +1559,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('🗣️', style: TextStyle(fontSize: 10)),
+                          const Text('🗣️', style: TextStyle(fontSize: 8)),
                           const SizedBox(width: 4),
                           Text(
                             match.location.contains('Language:')
@@ -1579,48 +1579,48 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   ),
 
                   // Decorative Corner Pill (Right): Instant
-                  Positioned(
-                    top: 8,
-                    right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD6F887),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 1.2,
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.bolt_rounded,
-                            size: 12,
-                            color: AppColors.strokeBlack,
-                          ),
-                          SizedBox(width: 2),
-                          Text(
-                            'Instant',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textBlack,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Positioned(
+                  //   top: 12,
+                  //   right: 10,
+                  //   child: Container(
+                  //     padding: const EdgeInsets.symmetric(
+                  //       horizontal: 8,
+                  //       vertical: 3,
+                  //     ),
+                  //     decoration: BoxDecoration(
+                  //       color: const Color(0xFFD6F887),
+                  //       borderRadius: BorderRadius.circular(10),
+                  //       border: Border.all(
+                  //         color: AppColors.strokeBlack,
+                  //         width: 1.2,
+                  //       ),
+                  //     ),
+                  //     child: const Row(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       children: [
+                  //         Icon(
+                  //           Icons.bolt_rounded,
+                  //           size: 12,
+                  //           color: AppColors.strokeBlack,
+                  //         ),
+                  //         SizedBox(width: 2),
+                  //         Text(
+                  //           'Instant',
+                  //           style: TextStyle(
+                  //             fontSize: 10,
+                  //             fontWeight: FontWeight.w900,
+                  //             color: AppColors.textBlack,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
 
                   // Center Gender Image with Circle Frame & Shadow (No DP)
                   Container(
-                    width: 104,
-                    height: 104,
+                    width: 70,
+                    height: 70,
                     decoration: BoxDecoration(
                       color: match.isFemale
                           ? const Color(0xFFFFF0F5)
@@ -1646,11 +1646,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   ),
 
                   // Sparkle decoration on top right of avatar
-                  Positioned(
-                    top: 12,
-                    right: 90,
-                    child: SparkleWidget(size: 16, color: match.avatarColor),
-                  ),
+                  // Positioned(
+                  //   top: 12,
+                  //   right: 90,
+                  //   child: SparkleWidget(size: 16, color: match.avatarColor),
+                  // ),
                 ],
               ),
             ),
@@ -1669,7 +1669,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     Text(
                       '${match.name}${match.age > 0 ? ', ${match.age}' : ''}',
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: AppColors.textBlack,
                         letterSpacing: -0.4,
@@ -1678,7 +1678,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     const SizedBox(width: 6),
                     const Icon(
                       Icons.verified_rounded,
-                      size: 20,
+                      size: 15,
                       color: Color(0xFF2563EB),
                     ),
                   ],
@@ -1723,69 +1723,69 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
 
                 // Interests Box with "Interests" heading & all user interests
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardWhite.withOpacity(0.92),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: AppColors.strokeBlack,
-                      width: 1.4,
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 2.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFD1E3),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.strokeBlack,
-                            width: 1.1,
-                          ),
-                        ),
-                        child: const Text(
-                          'Interests',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textBlack,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          interestDisplay,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textBlack,
-                            height: 1.25,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   width: double.infinity,
+                //   padding: const EdgeInsets.symmetric(
+                //     horizontal: 10,
+                //     vertical: 6,
+                //   ),
+                //   decoration: BoxDecoration(
+                //     color: AppColors.cardWhite.withOpacity(0.92),
+                //     borderRadius: BorderRadius.circular(14),
+                //     border: Border.all(
+                //       color: AppColors.strokeBlack,
+                //       width: 1.4,
+                //     ),
+                //   ),
+                //   child: Row(
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     children: [
+                //       Container(
+                //         padding: const EdgeInsets.symmetric(
+                //           horizontal: 7,
+                //           vertical: 2.5,
+                //         ),
+                //         decoration: BoxDecoration(
+                //           color: const Color(0xFFFFD1E3),
+                //           borderRadius: BorderRadius.circular(8),
+                //           border: Border.all(
+                //             color: AppColors.strokeBlack,
+                //             width: 1.1,
+                //           ),
+                //         ),
+                //         child: const Text(
+                //           'Interests',
+                //           style: TextStyle(
+                //             fontSize: 10.5,
+                //             fontWeight: FontWeight.w900,
+                //             color: AppColors.textBlack,
+                //           ),
+                //         ),
+                //       ),
+                //       const SizedBox(width: 8),
+                //       Expanded(
+                //         child: Text(
+                //           interestDisplay,
+                //           maxLines: 2,
+                //           overflow: TextOverflow.ellipsis,
+                //           style: const TextStyle(
+                //             fontSize: 12,
+                //             fontWeight: FontWeight.w800,
+                //             color: AppColors.textBlack,
+                //             height: 1.25,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
 
           // 4. Slide to Call Action Button
           Padding(
@@ -1793,7 +1793,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             child: SlideToActionButton(
               text: 'Slide to Call',
               icon: Icons.phone_rounded,
-              height: 48,
+              height: 35,
               backgroundColor: const Color(0xFFF1FAC0),
               handleColor: const Color(0xFFD6F887),
               textColor: AppColors.strokeBlack,
