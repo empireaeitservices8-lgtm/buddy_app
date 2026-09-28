@@ -491,24 +491,41 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
             const SizedBox(height: 10),
 
-            // 2-Column Grid matching the 3D card layout
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: intents.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 14,
-                childAspectRatio: 0.98,
-              ),
-              itemBuilder: (context, index) {
-                final intent = intents[index];
-                final isSelected = _viewModel.isIntentSelected(intent);
-                return ConversationCategoryCard(
-                  intent: intent,
-                  isSelected: isSelected,
-                  onTap: () => _viewModel.toggleIntentSelection(intent),
+            // Keep two-column sizing and center an odd final card on its row.
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const spacing = 12.0;
+                final itemWidth = (constraints.maxWidth - spacing) / 2;
+                final itemHeight = itemWidth / 0.98;
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: 14,
+                  children: List.generate(intents.length, (index) {
+                    final intent = intents[index];
+                    final isLastOddItem =
+                        intents.length.isOdd && index == intents.length - 1;
+
+                    final card = ConversationCategoryCard(
+                      intent: intent,
+                      isSelected: _viewModel.isIntentSelected(intent),
+                      onTap: () => _viewModel.toggleIntentSelection(intent),
+                    );
+
+                    return SizedBox(
+                      width: isLastOddItem ? constraints.maxWidth : itemWidth,
+                      height: itemHeight,
+                      child: isLastOddItem
+                          ? Center(
+                              child: SizedBox(
+                                width: itemWidth,
+                                height: itemHeight,
+                                child: card,
+                              ),
+                            )
+                          : card,
+                    );
+                  }),
                 );
               },
             ),
@@ -1019,8 +1036,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 10,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.49,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.53,
                 ),
                 itemBuilder: (context, index) {
                   return _buildMatchCard(matches[index]);
@@ -1373,7 +1390,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
@@ -1459,7 +1476,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
             // Rate Badge & Favorite Button Group
             Row(
@@ -1533,12 +1550,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
             // 2. Beautiful Visual Showcase with Hero Avatar & Language Tag
             Container(
               width: double.infinity,
-              height: 126,
+              height: 110,
               decoration: BoxDecoration(
                 color: AppColors.cardWhite,
                 borderRadius: BorderRadius.circular(18),
@@ -1566,10 +1583,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
                   // Center Avatar Circle (Large & Clean)
                   Positioned(
-                    top: 8,
+                    top: 7,
                     child: Container(
-                      width: 74,
-                      height: 74,
+                      width: 66,
+                      height: 66,
                       decoration: BoxDecoration(
                         color: match.isFemale
                             ? const Color(0xFFFFF0F5)
@@ -1646,7 +1663,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
             // 3. Name & Verified Badge
             Row(
@@ -1677,17 +1694,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
             // Profession Badge
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 2.5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
               decoration: BoxDecoration(
                 color: AppColors.cardWhite,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.strokeBlack,
-                  width: 1.1,
-                ),
+                border: Border.all(color: AppColors.strokeBlack, width: 1.1),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -1717,7 +1728,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 4),
 
             // Interests Tag / Topic in the space after profession (2 Lines supported)
             if (interestDisplay.isNotEmpty)
@@ -1760,7 +1771,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
             // 4. Slide to Call Action Button
             SlideToActionButton(

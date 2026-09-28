@@ -302,7 +302,7 @@ class RegistrationViewModel extends BaseViewModel {
       setError('Please enter your first name');
       return false;
     }
-    if (_age == null || _age! < 17 || _age! > 99) {
+    if (_age == null || _age! < 18 || _age! > 99) {
       setError('Please enter an age of 18 or above');
       return false;
     }
