@@ -7,7 +7,7 @@ import '../../../data/models/caller_intent_model.dart';
 class ConversationCategoryCard extends StatelessWidget {
   final CallerIntent intent;
   final bool isSelected;
-  final ValueChanged<String> onTap;
+  final VoidCallback onTap;
 
   const ConversationCategoryCard({
     super.key,
@@ -56,7 +56,7 @@ class ConversationCategoryCard extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => onTap(intent.id),
+            onTap: onTap,
             borderRadius: BorderRadius.circular(22),
             child: Stack(
               fit: StackFit.expand,
