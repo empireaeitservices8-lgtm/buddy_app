@@ -10,7 +10,7 @@ enum Gender {
       case Gender.man:
         return 'Male';
       case Gender.nonBinary:
-        return 'Non-Binary';
+        return 'Non-binary';
     }
   }
 

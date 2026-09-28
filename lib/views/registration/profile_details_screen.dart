@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../../data/models/user_profile.dart';
 import '../../viewmodels/registration_view_model.dart';
 import '../widgets/segmented_progress_bar.dart';
@@ -57,14 +56,14 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
                 Text(
                   "Let's personalize!",
                   style: AppTypography.headlineLarge.copyWith(
-                    fontSize: 28,
+                    fontSize: 26,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.textBlack,
+                    color: CartoonColors.charcoal,
                     letterSpacing: -0.6,
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Text('✍️', style: TextStyle(fontSize: 24)),
+                const Text('✍️', style: TextStyle(fontSize: 22)),
               ],
             ),
           ),
@@ -75,17 +74,17 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
             child: Text(
               'Tell us about yourself to build your profile.',
               textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: CartoonColors.textMuted,
               ),
             ),
           ),
 
           const SizedBox(height: 18),
 
-          // Progress Bar with 5 segments & vertical slider pill (5th/last step)
+          // Progress Bar
           const SegmentedProgressBar(
             totalSegments: 3,
             activeIndex: 2,
@@ -97,10 +96,15 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
           // FIRST NAME Card
           Container(
             decoration: BoxDecoration(
-              color: AppColors.cardWhite,
+              color: CartoonColors.white,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-              boxShadow: AppTheme.neoShadow(offset: const Offset(3.0, 3.0)),
+              border: Border.all(
+                color: CartoonColors.charcoal,
+                width: CartoonDimensions.borderWidthThin,
+              ),
+              boxShadow: CartoonDimensions.shadowSmall(
+                offset: const Offset(2.5, 2.5),
+              ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
@@ -109,11 +113,11 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFE4E6),
+                    color: CartoonColors.pinkSoft,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.strokeBlack,
-                      width: 1.8,
+                      color: CartoonColors.charcoal,
+                      width: 1.6,
                     ),
                   ),
                   child: const Center(
@@ -126,29 +130,20 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // const Text(
-                      //   'FIRST NAME',
-                      //   style: TextStyle(
-                      //     fontSize: 11,
-                      //     fontWeight: FontWeight.w900,
-                      //     letterSpacing: 0.8,
-                      //     color: AppColors.textBlack,
-                      //   ),
-                      // ),
                       const SizedBox(height: 4),
                       TextField(
                         controller: _nameController,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textBlack,
+                          color: CartoonColors.charcoal,
                         ),
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'e.g., Anna Daize',
-                          hintStyle: const TextStyle(
+                          hintStyle: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF94A3B8),
+                            color: CartoonColors.textPlaceholder,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.zero,
@@ -188,7 +183,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               fontSize: 11,
               fontWeight: FontWeight.w900,
               letterSpacing: 0.8,
-              color: AppColors.textBlack,
+              color: CartoonColors.charcoal,
             ),
           ),
           const SizedBox(height: 8),
@@ -196,10 +191,15 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
           // AGE Card
           Container(
             decoration: BoxDecoration(
-              color: AppColors.cardWhite,
+              color: CartoonColors.white,
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-              boxShadow: AppTheme.neoShadow(offset: const Offset(3.0, 3.0)),
+              border: Border.all(
+                color: CartoonColors.charcoal,
+                width: CartoonDimensions.borderWidthThin,
+              ),
+              boxShadow: CartoonDimensions.shadowSmall(
+                offset: const Offset(2.5, 2.5),
+              ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
@@ -208,11 +208,11 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
+                    color: CartoonColors.yellowSoft,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.strokeBlack,
-                      width: 1.8,
+                      color: CartoonColors.charcoal,
+                      width: 1.6,
                     ),
                   ),
                   child: const Center(
@@ -231,14 +231,14 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textBlack,
+                      color: CartoonColors.charcoal,
                     ),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'e.g., 24',
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF94A3B8),
+                        color: CartoonColors.textPlaceholder,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
@@ -278,7 +278,7 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               fontSize: 11,
               fontWeight: FontWeight.w900,
               letterSpacing: 0.8,
-              color: AppColors.textBlack,
+              color: CartoonColors.charcoal,
             ),
           ),
           const SizedBox(height: 10),
@@ -323,95 +323,22 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
 
           const SizedBox(height: 30),
 
-          // CONTINUE CTA Button (Coral/Orange Pill)
-
-          vm.isLoading
-              ? Center(
-                child: const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                strokeWidth: 2.4,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                            ),
-                          ),
-              )
-              : Padding(
-            padding: const EdgeInsets.only(
-              left: 14,
-              right: 14,
-              bottom: 10,
-            ),
-            child: SlideToActionButton(
-              text: 'CONTINUE',
-              icon: Icons.check,
-              height: 70,
-              backgroundColor: const Color(0xFFF1FAC0),
-              handleColor: const Color(0xFFD6F887),
-              textColor: AppColors.strokeBlack,
-              iconColor: AppColors.strokeBlack,
-              onCompleted: () {
-                vm.setFirstName(_nameController.text.trim());
-                vm.setAge(_ageController.text.trim());
-                vm.submitFirstDetails();
-              },
-              // onCompleted: () => _startCall(match),
-            ),
+          // Slide To Action Button
+          SlideToActionButton(
+            text: 'SLIDE TO CONTINUE',
+            icon: Icons.arrow_forward_rounded,
+            backgroundColor: CartoonColors.charcoal,
+            handleColor: CartoonColors.lime,
+            textColor: Colors.white,
+            iconColor: CartoonColors.charcoal,
+            height: 64.0,
+            isLoading: vm.isLoading,
+            onCompleted: () {
+              vm.setFirstName(_nameController.text.trim());
+              vm.setAge(_ageController.text.trim());
+              vm.submitFirstDetails();
+            },
           ),
-          //
-          // GestureDetector(
-          //   onTap: vm.isLoading
-          //       ? null
-          //       : () {
-          //           vm.setFirstName(_nameController.text.trim());
-          //           vm.setAge(_ageController.text.trim());
-          //           vm.submitFirstDetails();
-          //         },
-          //   child: AnimatedContainer(
-          //     duration: const Duration(milliseconds: 150),
-          //     width: double.infinity,
-          //     height: 56,
-          //     decoration: BoxDecoration(
-          //       gradient: const LinearGradient(
-          //         colors: [Color(0xFFFF8B77), Color(0xFFFF6B6B)],
-          //         begin: Alignment.topCenter,
-          //         end: Alignment.bottomCenter,
-          //       ),
-          //       borderRadius: BorderRadius.circular(28),
-          //       border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-          //       boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
-          //     ),
-          //     child: Center(
-          //       child: vm.isLoading
-          //           ? const SizedBox(
-          //               width: 22,
-          //               height: 22,
-          //               child: CircularProgressIndicator(
-          //                 strokeWidth: 2.4,
-          //                 valueColor: AlwaysStoppedAnimation<Color>(
-          //                   Colors.white,
-          //                 ),
-          //               ),
-          //             )
-          //           : Row(
-          //               mainAxisAlignment: MainAxisAlignment.center,
-          //               children: const [
-          //                 Text(
-          //                   'CONTINUE',
-          //                   style: TextStyle(
-          //                     fontSize: 16,
-          //                     fontWeight: FontWeight.w900,
-          //                     color: Colors.white,
-          //                     letterSpacing: 0.6,
-          //                   ),
-          //                 ),
-          //                 SizedBox(width: 8),
-          //                 Text('🚀', style: TextStyle(fontSize: 18)),
-          //               ],
-          //             ),
-          //     ),
-          //   ),
-          // ),
 
           const SizedBox(height: 24),
         ],
@@ -433,16 +360,16 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
         duration: const Duration(milliseconds: 150),
         height: 104,
         decoration: BoxDecoration(
-          color: isSelected ? selectedColor : AppColors.cardWhite,
+          color: isSelected ? selectedColor : CartoonColors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppColors.strokeBlack,
-            width: isSelected ? 2.4 : 1.8,
+            color: CartoonColors.charcoal,
+            width: isSelected ? 2.4 : CartoonDimensions.borderWidthThin,
           ),
-          boxShadow: AppTheme.neoShadow(
+          boxShadow: CartoonDimensions.shadowSmall(
             offset: isSelected
                 ? const Offset(1.5, 1.5)
-                : const Offset(3.0, 3.0),
+                : const Offset(2.5, 2.5),
           ),
         ),
         child: Column(
@@ -452,9 +379,12 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.cardWhite,
+                color: CartoonColors.white,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.strokeBlack, width: 1.6),
+                border: Border.all(
+                  color: CartoonColors.charcoal,
+                  width: 1.5,
+                ),
               ),
               child: Center(
                 child: Text(iconText, style: const TextStyle(fontSize: 20)),
@@ -464,10 +394,10 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
-                color: AppColors.textBlack,
+                color: CartoonColors.charcoal,
               ),
             ),
           ],
@@ -476,3 +406,4 @@ class _ProfileDetailsViewState extends State<ProfileDetailsView> {
     );
   }
 }
+

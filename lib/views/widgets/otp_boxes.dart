@@ -1,10 +1,7 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/cartoon_theme.dart';
 
 class OtpInputField extends StatefulWidget {
   final int length;
@@ -117,14 +114,13 @@ class _OtpInputFieldState extends State<OtpInputField> {
 
   @override
   Widget build(BuildContext context) {
-    final boxSize = widget.length > 4 ? 50.0 : 66.0;
+    final boxSize = widget.length > 4 ? 50.0 : 64.0;
     final fontSize = widget.length > 4 ? 22.0 : 26.0;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(widget.length, (index) {
         final isFocused = _focusNodes[index].hasFocus;
-        final hasValue = _controllers[index].text.isNotEmpty;
 
         return RawKeyboardListener(
           focusNode: FocusNode(),
@@ -138,23 +134,14 @@ class _OtpInputFieldState extends State<OtpInputField> {
               width: boxSize,
               height: boxSize,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFE0F2FE), // Soft sky
-                    Color(0xFFFFE4E6), // Soft peach/pink
-                    Color(0xFFFEF3C7), // Soft yellow
-                    Color(0xFFD1FAE5), // Soft mint
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: CartoonColors.white,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: AppColors.strokeBlack,
-                  width: isFocused ? 2.6 : 2.0,
+                  color: isFocused ? const Color(0xFF00A79D) : CartoonColors.charcoal,
+                  width: isFocused ? 2.5 : CartoonDimensions.borderWidthThin,
                 ),
-                boxShadow: AppTheme.neoShadow(
-                  offset: isFocused ? const Offset(1.5, 1.5) : const Offset(3.0, 3.0),
+                boxShadow: CartoonDimensions.shadowSmall(
+                  offset: isFocused ? const Offset(1.5, 1.5) : const Offset(2.5, 2.5),
                 ),
               ),
               alignment: Alignment.center,
@@ -173,7 +160,7 @@ class _OtpInputFieldState extends State<OtpInputField> {
                 style: AppTypography.headlineLarge.copyWith(
                   fontWeight: FontWeight.w900,
                   fontSize: fontSize,
-                  color: AppColors.textBlack,
+                  color: CartoonColors.charcoal,
                 ),
                 decoration: const InputDecoration(
                   isDense: true,
@@ -192,3 +179,4 @@ class _OtpInputFieldState extends State<OtpInputField> {
     );
   }
 }
+

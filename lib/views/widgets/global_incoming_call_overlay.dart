@@ -127,7 +127,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  // Header Bar: Gabby Talk Logo + Incoming Call Badge
+                  // Header Bar: Gaby Talk Logo + Incoming Call Badge
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -135,11 +135,11 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                         text: const TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Gabby ',
+                              text: 'Gaby ',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFFFF8A9A), // Pink Accent
+                                color: Color(0xFF0A2E65), // Navy Accent
                                 fontFamily: 'Inter',
                               ),
                             ),
@@ -148,7 +148,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF00C4B4), // Teal Accent
+                                color: Color(0xFF00A79D), // Teal Accent
                                 fontFamily: 'Inter',
                               ),
                             ),

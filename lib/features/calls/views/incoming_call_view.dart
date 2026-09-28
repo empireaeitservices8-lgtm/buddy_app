@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/call_session_model.dart';
 import '../viewmodels/call_viewmodel.dart';
 
@@ -152,11 +152,11 @@ class _IncomingCallViewState extends State<IncomingCallView>
                         text: const TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Gabby ',
+                              text: 'Gaby ',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFFFF8A9A), // Pink Accent
+                                color: Color(0xFF0A2E65), // Pink Accent
                                 fontFamily: 'Inter',
                               ),
                             ),
@@ -165,7 +165,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF00C4B4), // Teal Accent
+                                color: Color(0xFF00A79D), // Teal Accent
                                 fontFamily: 'Inter',
                               ),
                             ),
@@ -323,7 +323,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                         width: 6,
                         height: 6,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00C4B4),
+                          color: Color(0xFF00A79D),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -332,7 +332,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                         width: 6,
                         height: 6,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00C4B4),
+                          color: Color(0xFF00A79D),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -341,7 +341,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                         width: 6,
                         height: 6,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF00C4B4),
+                          color: Color(0xFF00A79D),
                           shape: BoxShape.circle,
                         ),
                       ),

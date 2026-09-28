@@ -4,7 +4,6 @@ import '../../core/theme/cartoon_theme.dart';
 import '../../data/models/auth_state.dart';
 import '../../viewmodels/splash_view_model.dart';
 import '../registration/registration_flow_page.dart';
-import '../widgets/gabby_mascot_widget.dart';
 import '../widgets/slide_to_action.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -45,7 +44,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final isSmallScreen = screenHeight < 680;
-    final mascotSize = (screenHeight * 0.25).clamp(110.0, 200.0);
 
     return CartoonScaffold(
       body: ListenableBuilder(
@@ -135,34 +133,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Circular Gabby Speech Bubble Icon
+        // Official Gaby Speech Bubble Icon
         Container(
-          width: 46,
-          height: 46,
+          width: 48,
+          height: 48,
           decoration: BoxDecoration(
-            color: CartoonColors.sky,
+            color: Colors.white,
             shape: BoxShape.circle,
             border: Border.all(
               color: CartoonColors.charcoal,
-              width: CartoonTheme.borderWidth,
+              width: CartoonDimensions.borderWidthThin,
             ),
-            boxShadow: CartoonTheme.shadow(offset: const Offset(2.5, 2.5)),
+            boxShadow: CartoonDimensions.shadowSmall(
+              offset: const Offset(2.0, 2.0),
+            ),
           ),
-          child: const Center(
-            child: Icon(
-              Icons.graphic_eq_rounded,
-              color: CartoonColors.charcoal,
-              size: 26,
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/app_icon.png',
+              fit: BoxFit.cover,
             ),
           ),
         ),
         const SizedBox(width: 10),
 
-        // GabbyTalk High-Contrast Typography
+        // GabyTalk Official Typography
         RichText(
           text: const TextSpan(
             style: TextStyle(
-              fontSize: 34,
+              fontSize: 32,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
               fontFamily: 'Roboto',
@@ -170,7 +169,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             children: [
               TextSpan(
                 text: 'Gaby',
-                style: TextStyle(color: Color(0xFFFF6B6B)),
+                style: TextStyle(color: Color(0xFF0A2E65)),
               ),
               TextSpan(
                 text: 'Talk',

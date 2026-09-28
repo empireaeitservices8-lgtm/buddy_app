@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+﻿// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -233,14 +233,14 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
       ),
     );
   }
-  // Top App Bar: GABBY TALK AGENT + DUTY TOGGLE
+  // Top App Bar: GABY TALK AGENT + DUTY TOGGLE
   Widget _buildAgentTopBar() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Brand Logo: GabbyTalk [AGENT]
+          // Brand Logo: GabyTalk [AGENT]
           Row(
             children: [
               RichText(
@@ -253,12 +253,12 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   ),
                   children: [
                     TextSpan(
-                      text: 'Gabby',
+                      text: 'Gaby',
                       style: TextStyle(color: CartoonColors.primary),
                     ),
                     TextSpan(
                       text: 'Talk',
-                      style: TextStyle(color: Color(0xFF00C4B4)),
+                      style: TextStyle(color: Color(0xFF00A79D)),
                     ),
                   ],
                 ),
@@ -1085,7 +1085,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // GABBY TALK AGENT PROFILE Pill Badge
+            // GABY TALK AGENT PROFILE Pill Badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -1104,7 +1104,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   ),
                   SizedBox(width: 6),
                   Text(
-                    'GABBY TALK AGENT PROFILE',
+                    'GABY TALK AGENT PROFILE',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
@@ -1362,7 +1362,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                             style: TextStyle(fontWeight: FontWeight.w900),
                           ),
                           content: const Text(
-                            'Are you sure you want to log out of your Gabby Talk Agent account?',
+                            'Are you sure you want to log out of your Gaby Talk Agent account?',
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                           actions: [

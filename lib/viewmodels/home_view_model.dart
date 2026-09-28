@@ -556,15 +556,29 @@ class HomeViewModel extends BaseViewModel {
     notifyListenersSafely();
   }
 
+  bool get areAllIntentsSelected {
+    final list = callerIntents;
+    if (list.isEmpty) return false;
+    return list.every((intent) => isIntentSelected(intent));
+  }
+
   void selectAllIntents() {
     _selectedIntentIds.clear();
-    _selectedIntentIds.addAll(defaultCallerIntents.map((e) => e.id));
+    _selectedIntentIds.addAll(callerIntents.map((e) => e.id));
     notifyListenersSafely();
   }
 
   void clearIntentSelections() {
     _selectedIntentIds.clear();
     notifyListenersSafely();
+  }
+
+  void toggleSelectAllIntents() {
+    if (areAllIntentsSelected) {
+      clearIntentSelections();
+    } else {
+      selectAllIntents();
+    }
   }
 
   void setMultipleSelectedIntents(Set<String> ids) {

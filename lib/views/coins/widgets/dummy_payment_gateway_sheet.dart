@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+﻿// ignore_for_file: deprecated_member_use
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -194,7 +194,7 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                       Row(
                         children: [
                           const Text(
-                            'GABBYTALK PAY',
+                            'GABYTALK PAY',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -397,7 +397,7 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                 Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey.shade600),
                 const SizedBox(width: 6),
                 Text(
-                  '256-Bit SSL • PCI-DSS Level 1 • Powered by GabbyPay',
+                  '256-Bit SSL • PCI-DSS Level 1 • Powered by GabyPay',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -524,7 +524,7 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Merchant: GabbyTalk Media',
+                  'Merchant: GabyTalk Media',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,

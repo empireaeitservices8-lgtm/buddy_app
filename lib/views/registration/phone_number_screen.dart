@@ -1,11 +1,9 @@
-﻿import 'package:buddy_app/views/widgets/slide_to_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../../viewmodels/registration_view_model.dart';
-import '../widgets/gabby_mascot_widget.dart';
+import '../widgets/slide_to_action.dart';
 import '../widgets/toast_utils.dart';
 
 class CountryItem {
@@ -74,10 +72,13 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
-          color: AppColors.cardWhite,
+          color: CartoonColors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-          boxShadow: AppTheme.neoShadow(offset: const Offset(0, -4)),
+          border: Border.all(
+            color: CartoonColors.charcoal,
+            width: CartoonDimensions.borderWidthThin,
+          ),
+          boxShadow: CartoonDimensions.shadow(offset: const Offset(0, -4)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
@@ -89,7 +90,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                 width: 44,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: AppColors.strokeBlack.withOpacity(0.2),
+                  color: CartoonColors.charcoal.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
@@ -100,7 +101,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
               style: AppTypography.headlineMedium.copyWith(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                color: AppColors.textBlack,
+                color: CartoonColors.charcoal,
               ),
             ),
             const SizedBox(height: 12),
@@ -108,7 +109,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: _supportedCountries.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (context, index) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final country = _supportedCountries[index];
                   final isSelected =
@@ -130,7 +131,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                         fontWeight: isSelected
                             ? FontWeight.w800
                             : FontWeight.w600,
-                        color: AppColors.textBlack,
+                        color: CartoonColors.charcoal,
                       ),
                     ),
                     trailing: Text(
@@ -140,7 +141,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                         fontWeight: FontWeight.w800,
                         color: isSelected
                             ? const Color(0xFF00A79D)
-                            : AppColors.textSecondary,
+                            : CartoonColors.textMuted,
                       ),
                     ),
                     onTap: () {
@@ -187,6 +188,8 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
   @override
   Widget build(BuildContext context) {
     final vm = widget.viewModel;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isSmallScreen = screenHeight < 680;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -194,55 +197,66 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 130),
+          SizedBox(height: isSmallScreen ? 12 : 24),
 
-          // Header Title
+          // 1. Header Title (at TOP)
           Text(
             "What's your\nnumber?",
             textAlign: TextAlign.center,
             style: AppTypography.headlineLarge.copyWith(
-              fontSize: 32,
+              fontSize: isSmallScreen ? 28 : 32,
               fontWeight: FontWeight.w900,
-              color: AppColors.textBlack,
+              color: CartoonColors.charcoal,
               letterSpacing: -0.8,
               height: 1.15,
             ),
           ),
           const SizedBox(height: 8),
 
-          // Subtitle
-          Text(
+          // 2. Subtitle
+          const Text(
             "We'll send a code to verify you.",
             textAlign: TextAlign.center,
-            style: AppTypography.bodyMedium.copyWith(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: CartoonColors.textMuted,
             ),
           ),
 
-          const SizedBox(height: 18),
+          SizedBox(height: isSmallScreen ? 16 : 24),
 
-          // Center Animated Mascot with Phone Handset
-          ClipOval(
-            child: Image.asset(
-              "assets/images/welcome.jpeg",
-              width: 210,
-              fit: BoxFit.contain,
+          // 3. Center Mascot / Illustration (in the MIDDLE)
+          Container(
+            width: isSmallScreen ? 175 : 205,
+            height: isSmallScreen ? 175 : 205,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                "assets/images/welcome.jpeg",
+                fit: BoxFit.contain,
+              ),
             ),
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: isSmallScreen ? 20 : 28),
 
-          // Phone Number Input Container (Country Pill + Text Field)
+          // 4. Phone Number Input Container (Country Pill + Text Field)
           Container(
             decoration: BoxDecoration(
-              color: AppColors.cardWhite,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-              boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+              color: CartoonColors.white,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: CartoonColors.charcoal,
+                width: CartoonDimensions.borderWidthThin,
+              ),
+              boxShadow: CartoonDimensions.shadowSmall(
+                offset: const Offset(3.0, 3.0),
+              ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: Row(
               children: [
                 // Country Code Selector Pill
@@ -257,8 +271,8 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                       color: const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: AppColors.strokeBlack,
-                        width: 1.6,
+                        color: CartoonColors.charcoal,
+                        width: 1.5,
                       ),
                     ),
                     child: Row(
@@ -274,14 +288,14 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textBlack,
+                            color: CartoonColors.charcoal,
                           ),
                         ),
                         const SizedBox(width: 2),
                         const Icon(
                           Icons.arrow_drop_down_rounded,
                           size: 20,
-                          color: AppColors.textBlack,
+                          color: CartoonColors.charcoal,
                         ),
                       ],
                     ),
@@ -303,7 +317,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textBlack,
+                      color: CartoonColors.charcoal,
                       letterSpacing: 0.8,
                     ),
                     decoration: InputDecoration(
@@ -311,9 +325,9 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                           ? 'Enter 10-digit number'
                           : 'Enter mobile number',
                       hintStyle: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 14.5,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF94A3B8),
+                        color: CartoonColors.textPlaceholder,
                         letterSpacing: 0,
                       ),
                       border: InputBorder.none,
@@ -325,7 +339,7 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
                               icon: const Icon(
                                 Icons.clear_rounded,
                                 size: 18,
-                                color: Color(0xFF94A3B8),
+                                color: CartoonColors.textPlaceholder,
                               ),
                               onPressed: () {
                                 _phoneController.clear();
@@ -346,91 +360,25 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
             ),
           ),
 
-          const SizedBox(height: 35),
+          SizedBox(height: isSmallScreen ? 16 : 22),
 
-          vm.isLoading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(
-                    left: 14,
-                    right: 14,
-                    bottom: 10,
-                  ),
-                  child: SlideToActionButton(
-                    text: 'Send Verification Code',
-                    icon: Icons.message,
-                    height: 70,
-                    backgroundColor: const Color(0xFFF1FAC0),
-                    handleColor: const Color(0xFFD6F887),
-                    textColor: AppColors.strokeBlack,
-                    iconColor: AppColors.strokeBlack,
-                    onCompleted: () => _handleSendCode(),
-                    // onCompleted: () => _startCall(match),
-                  ),
-                ),
+          // 5. Slide To Action Button
+          SlideToActionButton(
+            text: 'SLIDE TO GET OTP',
+            icon: Icons.arrow_forward_rounded,
+            backgroundColor: CartoonColors.charcoal,
+            handleColor: CartoonColors.lime,
+            textColor: Colors.white,
+            iconColor: CartoonColors.charcoal,
+            height: 64.0,
+            isLoading: vm.isLoading,
+            onCompleted: _handleSendCode,
+          ),
 
-          // Send Verification Code CTA Button (Teal Pill Button)
-          // GestureDetector(
-          //   onTap: vm.isLoading ? null : _handleSendCode,
-          //   child: AnimatedContainer(
-          //     duration: const Duration(milliseconds: 150),
-          //     width: double.infinity,
-          //     height: 56,
-          //     decoration: BoxDecoration(
-          //       gradient: const LinearGradient(
-          //         colors: [Color(0xFF2DD4BF), Color(0xFF00A79D)],
-          //         begin: Alignment.topCenter,
-          //         end: Alignment.bottomCenter,
-          //       ),
-          //       borderRadius: BorderRadius.circular(28),
-          //       border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-          //       boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
-          //     ),
-          //     child: Center(
-          //       child: vm.isLoading
-          //           ? const SizedBox(
-          //               width: 22,
-          //               height: 22,
-          //               child: CircularProgressIndicator(
-          //                 strokeWidth: 2.4,
-          //                 valueColor: AlwaysStoppedAnimation<Color>(
-          //                   Colors.white,
-          //                 ),
-          //               ),
-          //             )
-          //           : Row(
-          //               mainAxisAlignment: MainAxisAlignment.center,
-          //               children: const [
-          //                 Text(
-          //                   'Send Verification Code',
-          //                   style: TextStyle(
-          //                     fontSize: 16,
-          //                     fontWeight: FontWeight.w900,
-          //                     color: Colors.white,
-          //                     letterSpacing: 0.2,
-          //                   ),
-          //                 ),
-          //                 SizedBox(width: 8),
-          //                 Icon(
-          //                   Icons.mark_email_read_rounded,
-          //                   size: 19,
-          //                   color: Colors.white,
-          //                 ),
-          //               ],
-          //             ),
-          //     ),
-          //   ),
-          // ),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
 }
+

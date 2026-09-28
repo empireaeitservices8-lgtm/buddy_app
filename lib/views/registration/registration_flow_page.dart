@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../../data/models/auth_state.dart';
 import '../../data/repositories/auth_api_repository.dart';
 import '../../data/repositories/user_api_repository.dart';
 import '../../viewmodels/registration_view_model.dart';
 import '../agent/agent_dashboard_screen.dart';
 import '../home/home_dashboard_screen.dart';
-import '../widgets/neo_background.dart';
-import '../widgets/segmented_progress_bar.dart';
 import '../widgets/toast_utils.dart';
 import 'otp_verification_screen.dart';
 import 'phone_number_screen.dart';
@@ -114,113 +112,153 @@ class _RegistrationFlowPageState extends State<RegistrationFlowPage> {
               _handleBack();
             }
           },
-          child: Scaffold(
-            backgroundColor: const Color(0xFFFBF8EE),
-            body: NeoBackground(
-              child: SafeArea(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onHorizontalDragEnd: (details) {
-                    final velocity = details.primaryVelocity ?? 0;
-                    if (velocity > 300) {
-                      _handleBack();
-                    } else if (velocity < -300) {
-                      _handleForwardSwipe();
-                    }
-                  },
-                  child: Stack(
-                    children: [
-                      Column(
+          child: CartoonScaffold(
+            body: SafeArea(
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onHorizontalDragEnd: (details) {
+                  final velocity = details.primaryVelocity ?? 0;
+                  if (velocity > 300) {
+                    _handleBack();
+                  } else if (velocity < -300) {
+                    _handleForwardSwipe();
+                  }
+                },
+                child: Column(
+                  children: [
+                    // Unified Top Navigation & Brand Header Row
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Top Navigation Row
-                          if (currentStep != RegistrationStep.phoneNumber)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 16.0,
-                                right: 16.0,
-                                top: 8.0,
+                          GestureDetector(
+                            onTap: _handleBack,
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: CartoonColors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: CartoonColors.charcoal,
+                                  width: CartoonDimensions.borderWidthThin,
+                                ),
+                                boxShadow: CartoonDimensions.shadowSmall(
+                                  offset: const Offset(2, 2),
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: _handleBack,
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.cardWhite,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppColors.strokeBlack,
-                                          width: 1.8,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppColors.strokeBlack
-                                                .withOpacity(0.15),
-                                            offset: const Offset(2, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: const Icon(
-                                        Icons.arrow_back_rounded,
-                                        color: AppColors.strokeBlack,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                          // Dynamic step content with smooth slide transition
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 280),
-                              switchInCurve: Curves.easeOutCubic,
-                              switchOutCurve: Curves.easeInCubic,
-                              layoutBuilder: (
-                                Widget? currentChild,
-                                List<Widget> previousChildren,
-                              ) {
-                                return Stack(
-                                  alignment: Alignment.topCenter,
-                                  children: <Widget>[
-                                    ...previousChildren,
-                                    ?currentChild,
-                                  ],
-                                );
-                              },
-                              transitionBuilder:
-                                  (Widget child, Animation<double> animation) {
-                                final inOffset = Tween<Offset>(
-                                  begin: Offset(isForward ? 1.0 : -1.0, 0.0),
-                                  end: Offset.zero,
-                                ).animate(animation);
-
-                                return SlideTransition(
-                                  position: inOffset,
-                                  child: child,
-                                );
-                              },
-                              child: SizedBox(
-                                key: ValueKey(currentStep),
-                                width: double.infinity,
-                                height: double.infinity,
-                                child: _buildCurrentStepView(currentStep),
+                              child: const Icon(
+                                Icons.arrow_back_rounded,
+                                color: CartoonColors.charcoal,
+                                size: 20,
                               ),
                             ),
                           ),
+                          _buildTopLogoHeader(),
+                          const SizedBox(width: 40),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+
+                    // Dynamic step content with smooth slide transition
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 280),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        layoutBuilder: (
+                          Widget? currentChild,
+                          List<Widget> previousChildren,
+                        ) {
+                          return Stack(
+                            alignment: Alignment.topCenter,
+                            children: <Widget>[
+                              ...previousChildren,
+                              ?currentChild,
+                            ],
+                          );
+                        },
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          final inOffset = Tween<Offset>(
+                            begin: Offset(isForward ? 1.0 : -1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(animation);
+
+                          return SlideTransition(
+                            position: inOffset,
+                            child: child,
+                          );
+                        },
+                        child: SizedBox(
+                          key: ValueKey(currentStep),
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: _buildCurrentStepView(currentStep),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTopLogoHeader() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: CartoonColors.charcoal,
+              width: CartoonDimensions.borderWidthThin,
+            ),
+            boxShadow: CartoonDimensions.shadowSmall(
+              offset: const Offset(2, 2),
+            ),
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/app_icon.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.4,
+              fontFamily: 'Roboto',
+            ),
+            children: [
+              TextSpan(
+                text: 'Gaby',
+                style: TextStyle(color: Color(0xFF0A2E65)),
+              ),
+              TextSpan(
+                text: 'Talk',
+                style: TextStyle(color: Color(0xFF00A79D)),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+﻿// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import '../../../viewmodels/home_view_model.dart';
@@ -164,11 +164,11 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             text: const TextSpan(
                                               children: [
                                                 TextSpan(
-                                                  text: 'Gabby ',
+                                                  text: 'Gaby ',
                                                   style: TextStyle(
                                                     fontSize: 24,
                                                     fontWeight: FontWeight.w900,
-                                                    color: Color(0xFFFF8A9A),
+                                                    color: Color(0xFF0A2E65),
                                                     fontFamily: 'Inter',
                                                   ),
                                                 ),
@@ -177,7 +177,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                   style: TextStyle(
                                                     fontSize: 24,
                                                     fontWeight: FontWeight.w900,
-                                                    color: Color(0xFF00C4B4),
+                                                    color: Color(0xFF00A79D),
                                                     fontFamily: 'Inter',
                                                   ),
                                                 ),
@@ -397,7 +397,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w800,
-                                            color: Color(0xFF00C4B4),
+                                            color: Color(0xFF00A79D),
                                             letterSpacing: 0.8,
                                           ),
                                         ),

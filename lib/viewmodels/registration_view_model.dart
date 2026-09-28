@@ -277,7 +277,7 @@ class RegistrationViewModel extends BaseViewModel {
       case Gender.man:
         return 'Male';
       case Gender.nonBinary:
-        return 'Female';
+        return 'Non-binary';
     }
   }
 

@@ -1,11 +1,10 @@
-﻿import 'package:buddy_app/views/widgets/slide_to_action.dart';
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../../viewmodels/registration_view_model.dart';
-import '../widgets/gabby_mascot_widget.dart';
 import '../widgets/otp_boxes.dart';
+import '../widgets/slide_to_action.dart';
+import '../widgets/toast_utils.dart';
 
 class OtpVerificationView extends StatelessWidget {
   final RegistrationViewModel viewModel;
@@ -14,6 +13,9 @@ class OtpVerificationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isSmallScreen = screenHeight < 680;
+
     final displayPhone = viewModel.fullDisplayPhone.trim().isNotEmpty
         ? viewModel.fullDisplayPhone
         : '+91 98765 43210';
@@ -24,42 +26,23 @@ class OtpVerificationView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 80),
+          SizedBox(height: isSmallScreen ? 12 : 24),
 
-          // Mini GabbyTalk Logo
-          _buildMiniLogo(),
-
-          const SizedBox(height: 12),
-          // Center Animated Mascot with Phone Handset
-          ClipOval(
-            child: Image.asset(
-              "assets/images/welcome.jpeg",
-              width: 210,
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          // // Center Animated Mascot with Envelope & Thumbs Up
-          // const GabbyMascotWidget(
-          //   pose: MascotPose.envelopeThumbsUp,
-          //   size: 200,
-          // ),
-          const SizedBox(height: 16),
-
-          // Title: Enter the code!
+          // 1. Header Title (at TOP)
           Text(
-            'Enter the code!',
+            'Enter the code! 🔐',
             textAlign: TextAlign.center,
             style: AppTypography.headlineLarge.copyWith(
-              fontSize: 30,
+              fontSize: isSmallScreen ? 26 : 30,
               fontWeight: FontWeight.w900,
-              color: AppColors.textBlack,
+              color: CartoonColors.charcoal,
               letterSpacing: -0.8,
+              height: 1.15,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
-          // Subtitle
+          // 2. Subtitle with Phone & Edit
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -67,10 +50,10 @@ class OtpVerificationView extends StatelessWidget {
                 child: Text(
                   'Code sent to $displayPhone.',
                   textAlign: TextAlign.center,
-                  style: AppTypography.bodyMedium.copyWith(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: CartoonColors.textMuted,
                   ),
                 ),
               ),
@@ -80,7 +63,7 @@ class OtpVerificationView extends StatelessWidget {
                 child: const Text(
                   'Edit',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF00A79D),
                     decoration: TextDecoration.underline,
@@ -90,9 +73,26 @@ class OtpVerificationView extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: isSmallScreen ? 16 : 24),
 
-          // 4-box Pastel Gradient OTP Input
+          // 3. Center Mascot / Illustration (in the MIDDLE)
+          Container(
+            width: isSmallScreen ? 175 : 205,
+            height: isSmallScreen ? 175 : 205,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                "assets/images/welcome.jpeg",
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+
+          SizedBox(height: isSmallScreen ? 18 : 24),
+
+          // 4. 4-box OTP Input
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: OtpInputField(
@@ -105,160 +105,57 @@ class OtpVerificationView extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 20),
-          viewModel.isLoading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.only(
-                    left: 14,
-                    right: 14,
-                    bottom: 10,
-                  ),
-                  child: SlideToActionButton(
-                    text: 'Send Verification Code',
-                    icon: Icons.message,
-                    height: 70,
-                    backgroundColor: const Color(0xFFF1FAC0),
-                    handleColor: const Color(0xFFD6F887),
-                    textColor: AppColors.strokeBlack,
-                    iconColor: AppColors.strokeBlack,
-                    onCompleted: () => viewModel.submitOtp(),
-                    // onCompleted: () => _startCall(match),
-                  ),
-                ),
+          const SizedBox(height: 14),
 
-          // Resend Code in 30s / Resend now
-          // GestureDetector(
-          //   onTap: viewModel.canResend ? viewModel.resendOtp : null,
-          //   child: Text(
-          //     viewModel.canResend
-          //         ? 'Resend code now'
-          //         : 'Resend code in ${viewModel.resendCountdown}s',
-          //     style: TextStyle(
-          //       fontSize: 13,
-          //       fontWeight: FontWeight.w700,
-          //       color: viewModel.canResend
-          //           ? const Color(0xFF00A79D)
-          //           : AppColors.textMuted,
-          //       decoration: viewModel.canResend
-          //           ? TextDecoration.underline
-          //           : TextDecoration.none,
-          //     ),
-          //   ),
-          // ),
+          // Resend Code CTA
+          GestureDetector(
+            onTap: viewModel.canResend ? viewModel.resendOtp : null,
+            child: Text(
+              viewModel.canResend
+                  ? 'Resend code now'
+                  : 'Resend code in ${viewModel.resendCountdown}s',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: viewModel.canResend
+                    ? const Color(0xFF00A79D)
+                    : CartoonColors.textMuted,
+                decoration: viewModel.canResend
+                    ? TextDecoration.underline
+                    : TextDecoration.none,
+              ),
+            ),
+          ),
 
-          // const SizedBox(height: 24),
+          SizedBox(height: isSmallScreen ? 18 : 24),
 
-          // // Verify and Start Talking CTA Button (Teal Pill)
-          // GestureDetector(
-          //   onTap: viewModel.isLoading
-          //       ? null
-          //       : () {
-          //           viewModel.submitOtp();
-          //         },
-          //   child: AnimatedContainer(
-          //     duration: const Duration(milliseconds: 150),
-          //     width: double.infinity,
-          //     height: 56,
-          //     decoration: BoxDecoration(
-          //       gradient: const LinearGradient(
-          //         colors: [Color(0xFF2DD4BF), Color(0xFF00A79D)],
-          //         begin: Alignment.topCenter,
-          //         end: Alignment.bottomCenter,
-          //       ),
-          //       borderRadius: BorderRadius.circular(28),
-          //       border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-          //       boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
-          //     ),
-          //     child: Center(
-          //       child: viewModel.isLoading
-          //           ? const SizedBox(
-          //               width: 22,
-          //               height: 22,
-          //               child: CircularProgressIndicator(
-          //                 strokeWidth: 2.4,
-          //                 valueColor: AlwaysStoppedAnimation<Color>(
-          //                   Colors.white,
-          //                 ),
-          //               ),
-          //             )
-          //           : Row(
-          //               mainAxisAlignment: MainAxisAlignment.center,
-          //               children: const [
-          //                 Text(
-          //                   'Verify and Start Talking!',
-          //                   style: TextStyle(
-          //                     fontSize: 16,
-          //                     fontWeight: FontWeight.w900,
-          //                     color: Colors.white,
-          //                     letterSpacing: 0.2,
-          //                   ),
-          //                 ),
-          //                 SizedBox(width: 8),
-          //                 Icon(
-          //                   Icons.check_circle_rounded,
-          //                   size: 20,
-          //                   color: Colors.white,
-          //                 ),
-          //               ],
-          //             ),
-          //     ),
-          //   ),
-          // ),
+          // 5. Slide To Verify OTP Button
+          SlideToActionButton(
+            text: 'SLIDE TO VERIFY OTP',
+            icon: Icons.check_rounded,
+            backgroundColor: CartoonColors.charcoal,
+            handleColor: CartoonColors.lime,
+            textColor: Colors.white,
+            iconColor: CartoonColors.charcoal,
+            height: 64.0,
+            isLoading: viewModel.isLoading,
+            onCompleted: () {
+              if (viewModel.otpCode.length < 4) {
+                showNeoToast(
+                  context,
+                  'Please enter the 4-digit code',
+                  isError: true,
+                );
+                return;
+              }
+              viewModel.submitOtp();
+            },
+          ),
+
           const SizedBox(height: 20),
         ],
       ),
     );
   }
-
-  Widget _buildMiniLogo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: const Color(0xFF38BDF8),
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.strokeBlack, width: 1.8),
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.graphic_eq_rounded,
-              color: Colors.white,
-              size: 16,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        RichText(
-          text: TextSpan(
-            style: AppTypography.brandLogo.copyWith(
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.3,
-            ),
-            children: const [
-              TextSpan(
-                text: 'Gaby',
-                style: TextStyle(color: Color(0xFFFF6B6B)),
-              ),
-              TextSpan(
-                text: 'Talk',
-                style: TextStyle(color: Color(0xFF00A79D)),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 }
+

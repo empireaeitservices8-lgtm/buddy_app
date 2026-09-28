@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class ProfessionCategory {
   final String id;
@@ -600,7 +600,7 @@ class CallLogItem {
         location: 'Available',
         profession: category,
         professionCategory: catLower,
-        bio: 'Verified listener on Gabby Talk',
+        bio: 'Verified listener on Gaby Talk',
         cardColor: avatarColors[colorIndex],
         avatarColor: avatarColors[colorIndex],
         gender: otherUser?['gender']?.toString() ??

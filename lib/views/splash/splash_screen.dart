@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_typography.dart';
 import '../../core/network/token_manager.dart';
 import '../../core/services/fcm_service.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../agent/agent_dashboard_screen.dart';
 import '../home/home_dashboard_screen.dart';
 import '../welcome/welcome_screen.dart';
-import '../widgets/neo_background.dart';
-import '../widgets/sparkle_widget.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -135,125 +132,118 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFBF8EE),
-      body: NeoBackground(
-        child: SafeArea(
-          child: Stack(
-            children: [
-              // Center Branding & Loading Indicator
-              Center(
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // App Icon
-                        Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            borderRadius: BorderRadius.circular(36),
-                            border: Border.all(
-                              color: AppColors.strokeBlack,
-                              width: 3.0,
-                            ),
-                            boxShadow: AppTheme.neoShadow(
-                              offset: const Offset(5, 5),
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(32),
-                            child: Image.asset(
-                              'assets/images/app_icon2.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 28),
+    return CartoonScaffold(
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Official App Icon
+                  Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      color: CartoonColors.white,
+                      borderRadius: BorderRadius.circular(36),
+                      border: Border.all(
+                        color: CartoonColors.charcoal,
+                        width: CartoonDimensions.borderWidth,
+                      ),
+                      boxShadow: CartoonDimensions.shadow(
+                        offset: const Offset(4, 4),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(32),
+                      child: Image.asset(
+                        'assets/images/app_icon.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
 
-                        // App Title
-                        RichText(
-                          text: TextSpan(
-                            style: AppTypography.brandLogo.copyWith(
-                              fontSize: 44,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.5,
-                            ),
-                            children: const [
-                              TextSpan(
-                                text: 'Gaby',
-                                style: TextStyle(color: Color(0xFFFF6B6B)),
-                              ),
-                              TextSpan(
-                                text: 'Talk',
-                                style: TextStyle(color: Color(0xFF00A79D)),
-                              ),
-                            ],
-                          ),
+                  // App Title
+                  RichText(
+                    text: TextSpan(
+                      style: AppTypography.brandLogo.copyWith(
+                        fontSize: 42,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                      children: const [
+                        TextSpan(
+                          text: 'Gaby',
+                          style: TextStyle(color: Color(0xFF0A2E65)),
                         ),
-                        const SizedBox(height: 12),
-
-                        // Tagline Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: AppColors.strokeBlack,
-                              width: 2.0,
-                            ),
-                            boxShadow: AppTheme.neoShadow(
-                              offset: const Offset(2.5, 2.5),
-                            ),
-                          ),
-                          child: Text(
-                            AppStrings.tagline,
-                            style: AppTypography.badgeText.copyWith(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 48),
-
-                        // Animated Neo Loading Indicator
-                        Container(
-                          width: 44,
-                          height: 44,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.strokeBlack,
-                              width: 2.0,
-                            ),
-                            boxShadow: AppTheme.neoShadow(
-                              offset: const Offset(2, 2),
-                            ),
-                          ),
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 3.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFF00A79D),
-                            ),
-                          ),
+                        TextSpan(
+                          text: 'Talk',
+                          style: TextStyle(color: Color(0xFF00A79D)),
                         ),
                       ],
                     ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+
+                  // Tagline Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: CartoonColors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: CartoonColors.charcoal,
+                        width: CartoonDimensions.borderWidthThin,
+                      ),
+                      boxShadow: CartoonDimensions.shadowSmall(
+                        offset: const Offset(2, 2),
+                      ),
+                    ),
+                    child: Text(
+                      AppStrings.tagline,
+                      style: AppTypography.badgeText.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: CartoonColors.charcoal,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+
+                  // Animated Loading Indicator
+                  Container(
+                    width: 44,
+                    height: 44,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: CartoonColors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: CartoonColors.charcoal,
+                        width: CartoonDimensions.borderWidthThin,
+                      ),
+                      boxShadow: CartoonDimensions.shadowSmall(
+                        offset: const Offset(2, 2),
+                      ),
+                    ),
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 3.0,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF00A79D),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

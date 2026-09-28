@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, duplicate_ignore, deprecated_member_use
+﻿// ignore_for_file: use_build_context_synchronously, duplicate_ignore, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -156,11 +156,11 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                           text: const TextSpan(
                                             children: [
                                               TextSpan(
-                                                text: 'Gabby ',
+                                                text: 'Gaby ',
                                                 style: TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFFFF8A9A), // Pink Accent
+                                                  color: Color(0xFF0A2E65), // Pink Accent
                                                   fontFamily: 'Inter',
                                                 ),
                                               ),
@@ -169,7 +169,7 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                 style: TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFF00C4B4), // Teal Accent
+                                                  color: Color(0xFF00A79D), // Teal Accent
                                                   fontFamily: 'Inter',
                                                 ),
                                               ),
@@ -386,7 +386,7 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                         style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w800,
-                                          color: Color(0xFF00C4B4),
+                                          color: Color(0xFF00A79D),
                                           letterSpacing: 0.8,
                                         ),
                                       ),

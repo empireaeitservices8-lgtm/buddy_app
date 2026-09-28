@@ -10,7 +10,7 @@ class AppStrings {
 
   // Role Selection
   static const String selectYourRole = 'SELECT YOUR ROLE';
-  static const String roleQuestion = 'How will you use Gabby Talk?';
+  static const String roleQuestion = 'How will you use Gaby Talk?';
   static const String roleSubtitle = 'Choose your account type to continue to the relevant login and signup screens.';
 
   static const String roleUserTitle = 'User';
@@ -24,7 +24,7 @@ class AppStrings {
   static const String continueAsUser = 'Continue as User';
   static const String continueAsAgent = 'Continue as Agent';
   static const String continueText = 'Continue';
-  static const String newToBuddy = 'New to Gabby Talk? ';
+  static const String newToBuddy = 'New to Gaby Talk? ';
   static const String signUpNow = 'Sign Up Now';
   static const String alreadyHaveAccount = 'Already have an account? ';
   static const String logIn = 'Log In';
