@@ -504,11 +504,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
               itemBuilder: (context, index) {
                 final intent = intents[index];
+
                 final isSelected = _viewModel.isIntentSelected(intent);
                 return ConversationCategoryCard(
                   intent: intent,
                   isSelected: isSelected,
-                  onTap: () => _viewModel.toggleIntentSelection(intent),
+                  onTap: (categoryId) {
+                    _viewModel.toggleIntentSelection(intent);
+                  },
                 );
               },
             ),
@@ -1677,17 +1680,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
             // Profession Badge
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 2.5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
               decoration: BoxDecoration(
                 color: AppColors.cardWhite,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.strokeBlack,
-                  width: 1.1,
-                ),
+                border: Border.all(color: AppColors.strokeBlack, width: 1.1),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

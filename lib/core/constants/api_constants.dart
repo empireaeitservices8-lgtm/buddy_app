@@ -12,7 +12,8 @@ class ApiConstants {
   static const String verifyOtp = 'auth/caller/signup/verify-otp/';
   static const String callerSignupVerifyOtp = 'auth/caller/signup/verify-otp/';
   static const String callerLoginVerifyOtp = 'auth/caller/login/verify-otp/';
-  static const String callerCompleteProfile = 'auth/caller/signup/complete-profile/';
+  static const String callerCompleteProfile =
+      'auth/caller/signup/complete-profile/';
   static const String agentLogin = 'auth/listener/login/';
   static const String listenerLogin = 'auth/listener/login/';
   static const String agentLogout = 'auth/listener/logout/';
@@ -31,7 +32,8 @@ class ApiConstants {
   static const String interests = 'interests/';
   static const String professions = 'conversation-categories/';
   static const String matches = 'matches/';
-  static const String discoverAgents = 'agents/discover/';
+  static const String discoverAgents =
+      'agents/discover/?conversation_categories=&available_only=true';
 
   // Calls & Wallet Endpoints
   static const String callLogs = 'calls/history/';
@@ -64,7 +66,9 @@ class ApiConstants {
       return endpoint;
     }
     final cleanBase = baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
-    final cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+    final cleanEndpoint = endpoint.startsWith('/')
+        ? endpoint.substring(1)
+        : endpoint;
     return '$cleanBase$cleanEndpoint';
   }
 }
