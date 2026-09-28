@@ -44,7 +44,7 @@ abstract class IUserRepository {
   /// Discovers agents from backend matching conversation categories, profession, and availability.
   /// GET /api/agents/discover/?conversation_categories=1,2,3&profession=1&available_only=true
   Future<List<MatchProfile>> discoverAgents({
-    List<String>? conversationCategoryIds,
+    List<int>? conversationCategoryIds,
     String? professionId,
     bool availableOnly = true,
   });

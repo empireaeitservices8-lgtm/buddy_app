@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/network/api_exceptions.dart';
@@ -286,26 +287,36 @@ class UserApiRepository implements IUserRepository {
         requiresAuth: true,
       );
 
-      debugPrint('📂 [ConversationCategories Response]: status=${response.statusCode}, data=${response.rawData}');
+      debugPrint(
+        '📂 [ConversationCategories Response]: status=${response.statusCode}, data=${response.rawData}',
+      );
 
       if (response.rawData is Map) {
         final raw = response.rawData as Map<String, dynamic>;
         final list = (raw['data'] is List)
             ? raw['data'] as List
             : (raw['results'] is List
-                ? raw['results'] as List
-                : (raw['categories'] is List ? raw['categories'] as List : []));
+                  ? raw['results'] as List
+                  : (raw['categories'] is List
+                        ? raw['categories'] as List
+                        : []));
 
         if (list.isNotEmpty) {
           return list
-              .map((e) => CallerIntent.fromJson(Map<String, dynamic>.from(e as Map)))
+              .map(
+                (e) =>
+                    CallerIntent.fromJson(Map<String, dynamic>.from(e as Map)),
+              )
               .toList();
         }
       } else if (response.rawData is List) {
         final list = response.rawData as List;
         if (list.isNotEmpty) {
           return list
-              .map((e) => CallerIntent.fromJson(Map<String, dynamic>.from(e as Map)))
+              .map(
+                (e) =>
+                    CallerIntent.fromJson(Map<String, dynamic>.from(e as Map)),
+              )
               .toList();
         }
       }
@@ -324,15 +335,21 @@ class UserApiRepository implements IUserRepository {
 
   @override
   Future<List<MatchProfile>> discoverAgents({
-    List<String>? conversationCategoryIds,
+    List<int>? conversationCategoryIds,
     String? professionId,
     bool availableOnly = true,
   }) async {
     try {
       final queryParams = <String, dynamic>{};
-      if (conversationCategoryIds != null && conversationCategoryIds.isNotEmpty) {
-        queryParams['conversation_categories'] = conversationCategoryIds.join(',');
+      if (conversationCategoryIds != null &&
+          conversationCategoryIds.isNotEmpty) {
+        queryParams['conversation_categories'] = conversationCategoryIds.join(
+          ',',
+        );
+
+        debugPrint('🔍 [category id]: $queryParams');
       }
+
       if (professionId != null && professionId.trim().isNotEmpty) {
         queryParams['profession'] = professionId.trim();
       }
@@ -347,7 +364,9 @@ class UserApiRepository implements IUserRepository {
       );
 
       try {
-        final pretty = const JsonEncoder.withIndent('  ').convert(response.rawData);
+        final pretty = const JsonEncoder.withIndent(
+          '  ',
+        ).convert(response.rawData);
         developer.log(pretty, name: 'DiscoverAgents');
         for (final line in pretty.split('\n')) {
           debugPrint('🔍 [DiscoverAgents Response]: $line');

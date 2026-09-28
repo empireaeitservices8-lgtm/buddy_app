@@ -7,7 +7,7 @@ import '../../../data/models/caller_intent_model.dart';
 class ConversationCategoryCard extends StatelessWidget {
   final CallerIntent intent;
   final bool isSelected;
-  final VoidCallback onTap;
+  final ValueChanged<String> onTap;
 
   const ConversationCategoryCard({
     super.key,
@@ -56,7 +56,7 @@ class ConversationCategoryCard extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onTap,
+            onTap: () => onTap(intent.id),
             borderRadius: BorderRadius.circular(22),
             child: Stack(
               fit: StackFit.expand,
@@ -75,7 +75,10 @@ class ConversationCategoryCard extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(intent.emoji, style: const TextStyle(fontSize: 40)),
+                              Text(
+                                intent.emoji,
+                                style: const TextStyle(fontSize: 40),
+                              ),
                               const SizedBox(height: 8),
                               Text(
                                 intent.title,
@@ -136,6 +139,7 @@ class ConversationCategoryCard extends StatelessWidget {
     if (intent.imagePath.isNotEmpty) {
       return intent.imagePath;
     }
+
     switch (intent.id.toLowerCase()) {
       case 'just_talk':
       case 'conversation':

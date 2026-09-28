@@ -72,9 +72,8 @@ class HomeViewModel extends BaseViewModel {
   List<CallerIntent> get callerIntents => _dynamicCallerIntents.isNotEmpty
       ? _dynamicCallerIntents
       : defaultCallerIntents;
-  List<CallerIntent> get selectedIntents => callerIntents
-      .where((i) => isIntentSelected(i))
-      .toList();
+  List<CallerIntent> get selectedIntents =>
+      callerIntents.where((i) => isIntentSelected(i)).toList();
   CallerIntent? get selectedIntent =>
       selectedIntents.isNotEmpty ? selectedIntents.first : null;
   HomeExploreStep get exploreStep => _exploreStep;
@@ -604,7 +603,8 @@ class HomeViewModel extends BaseViewModel {
       _exploreStep = HomeExploreStep.intentSelection;
     }
     notifyListenersSafely();
-    if (_selectedIntentIds.isNotEmpty && _exploreStep == HomeExploreStep.categoryMatches) {
+    if (_selectedIntentIds.isNotEmpty &&
+        _exploreStep == HomeExploreStep.categoryMatches) {
       fetchCategories(silent: false, force: true);
     }
   }
@@ -702,7 +702,8 @@ class HomeViewModel extends BaseViewModel {
       ),
     );
 
-    final bool hasExisting = cat.matches.isNotEmpty ||
+    final bool hasExisting =
+        cat.matches.isNotEmpty ||
         _matches.any((m) => m.matchesCategory(cat.id, cat.title));
 
     // Always show circular progress indicator while fetching API data
@@ -711,18 +712,19 @@ class HomeViewModel extends BaseViewModel {
 
     try {
       // conversation_categories: selected conversation category IDs (e.g. 1,2,3)
-      final convCatIds = _selectedIntentIds.isNotEmpty
-          ? _selectedIntentIds.toList()
-          : null;
+      final convCatIds = _selectedIntentIds
+          .map(int.tryParse)
+          .whereType<int>()
+          .toList();
 
       // profession: the ID of the selected profession category (e.g. 1, 9, 10)
-      final effectiveProfessionId = professionId ??
-          (int.tryParse(cat.id) != null ? cat.id : null);
+      final effectiveProfessionId =
+          professionId ?? (int.tryParse(cat.id) != null ? cat.id : null);
 
       // Discover agents: GET /api/agents/discover/?conversation_categories=1,2,3&profession=1&available_only=true
       try {
         final catAgents = await _userRepository.discoverAgents(
-          conversationCategoryIds: convCatIds,
+          conversationCategoryIds: convCatIds.isNotEmpty ? convCatIds : null,
           professionId: effectiveProfessionId,
           availableOnly: true,
         );
@@ -778,7 +780,10 @@ class HomeViewModel extends BaseViewModel {
     notifyListenersSafely();
   }
 
-  Future<void> fetchCategories({bool silent = false, bool force = false}) async {
+  Future<void> fetchCategories({
+    bool silent = false,
+    bool force = false,
+  }) async {
     if (!force &&
         _lastCategoriesFetchTime != null &&
         DateTime.now().difference(_lastCategoriesFetchTime!) <
@@ -794,11 +799,14 @@ class HomeViewModel extends BaseViewModel {
     try {
       // 1. Discover available agents: GET /api/agents/discover/?conversation_categories=1,2,3&available_only=true
       try {
-        final targetCategoryIds = _selectedIntentIds.isNotEmpty
-            ? _selectedIntentIds.toList()
-            : null;
+        final targetCategoryIds = _selectedIntentIds
+            .map(int.tryParse)
+            .whereType<int>()
+            .toList();
         final discovered = await _userRepository.discoverAgents(
-          conversationCategoryIds: targetCategoryIds,
+          conversationCategoryIds: targetCategoryIds.isNotEmpty
+              ? targetCategoryIds
+              : null,
           availableOnly: true,
         );
         if (discovered.isNotEmpty) {
@@ -806,7 +814,7 @@ class HomeViewModel extends BaseViewModel {
             _allKnownMatches[m.id] = m;
           }
           _matches = discovered;
-        } else if (targetCategoryIds != null) {
+        } else if (targetCategoryIds.isNotEmpty) {
           _matches = [];
         } else {
           _matches = discovered;
@@ -906,7 +914,9 @@ class HomeViewModel extends BaseViewModel {
 
   static String _getEmojiForCategory(String name) {
     final n = name.toLowerCase();
-    if (n.contains('nurse') || n.contains('caregiver') || n.contains('hospital')) {
+    if (n.contains('nurse') ||
+        n.contains('caregiver') ||
+        n.contains('hospital')) {
       return '🩺';
     }
     if (n.contains('teacher') ||
@@ -926,7 +936,9 @@ class HomeViewModel extends BaseViewModel {
         n.contains('program')) {
       return '💻';
     }
-    if (n.contains('student') || n.contains('college') || n.contains('studies')) {
+    if (n.contains('student') ||
+        n.contains('college') ||
+        n.contains('studies')) {
       return '🎓';
     }
     if (n.contains('career') || n.contains('business') || n.contains('job')) {
@@ -951,7 +963,10 @@ class HomeViewModel extends BaseViewModel {
     return '🌟';
   }
 
-  Future<void> fetchCallHistory({bool silent = false, bool force = false}) async {
+  Future<void> fetchCallHistory({
+    bool silent = false,
+    bool force = false,
+  }) async {
     if (!force &&
         _lastCallHistoryFetchTime != null &&
         DateTime.now().difference(_lastCallHistoryFetchTime!) <
@@ -1013,7 +1028,9 @@ class HomeViewModel extends BaseViewModel {
 
       // Check if user cancelled call while network request was pending
       if (_activeCallMatch == null || _callSessionCounter != currentSession) {
-        debugPrint('📞 [HomeVM] Call cancelled while requesting call from server');
+        debugPrint(
+          '📞 [HomeVM] Call cancelled while requesting call from server',
+        );
         await _agoraService.stopRingtone();
         await _agoraService.leaveCall();
         return;
@@ -1026,11 +1043,11 @@ class HomeViewModel extends BaseViewModel {
       final channelId = callResponse.channelName.isNotEmpty
           ? callResponse.channelName
           : (callResponse.callId > 0
-              ? 'gabby_call_${callResponse.callId}'
-              : AgoraConstants.generateChannelId(
-                  callerId: _userProfile?.id ?? 'caller',
-                  agentId: match.id,
-                ));
+                ? 'gabby_call_${callResponse.callId}'
+                : AgoraConstants.generateChannelId(
+                    callerId: _userProfile?.id ?? 'caller',
+                    agentId: match.id,
+                  ));
       String? token = callResponse.agoraToken;
       int uid = 0;
       if (callResponse.uid != null && callResponse.uid! > 0) {
@@ -1090,7 +1107,9 @@ class HomeViewModel extends BaseViewModel {
 
       // Check again after joining Agora
       if (_activeCallMatch == null || _callSessionCounter != currentSession) {
-        debugPrint('📞 [HomeVM] Call cancelled after joining Agora - leaving immediately');
+        debugPrint(
+          '📞 [HomeVM] Call cancelled after joining Agora - leaving immediately',
+        );
         await _agoraService.stopRingtone();
         await _agoraService.leaveCall();
         return;
@@ -1134,7 +1153,9 @@ class HomeViewModel extends BaseViewModel {
   void _startCallStatusPolling(int? callId) {
     _callStatusPollTimer?.cancel();
     int pollElapsedTicks = 0;
-    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
+    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (
+      timer,
+    ) async {
       pollElapsedTicks++;
       if (_isCallAttended || _activeCallMatch == null) {
         timer.cancel();
@@ -1146,7 +1167,9 @@ class HomeViewModel extends BaseViewModel {
       if (pollElapsedTicks >= 30) {
         timer.cancel();
         _callStatusPollTimer = null;
-        debugPrint('📞 [HomeVM] Call timed out after 45s without answer from listener.');
+        debugPrint(
+          '📞 [HomeVM] Call timed out after 45s without answer from listener.',
+        );
         setError('No answer from listener. Please try again.');
         endCall(status: 'cancelled');
         return;
@@ -1170,10 +1193,14 @@ class HomeViewModel extends BaseViewModel {
                   status == 'COMPLETED' ||
                   status == 'ENDED' ||
                   status == 'MISSED') {
-                debugPrint('📞 [HomeVM] Call #$callId status changed to $status on server. Dismissing calling screen.');
+                debugPrint(
+                  '📞 [HomeVM] Call #$callId status changed to $status on server. Dismissing calling screen.',
+                );
                 timer.cancel();
                 _callStatusPollTimer = null;
-                if (status == 'REJECT' || status == 'REJECTED' || status == 'DECLINED') {
+                if (status == 'REJECT' ||
+                    status == 'REJECTED' ||
+                    status == 'DECLINED') {
                   setError('Call declined by listener.');
                 }
                 endCall(status: status.toLowerCase());
@@ -1253,7 +1280,8 @@ class HomeViewModel extends BaseViewModel {
     _wasLastCallConnected = wasConnected;
 
     // Use actual call ID from _lastCallRequest, fallback to agent ID
-    final targetCallId = _lastCallRequest?.callId != null && _lastCallRequest!.callId > 0
+    final targetCallId =
+        _lastCallRequest?.callId != null && _lastCallRequest!.callId > 0
         ? _lastCallRequest!.callId
         : (_lastEndedCallId ?? int.tryParse(_activeCallMatch?.id ?? ''));
 
@@ -1267,7 +1295,9 @@ class HomeViewModel extends BaseViewModel {
           callId: targetCallId,
           status: finalStatus,
         );
-        debugPrint('📞 [HomeVM] Updated call status on server: callId=$targetCallId, status=$finalStatus');
+        debugPrint(
+          '📞 [HomeVM] Updated call status on server: callId=$targetCallId, status=$finalStatus',
+        );
       } catch (e) {
         debugPrint(
           '⚠️ [HomeVM] Update call status ($finalStatus) for ID $targetCallId failed: $e',
@@ -1298,7 +1328,10 @@ class HomeViewModel extends BaseViewModel {
     notifyListenersSafely();
   }
 
-  Future<void> fetchCoinsBalance({bool silent = false, bool force = false}) async {
+  Future<void> fetchCoinsBalance({
+    bool silent = false,
+    bool force = false,
+  }) async {
     if (!force &&
         _lastCoinsFetchTime != null &&
         DateTime.now().difference(_lastCoinsFetchTime!) <
@@ -1339,7 +1372,10 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> fetchCoinHistory({bool silent = false, bool force = false}) async {
+  Future<void> fetchCoinHistory({
+    bool silent = false,
+    bool force = false,
+  }) async {
     if (!force &&
         _lastHistoryFetchTime != null &&
         DateTime.now().difference(_lastHistoryFetchTime!) <
@@ -1368,7 +1404,10 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
-  Future<void> fetchUserProfile({bool silent = false, bool force = false}) async {
+  Future<void> fetchUserProfile({
+    bool silent = false,
+    bool force = false,
+  }) async {
     if (!force &&
         _lastProfileFetchTime != null &&
         DateTime.now().difference(_lastProfileFetchTime!) <
@@ -1451,8 +1490,12 @@ class HomeViewModel extends BaseViewModel {
 
       // Listen for token refresh events while caller is on home dashboard
       _fcmTokenSubscription?.cancel();
-      _fcmTokenSubscription = FcmService.onTokenRefreshStream.listen((newToken) {
-        debugPrint('🔄 [HomeViewModel] New FCM token received for caller: $newToken');
+      _fcmTokenSubscription = FcmService.onTokenRefreshStream.listen((
+        newToken,
+      ) {
+        debugPrint(
+          '🔄 [HomeViewModel] New FCM token received for caller: $newToken',
+        );
         FcmService.sendFcmTokenToBackend(newToken);
       });
 
@@ -1467,12 +1510,25 @@ class HomeViewModel extends BaseViewModel {
         )) {
           _agoraService.stopRingtone();
           if (_activeCallMatch != null) {
-            debugPrint('🛑 [HomeVM] Call cancellation/rejection received via FCM -> ending call');
+            debugPrint(
+              '🛑 [HomeVM] Call cancellation/rejection received via FCM -> ending call',
+            );
             setError('Call was declined or ended.');
             endCall(status: 'rejected');
           }
         }
       });
+
+      final conversationCategories = await _userRepository
+          .getConversationCategories();
+      final numericConversationCategories = conversationCategories
+          .where((category) => int.tryParse(category.id) != null)
+          .toList();
+      if (numericConversationCategories.isNotEmpty) {
+        _dynamicCallerIntents
+          ..clear()
+          ..addAll(numericConversationCategories);
+      }
 
       await Future.wait([
         fetchCategories(silent: false, force: true),
