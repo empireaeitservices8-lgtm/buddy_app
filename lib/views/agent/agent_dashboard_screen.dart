@@ -27,8 +27,6 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
   late final TextEditingController _bioController;
   bool _isAcceptingCall = false;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -233,6 +231,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
       ),
     );
   }
+
   // Top App Bar: GABY TALK AGENT + DUTY TOGGLE
   Widget _buildAgentTopBar() {
     return Padding(
@@ -282,7 +281,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                       color: AppColors.strokeBlack,
                       width: 2.5,
                     ),
-                    boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
+                    boxShadow: AppTheme.neoShadow(
+                      offset: const Offset(2.5, 2.5),
+                    ),
                   ),
                   child: const Icon(
                     Icons.refresh_rounded,
@@ -308,7 +309,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                         color: AppColors.strokeBlack,
                         width: 2.5,
                       ),
-                      boxShadow: AppTheme.neoShadow(offset: const Offset(2.5, 2.5)),
+                      boxShadow: AppTheme.neoShadow(
+                        offset: const Offset(2.5, 2.5),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -436,7 +439,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFF3C4), // Light Yellow PRO pill
+                              color: const Color(
+                                0xFFFFF3C4,
+                              ), // Light Yellow PRO pill
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: AppColors.strokeBlack,
@@ -1010,7 +1015,6 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
             ),
           ),
           const SizedBox(width: 14),
-
           // Name and call details
           Expanded(
             child: Column(
@@ -1064,7 +1068,6 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
       ),
     );
   }
-
 
   // TAB 2: Agent Profile / Form Configuration
   Widget _buildAgentFormTab() {
@@ -1193,7 +1196,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            _viewModel.profession.isNotEmpty ? _viewModel.profession : 'General',
+                            _viewModel.profession.isNotEmpty
+                                ? _viewModel.profession
+                                : 'General',
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 15,
@@ -1621,7 +1626,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                           }
                         },
                         child: Opacity(
-                          opacity: _viewModel.totalCoinBalance >= 5000 ? 1.0 : 0.75,
+                          opacity: _viewModel.totalCoinBalance >= 5000
+                              ? 1.0
+                              : 0.75,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,

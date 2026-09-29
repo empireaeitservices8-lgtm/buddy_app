@@ -101,160 +101,162 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop:
-          _viewModel.activeTab == 0 &&
-          _viewModel.exploreStep == HomeExploreStep.intentSelection,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          if (_viewModel.activeTab != 0) {
-            _viewModel.setTab(0);
-          } else if (_viewModel.exploreStep !=
-              HomeExploreStep.intentSelection) {
-            _viewModel.goBackInExplore();
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) => PopScope(
+        canPop:
+            _viewModel.activeTab == 0 &&
+            _viewModel.exploreStep == HomeExploreStep.intentSelection,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            if (_viewModel.activeTab != 0) {
+              _viewModel.setTab(0);
+            } else if (_viewModel.exploreStep !=
+                HomeExploreStep.intentSelection) {
+              _viewModel.goBackInExplore();
+            }
           }
-        }
-      },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFBF8EE),
-        body: Stack(
-          children: [
-            // 1. Top-Right Soft Sage Circle (Wraps around status bar and Coin badge)
-            Positioned(
-              top: -65,
-              right: -60,
-              child: Container(
-                width: 270,
-                height: 270,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFC3E2A0).withOpacity(0.45),
-                  shape: BoxShape.circle,
-                ),
+        },
+        child: _buildScaffold(),
+      ),
+    );
+  }
+
+  Widget _buildScaffold() {
+    return Scaffold(
+      backgroundColor: const Color(0xFFFBF8EE),
+      body: Stack(
+        children: [
+          // 1. Top-Right Soft Sage Circle (Wraps around status bar and Coin badge)
+          Positioned(
+            top: -65,
+            right: -60,
+            child: Container(
+              width: 270,
+              height: 270,
+              decoration: BoxDecoration(
+                color: const Color(0xFFC3E2A0).withOpacity(0.45),
+                shape: BoxShape.circle,
               ),
             ),
+          ),
 
-            // 2. Middle-Left Warm Peach / Sand Organic Circle
-            Positioned(
-              top: 270,
-              left: -90,
-              child: Container(
-                width: 260,
-                height: 260,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8D4AF).withOpacity(0.40),
-                  shape: BoxShape.circle,
-                ),
+          // 2. Middle-Left Warm Peach / Sand Organic Circle
+          Positioned(
+            top: 270,
+            left: -90,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8D4AF).withOpacity(0.40),
+                shape: BoxShape.circle,
               ),
             ),
+          ),
 
-            // 3. Bottom-Right Subtle Soft Lime Glow Circle
-            Positioned(
-              top: 500,
-              right: -80,
-              child: Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFCEF17D).withOpacity(0.40),
-                  shape: BoxShape.circle,
-                ),
+          // 3. Bottom-Right Subtle Soft Lime Glow Circle
+          Positioned(
+            top: 500,
+            right: -80,
+            child: Container(
+              width: 240,
+              height: 240,
+              decoration: BoxDecoration(
+                color: const Color(0xFFCEF17D).withOpacity(0.40),
+                shape: BoxShape.circle,
               ),
             ),
+          ),
 
-            // Main SafeArea Content
-            SafeArea(
-              bottom: false,
-              child: ListenableBuilder(
-                listenable: _viewModel,
-                builder: (context, _) {
-                  return Column(
-                    children: [
-                      // Top App Bar / Header
-                      _buildTopHeader(),
-
-                      // Tab Body
-                      Expanded(
-                        child: IndexedStack(
-                          index: _viewModel.activeTab,
-                          children: [
-                            _buildExploreTab(),
-                            CoinsStoreScreen(
-                              viewModel: _viewModel,
-                              isTab: true,
-                            ),
-                            _buildCallsTab(),
-                            _buildProfileTab(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-
-            // Floating Action Button for Category Multi-Selection
-            Positioned(
-              left: 24,
-              right: 24,
-              bottom: 96,
-              child: SafeArea(
-                top: false,
-                child: ListenableBuilder(
-                  listenable: _viewModel,
-                  builder: (context, _) => _buildFloatingCategoryActionButton(),
-                ),
-              ),
-            ),
-
-            // Floating Bottom Navigation Bar
-            Positioned(
-              left: 20,
-              right: 20,
-              bottom: 16,
-              child: SafeArea(
-                top: false,
-                child: ListenableBuilder(
-                  listenable: _viewModel,
-                  builder: (context, _) => _buildFloatingBottomNav(),
-                ),
-              ),
-            ),
-
-            // Centered Circular Progress Indicator when loading API
-            ListenableBuilder(
+          // Main SafeArea Content
+          SafeArea(
+            bottom: false,
+            child: ListenableBuilder(
               listenable: _viewModel,
               builder: (context, _) {
-                if (!_viewModel.isLoading) return const SizedBox.shrink();
-                return Container(
-                  color: Colors.black.withOpacity(0.25),
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(22),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppColors.strokeBlack,
-                          width: 2.2,
-                        ),
-                        boxShadow: AppTheme.neoShadow(
-                          offset: const Offset(4, 4),
-                        ),
-                      ),
-                      child: const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
-                        ),
-                        strokeWidth: 3.5,
+                return Column(
+                  children: [
+                    // Top App Bar / Header
+                    _buildTopHeader(),
+
+                    // Tab Body
+                    Expanded(
+                      child: IndexedStack(
+                        index: _viewModel.activeTab,
+                        children: [
+                          _buildExploreTab(),
+                          CoinsStoreScreen(viewModel: _viewModel, isTab: true),
+                          _buildCallsTab(),
+                          _buildProfileTab(),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 );
               },
             ),
-          ],
-        ),
+          ),
+
+          // Floating Action Button for Category Multi-Selection
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 96,
+            child: SafeArea(
+              top: false,
+              child: ListenableBuilder(
+                listenable: _viewModel,
+                builder: (context, _) => _buildFloatingCategoryActionButton(),
+              ),
+            ),
+          ),
+
+          // Floating Bottom Navigation Bar
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 16,
+            child: SafeArea(
+              top: false,
+              child: ListenableBuilder(
+                listenable: _viewModel,
+                builder: (context, _) => _buildFloatingBottomNav(),
+              ),
+            ),
+          ),
+
+          // Centered Circular Progress Indicator when loading API
+          ListenableBuilder(
+            listenable: _viewModel,
+            builder: (context, _) {
+              if (!_viewModel.isLoading) return const SizedBox.shrink();
+              return Container(
+                color: Colors.black.withOpacity(0.25),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(22),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardWhite,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 2.2,
+                      ),
+                      boxShadow: AppTheme.neoShadow(offset: const Offset(4, 4)),
+                    ),
+                    child: const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                      strokeWidth: 3.5,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -2164,11 +2166,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   // TAB 3: User Profile & Settings
   Widget _buildProfileTab() {
     final profile = _viewModel.userProfile;
-    final displayName = (profile != null && profile.firstName.isNotEmpty)
-        ? (profile.age != null
-              ? '${profile.fullName}, ${profile.age}'
-              : profile.fullName)
-        : 'Tester, 29';
+    final displayName = '${profile!.firstName}, ${profile.age}';
+    // (profile != null && profile.firstName.isNotEmpty)
+    //     ? (profile.age != null
+    //           ? '${profile.fullName}, ${profile.age}'
+    //           : profile.fullName)
+    //     : 'Tester, 29';
 
     final langStr = (profile?.language != null && profile!.language!.isNotEmpty)
         ? (profile.language!.length > 1

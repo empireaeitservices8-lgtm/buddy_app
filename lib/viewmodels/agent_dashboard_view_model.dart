@@ -184,7 +184,9 @@ class AgentDashboardViewModel extends BaseViewModel {
   Future<bool> _ensureAgentRole() async {
     final role = await _apiService.tokenManager.getUserRole();
     if (role != null && role.toLowerCase() == 'user') {
-      debugPrint('🛑 [AgentDashboard] Guard: Current account is a caller/user account. Suppressing agent API calls.');
+      debugPrint(
+        '🛑 [AgentDashboard] Guard: Current account is a caller/user account. Suppressing agent API calls.',
+      );
       return false;
     }
     return true;
@@ -202,10 +204,7 @@ class AgentDashboardViewModel extends BaseViewModel {
       _listenForIncomingCalls();
       await syncFcmTokenToBackend();
       await turnOnDutyAuto();
-      await Future.wait([
-        fetchAgentProfile(),
-        fetchDashboardData(),
-      ]);
+      await Future.wait([fetchAgentProfile(), fetchDashboardData()]);
       await fetchAgentRating();
       // Check if the app was launched directly from an incoming call notification
       await checkPendingFcmCall();
@@ -218,10 +217,7 @@ class AgentDashboardViewModel extends BaseViewModel {
   Future<void> refresh() async {
     await _loadAuthToken();
     await checkPendingFcmCall();
-    await Future.wait([
-      fetchAgentProfile(),
-      fetchDashboardData(silent: true),
-    ]);
+    await Future.wait([fetchAgentProfile(), fetchDashboardData(silent: true)]);
     await fetchAgentRating();
   }
 
@@ -302,7 +298,8 @@ class AgentDashboardViewModel extends BaseViewModel {
       payload.addAll(Map<String, dynamic>.from(message.data as Map));
     }
     if (message != null && message.notification != null) {
-      if (!payload.containsKey('title') && message.notification!.title != null) {
+      if (!payload.containsKey('title') &&
+          message.notification!.title != null) {
         payload['title'] = message.notification!.title;
       }
       if (!payload.containsKey('body') && message.notification!.body != null) {
@@ -331,14 +328,16 @@ class AgentDashboardViewModel extends BaseViewModel {
       return false;
     }
 
-    final hasCallId = data['call_id'] != null ||
+    final hasCallId =
+        data['call_id'] != null ||
         data['callId'] != null ||
         data['callID'] != null ||
         data['id'] != null ||
         data['pk'] != null ||
         data['session_id'] != null;
 
-    final channelName = data['channel_name']?.toString() ??
+    final channelName =
+        data['channel_name']?.toString() ??
         data['channelName']?.toString() ??
         data['channel']?.toString() ??
         data['room']?.toString() ??
@@ -348,7 +347,8 @@ class AgentDashboardViewModel extends BaseViewModel {
 
     final title = data['title']?.toString().toLowerCase() ?? '';
     final body = data['body']?.toString().toLowerCase() ?? '';
-    final isCallText = title.contains('call') ||
+    final isCallText =
+        title.contains('call') ||
         body.contains('call') ||
         type.contains('call') ||
         type.contains('incoming') ||
@@ -434,9 +434,15 @@ class AgentDashboardViewModel extends BaseViewModel {
     _fcmCallSubscription = FcmService.onMessageStream.listen((message) {
       final payload = _extractFullPayload(message);
       if (_isCallCancellationPayload(payload)) {
-        final cancelCallId = int.tryParse(payload['call_id']?.toString() ?? payload['id']?.toString() ?? '');
-        if (_hasIncomingCall && (cancelCallId == null || cancelCallId == _incomingCallData?.callId)) {
-          dismissIncomingCall(reason: 'Caller cancelled call via FCM foreground');
+        final cancelCallId = int.tryParse(
+          payload['call_id']?.toString() ?? payload['id']?.toString() ?? '',
+        );
+        if (_hasIncomingCall &&
+            (cancelCallId == null ||
+                cancelCallId == _incomingCallData?.callId)) {
+          dismissIncomingCall(
+            reason: 'Caller cancelled call via FCM foreground',
+          );
         }
       } else if (_isCallPayload(payload)) {
         final parsed = IncomingCallData.fromFcmData(payload);
@@ -456,8 +462,12 @@ class AgentDashboardViewModel extends BaseViewModel {
     _fcmTapSubscription = FcmService.onNotificationTapStream.listen((message) {
       final payload = _extractFullPayload(message);
       if (_isCallCancellationPayload(payload)) {
-        final cancelCallId = int.tryParse(payload['call_id']?.toString() ?? payload['id']?.toString() ?? '');
-        if (_hasIncomingCall && (cancelCallId == null || cancelCallId == _incomingCallData?.callId)) {
+        final cancelCallId = int.tryParse(
+          payload['call_id']?.toString() ?? payload['id']?.toString() ?? '',
+        );
+        if (_hasIncomingCall &&
+            (cancelCallId == null ||
+                cancelCallId == _incomingCallData?.callId)) {
           dismissIncomingCall(reason: 'Caller cancelled call');
         }
       } else if (_isCallPayload(payload)) {
@@ -477,8 +487,12 @@ class AgentDashboardViewModel extends BaseViewModel {
     // Native Android Intent: incoming call received via system intent/channel
     _fcmNativeSubscription = FcmService.onNativeCallStream.listen((data) {
       if (_isCallCancellationPayload(data)) {
-        final cancelCallId = int.tryParse(data['call_id']?.toString() ?? data['id']?.toString() ?? '');
-        if (_hasIncomingCall && (cancelCallId == null || cancelCallId == _incomingCallData?.callId)) {
+        final cancelCallId = int.tryParse(
+          data['call_id']?.toString() ?? data['id']?.toString() ?? '',
+        );
+        if (_hasIncomingCall &&
+            (cancelCallId == null ||
+                cancelCallId == _incomingCallData?.callId)) {
           dismissIncomingCall(reason: 'Caller cancelled call via Intent');
         }
       } else if (_isCallPayload(data)) {
@@ -497,7 +511,9 @@ class AgentDashboardViewModel extends BaseViewModel {
 
     // Automatically sync new FCM tokens to backend
     _fcmTokenSubscription = FcmService.onTokenRefreshStream.listen((newToken) {
-      debugPrint('🔄 [AgentDashboard] New FCM token received, syncing to backend: $newToken');
+      debugPrint(
+        '🔄 [AgentDashboard] New FCM token received, syncing to backend: $newToken',
+      );
       syncFcmTokenToBackend(newToken);
     });
   }
@@ -505,9 +521,13 @@ class AgentDashboardViewModel extends BaseViewModel {
   void _startIncomingCallVerification(IncomingCallData callData) {
     _incomingCallPollTimer?.cancel();
     int elapsedMs = 0;
-    _incomingCallPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
+    _incomingCallPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (
+      timer,
+    ) async {
       elapsedMs += 1500;
-      if (!_hasIncomingCall || _incomingCallData == null || _incomingCallData?.callId != callData.callId) {
+      if (!_hasIncomingCall ||
+          _incomingCallData == null ||
+          _incomingCallData?.callId != callData.callId) {
         timer.cancel();
         _incomingCallPollTimer = null;
         return;
@@ -558,9 +578,12 @@ class AgentDashboardViewModel extends BaseViewModel {
           }
 
           if (activeCallMap != null) {
-            final activeCallId = activeCallMap['id'] ?? activeCallMap['call_id'];
-            final status = activeCallMap['status']?.toString().toLowerCase() ?? '';
-            final isCancelled = status == 'cancelled' ||
+            final activeCallId =
+                activeCallMap['id'] ?? activeCallMap['call_id'];
+            final status =
+                activeCallMap['status']?.toString().toLowerCase() ?? '';
+            final isCancelled =
+                status == 'cancelled' ||
                 status == 'cancel' ||
                 status == 'rejected' ||
                 status == 'reject' ||
@@ -568,8 +591,12 @@ class AgentDashboardViewModel extends BaseViewModel {
                 status == 'ended' ||
                 status == 'missed';
 
-            if (isCancelled || (activeCallId != null && activeCallId.toString() != callData.callId.toString())) {
-              debugPrint('📞 [AgentDashboard] Call #${callData.callId} is no longer active on server ($status). Dismissing incoming call.');
+            if (isCancelled ||
+                (activeCallId != null &&
+                    activeCallId.toString() != callData.callId.toString())) {
+              debugPrint(
+                '📞 [AgentDashboard] Call #${callData.callId} is no longer active on server ($status). Dismissing incoming call.',
+              );
               timer.cancel();
               _incomingCallPollTimer = null;
               dismissIncomingCall(reason: 'Caller cancelled or call ended');
@@ -667,7 +694,8 @@ class AgentDashboardViewModel extends BaseViewModel {
           ? Options(headers: {'Authorization': 'Bearer $_authToken'})
           : null;
 
-      final dynamic agentId = targetAgentId ??
+      final dynamic agentId =
+          targetAgentId ??
           _agentProfile?.userId ??
           _dashboardData?.profile?.userId ??
           _agentProfile?.agentId ??
@@ -676,15 +704,17 @@ class AgentDashboardViewModel extends BaseViewModel {
           _dashboardData?.profile?.id;
 
       if (agentId == null || agentId.toString().isEmpty) {
-        debugPrint('⚠️ [AgentDashboard] Skipping fetchAgentRating: Agent user_id not yet loaded.');
+        debugPrint(
+          '⚠️ [AgentDashboard] Skipping fetchAgentRating: Agent user_id not yet loaded.',
+        );
         return;
       }
 
-      final Map<String, dynamic> queryParams = {
-        'agent_id': agentId,
-      };
+      final Map<String, dynamic> queryParams = {'agent_id': agentId};
 
-      debugPrint('🌟 [AgentDashboard] Fetching ratings from ${ApiConstants.agentRating} with query: $queryParams');
+      debugPrint(
+        '🌟 [AgentDashboard] Fetching ratings from ${ApiConstants.agentRating} with query: $queryParams',
+      );
 
       final response = await _apiService.get(
         ApiConstants.agentRating,
@@ -693,7 +723,9 @@ class AgentDashboardViewModel extends BaseViewModel {
         requiresAuth: true,
       );
 
-      debugPrint('🌟 [AgentDashboard] Agent rating response: ${response.rawData}');
+      debugPrint(
+        '🌟 [AgentDashboard] Agent rating response: ${response.rawData}',
+      );
 
       if (response.isSuccess && response.rawData is Map) {
         final raw = response.rawData as Map<String, dynamic>;
@@ -742,8 +774,8 @@ class AgentDashboardViewModel extends BaseViewModel {
           ? Options(headers: {'Authorization': 'Bearer $_authToken'})
           : null;
 
-      final fcmToken = await FcmService.getFcmToken() ??
-          await TokenManager().getFcmToken();
+      final fcmToken =
+          await FcmService.getFcmToken() ?? await TokenManager().getFcmToken();
 
       final body = <String, dynamic>{
         'is_on_duty': turnOn,
@@ -870,8 +902,10 @@ class AgentDashboardViewModel extends BaseViewModel {
           }
 
           if (activeCallMap != null) {
-            final status = activeCallMap['status']?.toString().toLowerCase() ?? '';
-            final isRinging = status.isEmpty ||
+            final status =
+                activeCallMap['status']?.toString().toLowerCase() ?? '';
+            final isRinging =
+                status.isEmpty ||
                 status == 'pending' ||
                 status == 'ringing' ||
                 status == 'calling' ||
@@ -1016,14 +1050,16 @@ class AgentDashboardViewModel extends BaseViewModel {
           final resData = res['data'] is Map<String, dynamic>
               ? res['data'] as Map<String, dynamic>
               : res;
-          final serverToken = resData['agora_token']?.toString() ??
+          final serverToken =
+              resData['agora_token']?.toString() ??
               resData['token']?.toString() ??
               resData['agoraToken']?.toString() ??
               resData['rtc_token']?.toString();
           if (serverToken != null && serverToken.isNotEmpty) {
             agoraToken = serverToken;
           }
-          final serverChannel = resData['channel_name']?.toString() ??
+          final serverChannel =
+              resData['channel_name']?.toString() ??
               resData['channelName']?.toString();
           if (serverChannel != null && serverChannel.isNotEmpty) {
             channel = serverChannel;
@@ -1038,7 +1074,9 @@ class AgentDashboardViewModel extends BaseViewModel {
           }
         }
       } catch (e) {
-        debugPrint('⚠️ [AgentDashboard] Error updating call status to accepted: $e');
+        debugPrint(
+          '⚠️ [AgentDashboard] Error updating call status to accepted: $e',
+        );
       }
     }
 
@@ -1046,8 +1084,8 @@ class AgentDashboardViewModel extends BaseViewModel {
       effectiveUid = _agentProfile?.userId != null && _agentProfile!.userId! > 0
           ? _agentProfile!.userId!
           : (_agentProfile?.id != null && _agentProfile!.id! > 0
-              ? _agentProfile!.id!
-              : 0);
+                ? _agentProfile!.id!
+                : 0);
     }
     if (effectiveUid <= 0) {
       final parts = channel.split('_');
@@ -1200,8 +1238,8 @@ class AgentDashboardViewModel extends BaseViewModel {
           ? Options(headers: {'Authorization': 'Bearer $_authToken'})
           : null;
 
-      final fcmToken = await FcmService.getFcmToken() ??
-          await TokenManager().getFcmToken();
+      final fcmToken =
+          await FcmService.getFcmToken() ?? await TokenManager().getFcmToken();
 
       await _apiService.post(
         ApiConstants.agentDutyForm,
@@ -1232,7 +1270,8 @@ class AgentDashboardViewModel extends BaseViewModel {
   /// Proactively pushes the current FCM device token to all backend agent/user profile endpoints
   Future<void> syncFcmTokenToBackend([String? token]) async {
     try {
-      final fcmToken = token ??
+      final fcmToken =
+          token ??
           await FcmService.getFcmToken() ??
           await TokenManager().getFcmToken();
       if (fcmToken == null || fcmToken.isEmpty) return;
@@ -1241,9 +1280,7 @@ class AgentDashboardViewModel extends BaseViewModel {
           ? Options(headers: {'Authorization': 'Bearer $_authToken'})
           : null;
 
-      final body = <String, dynamic>{
-        'fcm_token': fcmToken,
-      };
+      final body = <String, dynamic>{'fcm_token': fcmToken};
 
       // 0. Sync directly via api/fcm-token/
       try {
@@ -1288,7 +1325,6 @@ class AgentDashboardViewModel extends BaseViewModel {
   /// Alias for submitDutyForm
   Future<bool> saveDutyForm() => submitDutyForm();
 
-
   /// Submits a payout request to agent/request-payout/
   Future<bool> requestPayout({int? amount}) async {
     final payoutAmount = amount ?? _totalCoinBalance;
@@ -1331,7 +1367,9 @@ class AgentDashboardViewModel extends BaseViewModel {
     try {
       await setDutyStatus(false);
     } catch (e) {
-      debugPrint('⚠️ [AgentDashboard] Failed to set duty OFF during logout: $e');
+      debugPrint(
+        '⚠️ [AgentDashboard] Failed to set duty OFF during logout: $e',
+      );
     }
 
     try {
