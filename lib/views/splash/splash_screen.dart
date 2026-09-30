@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
       );
 
       // Show splash animation for at least 1.0 second for a smooth branded experience
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await Future.delayed(const Duration(milliseconds: 2000));
 
       if (!mounted) return;
 

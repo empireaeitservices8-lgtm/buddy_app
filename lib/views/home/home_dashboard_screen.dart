@@ -292,10 +292,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
               const SizedBox(width: 10),
               Image.asset(
-                'assets/images/gaby_new.jpeg',
+                'assets/images/gaby_new.png',
                 fit: BoxFit.cover,
                 width: 110,
-                height: 35,
+                height: 40,
               ),
             ],
           ),
@@ -575,8 +575,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   // STEP 2: "Category Listeners & Matches" User List Screen
   Widget _buildCategoryMatchesStep() {
     final matches = _viewModel.filteredMatches;
-    print("-----matches");
-    print(matches);
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -1369,7 +1367,19 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                               match.bio.trim().length > 3
                           ? match.bio.trim()
                           : match.profession)));
+    final languageText = match.location.contains('Language:')
+        ? match.location.replaceAll('Language:', '').trim()
+        : 'English';
 
+    final languages = languageText
+        .split(',')
+        .map((language) => language.trim())
+        .where((language) => language.isNotEmpty)
+        .toList();
+
+    final displayLanguages = languages.length > 3
+        ? '${languages.take(2).join(', ')}...'
+        : languages.join(', ');
     return Container(
       decoration: BoxDecoration(
         color: match.cardColor,
@@ -1601,18 +1611,18 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   // Language Pill at bottom-left (start of the row) of avatar box
                   Positioned(
                     bottom: 6,
-                    left: 8,
+                    left: 3,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
+                        horizontal: 4,
                         vertical: 2.5,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(5),
                         border: Border.all(
                           color: AppColors.strokeBlack,
-                          width: 1.1,
+                          width: 0.5,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -1627,21 +1637,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                         children: [
                           const Text('🗣️', style: TextStyle(fontSize: 8.5)),
                           const SizedBox(width: 3.5),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 120),
-                            child: Text(
-                              match.location.contains('Language:')
-                                  ? match.location
-                                        .replaceAll('Language:', '')
-                                        .trim()
-                                  : 'English',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.textBlack,
-                              ),
+                          Text(
+                            displayLanguages,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF334155),
+                              height: 1.25,
                             ),
                           ),
                         ],
@@ -1759,7 +1763,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ),
 
-            const SizedBox(height: 4),
+            const Spacer(),
 
             // 4. Slide to Call Action Button
             SlideToActionButton(
@@ -2426,6 +2430,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           value: '$voiceCallsCount',
                           label: 'Voice Calls',
                           bgColor: const Color(0xFFBAE6FD), // Pastel blue
+                          onTap: () => _viewModel.setTab(2),
                         ),
                       ),
                       const SizedBox(width: 10),

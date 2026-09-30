@@ -66,9 +66,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
                         // Top GabbyTalk Brand Logo Header
                         _buildTopLogoHeader(),
-
                         const Spacer(),
-
                         // Center Animated Mascot inside dark-bordered circular cartoon container
                         Container(
                           width: MediaQuery.sizeOf(context).width * 0.8,
@@ -149,35 +147,37 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
           child: ClipOval(
-            child: Image.asset(
-              'assets/images/app_icon.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/images/app_icon.png', fit: BoxFit.cover),
           ),
         ),
         const SizedBox(width: 10),
-
-        // GabyTalk Official Typography
-        RichText(
-          text: const TextSpan(
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
-              fontFamily: 'Roboto',
-            ),
-            children: [
-              TextSpan(
-                text: 'Gaby',
-                style: TextStyle(color: Color(0xFF0A2E65)),
-              ),
-              TextSpan(
-                text: 'Talk',
-                style: TextStyle(color: Color(0xFF00A79D)),
-              ),
-            ],
-          ),
+        Image.asset(
+          'assets/images/gaby_new.png',
+          fit: BoxFit.cover,
+          width: 110,
+          height: 45,
         ),
+        // GabyTalk Official Typography
+        // RichText(
+        //   text: const TextSpan(
+        //     style: TextStyle(
+        //       fontSize: 32,
+        //       fontWeight: FontWeight.w900,
+        //       letterSpacing: -0.5,
+        //       fontFamily: 'Roboto',
+        //     ),
+        //     children: [
+        //       TextSpan(
+        //         text: 'Gaby',
+        //         style: TextStyle(color: Color(0xFF0A2E65)),
+        //       ),
+        //       TextSpan(
+        //         text: 'Talk',
+        //         style: TextStyle(color: Color(0xFF00A79D)),
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
