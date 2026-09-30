@@ -285,14 +285,43 @@ class HomeViewModel extends BaseViewModel {
       }
       final savedProfilesJson = prefs.getStringList('user_favorite_profiles');
       if (savedProfilesJson != null) {
+        final legacyProfiles = <MatchProfile>[];
+        var favoritesWereMigrated = false;
         for (final itemStr in savedProfilesJson) {
           try {
             final map = jsonDecode(itemStr) as Map<String, dynamic>;
-            final profile = MatchProfile.fromJson(map);
+            final profileData = map['profile'];
+            final profile = MatchProfile.fromJson(
+              profileData is Map ? Map<String, dynamic>.from(profileData) : map,
+            );
             _allKnownMatches[profile.id] = profile;
-            _favoriteMatchesCache[profile.id] = profile;
+            final favoriteId = map['favorite_id']?.toString();
+            if (favoriteId != null) {
+              if (favoriteId != profile.id &&
+                  _favoriteMatchIds.remove(favoriteId)) {
+                _favoriteMatchIds.add(profile.id);
+                favoritesWereMigrated = true;
+              }
+              _favoriteMatchesCache[profile.id] = profile;
+            } else {
+              legacyProfiles.add(profile);
+              _favoriteMatchesCache[profile.id] = profile;
+            }
           } catch (_) {}
         }
+        if (savedIds != null && legacyProfiles.length == savedIds.length) {
+          for (var index = 0; index < savedIds.length; index++) {
+            final favoriteId = savedIds[index];
+            final profile = legacyProfiles[index];
+            if (favoriteId != profile.id &&
+                _favoriteMatchIds.remove(favoriteId)) {
+              _favoriteMatchIds.add(profile.id);
+              favoritesWereMigrated = true;
+            }
+            _favoriteMatchesCache[profile.id] = profile;
+          }
+        }
+        if (favoritesWereMigrated) await _saveFavoritesToStorage();
       }
       final savedCoins = prefs.getInt('last_known_wallet_coins');
       if (savedCoins != null) {
@@ -317,9 +346,12 @@ class HomeViewModel extends BaseViewModel {
         _favoriteMatchIds.toList(),
       );
       final profilesToSave = _favoriteMatchIds
-          .map((id) => _favoriteMatchesCache[id] ?? _allKnownMatches[id])
-          .whereType<MatchProfile>()
-          .map((p) => jsonEncode(p.toJson()))
+          .map((id) {
+            final profile = _favoriteMatchesCache[id] ?? _allKnownMatches[id];
+            if (profile == null) return null;
+            return jsonEncode({'favorite_id': id, 'profile': profile.toJson()});
+          })
+          .whereType<String>()
           .toList();
       await prefs.setStringList('user_favorite_profiles', profilesToSave);
     } catch (_) {}
@@ -368,6 +400,23 @@ class HomeViewModel extends BaseViewModel {
     notifyListenersSafely();
   }
 
+  void showFavorites() {
+    final hasUnresolvedFavorites = _favoriteMatchIds.any(
+      (id) => _findMatchById(id) == null,
+    );
+    _activeTab = 0;
+    _selectedCategory = null;
+    _exploreStep = HomeExploreStep.categoryMatches;
+    _selectedIntentIds.clear();
+    _searchQuery = '';
+    _showFavoritesOnly = true;
+    if (hasUnresolvedFavorites) {
+      fetchCategories(silent: true, force: true);
+    } else {
+      notifyListenersSafely();
+    }
+  }
+
   String get formattedCallDuration {
     final minutes = (_callDurationSeconds ~/ 60).toString().padLeft(2, '0');
     final seconds = (_callDurationSeconds % 60).toString().padLeft(2, '0');
@@ -405,6 +454,13 @@ class HomeViewModel extends BaseViewModel {
       for (final m in _matches) {
         if (_favoriteMatchIds.contains(m.id)) {
           allFavsMap[m.id] = m;
+        }
+      }
+      for (final category in _professions) {
+        for (final match in category.matches) {
+          if (_favoriteMatchIds.contains(match.id)) {
+            allFavsMap[match.id] = match;
+          }
         }
       }
 

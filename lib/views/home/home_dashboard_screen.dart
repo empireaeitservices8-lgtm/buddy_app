@@ -2022,7 +2022,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildCallCard(CallLogItem item) {
-    final isFav = _viewModel.isFavorite(item.id);
+    final favoriteId = item.matchProfile?.id ?? item.id;
+    final isFav = _viewModel.isFavorite(favoriteId);
     final isFemale =
         item.name.toLowerCase().endsWith('a') ||
         item.name.toLowerCase().endsWith('i') ||
@@ -2111,9 +2112,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
           GestureDetector(
             onTap: () {
-              final wasFav = _viewModel.isFavorite(item.id);
+              final wasFav = _viewModel.isFavorite(favoriteId);
 
-              _viewModel.toggleFavorite(item.id, item.matchProfile);
+              _viewModel.toggleFavorite(favoriteId, item.matchProfile);
 
               showNeoToast(
                 context,
@@ -2411,9 +2412,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           label: 'Favorites',
                           bgColor: const Color(0xFFFFB7D5),
                           onTap: () {
-                            if (!_viewModel.showFavoritesOnly) {
-                              _viewModel.toggleShowFavoritesOnly();
-                            }
+                            _searchController.clear();
+                            _viewModel.showFavorites();
                           },
                         ),
                       ),
