@@ -1,4 +1,4 @@
-﻿// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import '../../../viewmodels/home_view_model.dart';
@@ -407,111 +407,154 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
 
                                   const SizedBox(height: 24),
 
-                                  // Control Buttons: Mute, End Call, Speaker
+                                  // Control Buttons: Mute, End Call, Speaker / Earpiece
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 24.0),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         // Mute Button
-                                        GestureDetector(
-                                          onTap: widget.viewModel.toggleMute,
-                                          child: Container(
-                                            width: 58,
-                                            height: 58,
-                                            decoration: BoxDecoration(
-                                              color: widget.viewModel.isMuted
-                                                  ? const Color(0xFFFFD1DC)
-                                                  : Colors.white,
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: const Color(0xFF1E2022),
-                                                width: 2.5,
-                                              ),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Color(0xFF1E2022),
-                                                  offset: Offset(2, 2),
-                                                  blurRadius: 0,
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: widget.viewModel.toggleMute,
+                                              child: Container(
+                                                width: 58,
+                                                height: 58,
+                                                decoration: BoxDecoration(
+                                                  color: widget.viewModel.isMuted
+                                                      ? const Color(0xFFFFD1DC)
+                                                      : Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: const Color(0xFF1E2022),
+                                                    width: 2.5,
+                                                  ),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Color(0xFF1E2022),
+                                                      offset: Offset(2, 2),
+                                                      blurRadius: 0,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                                alignment: Alignment.center,
+                                                child: Icon(
+                                                  widget.viewModel.isMuted
+                                                      ? Icons.mic_off_rounded
+                                                      : Icons.mic_rounded,
+                                                  color: const Color(0xFF1E2022),
+                                                  size: 26,
+                                                ),
+                                              ),
                                             ),
-                                            alignment: Alignment.center,
-                                            child: Icon(
-                                              widget.viewModel.isMuted
-                                                  ? Icons.mic_off_rounded
-                                                  : Icons.mic_rounded,
-                                              color: const Color(0xFF1E2022),
-                                              size: 26,
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              widget.viewModel.isMuted ? 'Muted' : 'Mute',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF1E2022),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
 
                                         // End Call Button (Red Neubrutal)
-                                        GestureDetector(
-                                          onTap: () {
-                                            widget.viewModel.endCall();
-                                            Navigator.of(context).maybePop();
-                                          },
-                                          child: Container(
-                                            width: 72,
-                                            height: 72,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFFF5252), // Red Accent
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: const Color(0xFF1E2022),
-                                                width: 3.2,
-                                              ),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Color(0xFF1E2022),
-                                                  offset: Offset(3.5, 3.5),
-                                                  blurRadius: 0,
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                widget.viewModel.endCall();
+                                                Navigator.of(context).maybePop();
+                                              },
+                                              child: Container(
+                                                width: 72,
+                                                height: 72,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFFF5252), // Red Accent
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: const Color(0xFF1E2022),
+                                                    width: 3.2,
+                                                  ),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Color(0xFF1E2022),
+                                                      offset: Offset(3.5, 3.5),
+                                                      blurRadius: 0,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                                alignment: Alignment.center,
+                                                child: const Icon(
+                                                  Icons.call_end_rounded,
+                                                  color: Colors.white,
+                                                  size: 34,
+                                                ),
+                                              ),
                                             ),
-                                            alignment: Alignment.center,
-                                            child: const Icon(
-                                              Icons.call_end_rounded,
-                                              color: Colors.white,
-                                              size: 34,
+                                            const SizedBox(height: 6),
+                                            const Text(
+                                              'End',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF1E2022),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
 
-                                        // Speaker Button
-                                        GestureDetector(
-                                          onTap: widget.viewModel.toggleSpeaker,
-                                          child: Container(
-                                            width: 58,
-                                            height: 58,
-                                            decoration: BoxDecoration(
-                                              color: widget.viewModel.isSpeakerOn
-                                                  ? const Color(0xFFD4F19C)
-                                                  : Colors.white,
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: const Color(0xFF1E2022),
-                                                width: 2.5,
-                                              ),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Color(0xFF1E2022),
-                                                  offset: Offset(2, 2),
-                                                  blurRadius: 0,
+                                        // Speaker / Earpiece Button
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: widget.viewModel.toggleSpeaker,
+                                              child: Container(
+                                                width: 58,
+                                                height: 58,
+                                                decoration: BoxDecoration(
+                                                  color: widget.viewModel.isSpeakerOn
+                                                      ? const Color(0xFFD4F19C)
+                                                      : Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: const Color(0xFF1E2022),
+                                                    width: 2.5,
+                                                  ),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Color(0xFF1E2022),
+                                                      offset: Offset(2, 2),
+                                                      blurRadius: 0,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                                alignment: Alignment.center,
+                                                child: Icon(
+                                                  widget.viewModel.isSpeakerOn
+                                                      ? Icons.volume_up_rounded
+                                                      : Icons.hearing_rounded,
+                                                  color: const Color(0xFF1E2022),
+                                                  size: 26,
+                                                ),
+                                              ),
                                             ),
-                                            alignment: Alignment.center,
-                                            child: Icon(
-                                              widget.viewModel.isSpeakerOn
-                                                  ? Icons.volume_up_rounded
-                                                  : Icons.volume_down_rounded,
-                                              color: const Color(0xFF1E2022),
-                                              size: 26,
+                                            const SizedBox(height: 6),
+                                            Text(
+                                              widget.viewModel.isSpeakerOn ? 'Speaker' : 'Earpiece',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF1E2022),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),

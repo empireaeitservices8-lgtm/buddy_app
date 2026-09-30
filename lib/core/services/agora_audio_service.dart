@@ -259,6 +259,9 @@ class AgoraAudioService implements IAgoraAudioService {
       try {
         await _engine!.setDefaultAudioRouteToSpeakerphone(false);
       } catch (_) {}
+      try {
+        await _engine!.setEnableSpeakerphone(false);
+      } catch (_) {}
 
       const options = ChannelMediaOptions(
         clientRoleType: ClientRoleType.clientRoleBroadcaster,

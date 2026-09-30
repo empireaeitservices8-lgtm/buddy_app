@@ -160,6 +160,9 @@ class AgoraService {
       try {
         await _engine!.setDefaultAudioRouteToSpeakerphone(false);
       } catch (_) {}
+      try {
+        await _engine!.setEnableSpeakerphone(false);
+      } catch (_) {}
       _isSpeakerPhoneOn = false;
       _isLocalMuted = false;
 

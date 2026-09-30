@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../models/call_session_model.dart';
 import '../viewmodels/call_viewmodel.dart';
 
@@ -260,7 +260,7 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                         width: 124,
                                         height: 124,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => _buildAvatarInitial(),
+                                        errorBuilder: (context, error, stackTrace) => _buildAvatarInitial(),
                                       ),
                                     )
                                   : _buildAvatarInitial(),
@@ -384,86 +384,129 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                   padding: const EdgeInsets.only(bottom: 40.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       // Mute Button
-                      GestureDetector(
-                        onTap: _toggleMute,
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: _isMuted
-                                ? const Color(0xFFFFD1DC)
-                                : Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: const Color(0xFF1E2022), width: 2.5),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0xFF1E2022),
-                                offset: Offset(2, 2),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: _toggleMute,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: _isMuted
+                                    ? const Color(0xFFFFD1DC)
+                                    : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: const Color(0xFF1E2022), width: 2.5),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0xFF1E2022),
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: Icon(
+                                _isMuted ? Icons.mic_off : Icons.mic,
+                                color: const Color(0xFF1E2022),
+                                size: 26,
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            _isMuted ? Icons.mic_off : Icons.mic,
-                            color: const Color(0xFF1E2022),
-                            size: 26,
+                          const SizedBox(height: 6),
+                          Text(
+                            _isMuted ? 'Muted' : 'Mute',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E2022),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
 
                       // End Call Button (Red Neubrutal)
-                      GestureDetector(
-                        onTap: _handleEndCall,
-                        child: Container(
-                          width: 74,
-                          height: 74,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF5252), // Red Accent
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: const Color(0xFF1E2022), width: 3),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0xFF1E2022),
-                                offset: Offset(3, 3),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: _handleEndCall,
+                            child: Container(
+                              width: 74,
+                              height: 74,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF5252), // Red Accent
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: const Color(0xFF1E2022), width: 3),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0xFF1E2022),
+                                    offset: Offset(3, 3),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: const Icon(Icons.call_end_rounded,
+                                  color: Colors.white, size: 34),
+                            ),
                           ),
-                          child: const Icon(Icons.call_end_rounded,
-                              color: Colors.white, size: 34),
-                        ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'End',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E2022),
+                            ),
+                          ),
+                        ],
                       ),
 
-                      // Speaker Button
-                      GestureDetector(
-                        onTap: _toggleSpeaker,
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: _isSpeakerOn
-                                ? const Color(0xFFD4F19C)
-                                : Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: const Color(0xFF1E2022), width: 2.5),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0xFF1E2022),
-                                offset: Offset(2, 2),
+                      // Speaker / Earpiece Button
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: _toggleSpeaker,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: _isSpeakerOn
+                                    ? const Color(0xFFD4F19C)
+                                    : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: const Color(0xFF1E2022), width: 2.5),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0xFF1E2022),
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: Icon(
+                                _isSpeakerOn
+                                    ? Icons.volume_up_rounded
+                                    : Icons.hearing_rounded,
+                                color: const Color(0xFF1E2022),
+                                size: 26,
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            _isSpeakerOn
-                                ? Icons.volume_up_rounded
-                                : Icons.volume_down_rounded,
-                            color: const Color(0xFF1E2022),
-                            size: 26,
+                          const SizedBox(height: 6),
+                          Text(
+                            _isSpeakerOn ? 'Speaker' : 'Earpiece',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E2022),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
