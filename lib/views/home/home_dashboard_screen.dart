@@ -291,39 +291,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: AppTypography.brandLogo.copyWith(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
-                      children: const [
-                        TextSpan(
-                          text: 'GABY ',
-                          style: TextStyle(color: Color(0xFF0F2444)),
-                        ),
-                        TextSpan(
-                          text: 'TALK',
-                          style: TextStyle(color: Color(0xFF00A79D)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Text(
-                    'Real People • Real Conversations',
-                    style: TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF64748B),
-                      letterSpacing: -0.1,
-                    ),
-                  ),
-                ],
+              Image.asset(
+                'assets/images/gaby_new.jpeg',
+                fit: BoxFit.cover,
+                width: 110,
+                height: 35,
               ),
             ],
           ),
@@ -339,7 +311,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   Text(
                     'You talk... ',
                     style: TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 10.5,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w700,
                       color: const Color(0xFF0F2444).withOpacity(0.85),
@@ -348,7 +320,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   const Text(
                     'We connect ❤️',
                     style: TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w900,
                       color: Color(0xFFE11D48),
                     ),
@@ -1031,18 +1003,30 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
               )
             else
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: matches.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.53,
-                ),
-                itemBuilder: (context, index) {
-                  return _buildMatchCard(matches[index]);
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenWidth = constraints.maxWidth;
+
+                  final aspectRatio = screenWidth < 360
+                      ? 0.50
+                      : screenWidth < 400
+                      ? 0.58
+                      : 0.70;
+
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: matches.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: aspectRatio,
+                    ),
+                    itemBuilder: (context, index) {
+                      return _buildMatchCard(matches[index]);
+                    },
+                  );
                 },
               ),
           ],
