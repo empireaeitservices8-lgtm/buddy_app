@@ -1,4 +1,4 @@
-﻿// ignore_for_file: use_build_context_synchronously, duplicate_ignore, deprecated_member_use
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -401,108 +401,151 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                   padding: const EdgeInsets.only(bottom: 32.0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       // Mute Button
-                                      GestureDetector(
-                                        onTap: vm.toggleMute,
-                                        child: Container(
-                                          width: 58,
-                                          height: 58,
-                                          decoration: BoxDecoration(
-                                            color: vm.isMuted
-                                                ? const Color(0xFFFFD1DC)
-                                                : Colors.white,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: const Color(0xFF1E2022),
-                                              width: 2.5,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0xFF1E2022),
-                                                offset: Offset(2, 2),
-                                                blurRadius: 0,
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: vm.toggleMute,
+                                            child: Container(
+                                              width: 58,
+                                              height: 58,
+                                              decoration: BoxDecoration(
+                                                color: vm.isMuted
+                                                    ? const Color(0xFFFFD1DC)
+                                                    : Colors.white,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: const Color(0xFF1E2022),
+                                                  width: 2.5,
+                                                ),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Color(0xFF1E2022),
+                                                    offset: Offset(2, 2),
+                                                    blurRadius: 0,
+                                                  ),
+                                                ],
                                               ),
-                                            ],
+                                              alignment: Alignment.center,
+                                              child: Icon(
+                                                vm.isMuted
+                                                    ? Icons.mic_off_rounded
+                                                    : Icons.mic_rounded,
+                                                color: const Color(0xFF1E2022),
+                                                size: 26,
+                                              ),
+                                            ),
                                           ),
-                                          alignment: Alignment.center,
-                                          child: Icon(
-                                            vm.isMuted
-                                                ? Icons.mic_off_rounded
-                                                : Icons.mic_rounded,
-                                            color: const Color(0xFF1E2022),
-                                            size: 26,
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            vm.isMuted ? 'Muted' : 'Mute',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFF1E2022),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
 
                                       // End Call Button (Red Neubrutal)
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await vm.endCall();
-                                          if (mounted && Navigator.of(context).canPop()) {
-                                            Navigator.of(context).pop();
-                                          }
-                                        },
-                                        child: Container(
-                                          width: 72,
-                                          height: 72,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFF5252), // Red Accent
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: const Color(0xFF1E2022),
-                                              width: 3.2,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0xFF1E2022),
-                                                offset: Offset(3.5, 3.5),
-                                                blurRadius: 0,
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              await vm.endCall();
+                                              if (mounted && Navigator.of(context).canPop()) {
+                                                Navigator.of(context).pop();
+                                              }
+                                            },
+                                            child: Container(
+                                              width: 72,
+                                              height: 72,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFFF5252), // Red Accent
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: const Color(0xFF1E2022),
+                                                  width: 3.2,
+                                                ),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Color(0xFF1E2022),
+                                                    offset: Offset(3.5, 3.5),
+                                                    blurRadius: 0,
+                                                  ),
+                                                ],
                                               ),
-                                            ],
+                                              alignment: Alignment.center,
+                                              child: const Icon(
+                                                Icons.call_end_rounded,
+                                                color: Colors.white,
+                                                size: 34,
+                                              ),
+                                            ),
                                           ),
-                                          alignment: Alignment.center,
-                                          child: const Icon(
-                                            Icons.call_end_rounded,
-                                            color: Colors.white,
-                                            size: 34,
+                                          const SizedBox(height: 6),
+                                          const Text(
+                                            'End',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFF1E2022),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
 
-                                      // Speakerphone Button
-                                      GestureDetector(
-                                        onTap: vm.toggleSpeaker,
-                                        child: Container(
-                                          width: 58,
-                                          height: 58,
-                                          decoration: BoxDecoration(
-                                            color: vm.isSpeakerOn
-                                                ? const Color(0xFFD4F19C)
-                                                : Colors.white,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: const Color(0xFF1E2022),
-                                              width: 2.5,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Color(0xFF1E2022),
-                                                offset: Offset(2, 2),
-                                                blurRadius: 0,
+                                      // Speakerphone / Earpiece Button
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: vm.toggleSpeaker,
+                                            child: Container(
+                                              width: 58,
+                                              height: 58,
+                                              decoration: BoxDecoration(
+                                                color: vm.isSpeakerOn
+                                                    ? const Color(0xFFD4F19C)
+                                                    : Colors.white,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: const Color(0xFF1E2022),
+                                                  width: 2.5,
+                                                ),
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Color(0xFF1E2022),
+                                                    offset: Offset(2, 2),
+                                                    blurRadius: 0,
+                                                  ),
+                                                ],
                                               ),
-                                            ],
+                                              alignment: Alignment.center,
+                                              child: Icon(
+                                                vm.isSpeakerOn
+                                                    ? Icons.volume_up_rounded
+                                                    : Icons.hearing_rounded,
+                                                color: const Color(0xFF1E2022),
+                                                size: 26,
+                                              ),
+                                            ),
                                           ),
-                                          alignment: Alignment.center,
-                                          child: Icon(
-                                            vm.isSpeakerOn
-                                                ? Icons.volume_up_rounded
-                                                : Icons.volume_down_rounded,
-                                            color: const Color(0xFF1E2022),
-                                            size: 26,
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            vm.isSpeakerOn ? 'Speaker' : 'Earpiece',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                              color: Color(0xFF1E2022),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
                                     ],
                                   ),

@@ -56,7 +56,7 @@ class HomeViewModel extends BaseViewModel {
   int _callDurationSeconds = 0;
   int _callCoinsSpent = 0;
   bool _isMuted = false;
-  bool _isSpeakerOn = true;
+  bool _isSpeakerOn = false;
   Timer? _callTimer;
   Timer? _callStatusPollTimer;
   int _callSessionCounter = 0;
@@ -1057,7 +1057,7 @@ class HomeViewModel extends BaseViewModel {
     _callDurationSeconds = 0;
     _callCoinsSpent = 0;
     _isMuted = false;
-    _isSpeakerOn = true;
+    _isSpeakerOn = false;
     _lastCallRequest = null;
     _callTimer?.cancel();
     _callTimer = null;
