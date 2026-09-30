@@ -575,6 +575,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   // STEP 2: "Category Listeners & Matches" User List Screen
   Widget _buildCategoryMatchesStep() {
     final matches = _viewModel.filteredMatches;
+    print("-----matches");
+    print(matches);
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -2020,6 +2022,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Widget _buildCallCard(CallLogItem item) {
+    final isFav = _viewModel.isFavorite(item.id);
     final isFemale =
         item.name.toLowerCase().endsWith('a') ||
         item.name.toLowerCase().endsWith('i') ||
@@ -2027,8 +2030,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         item.matchProfile?.isFemale == true;
 
     final avatarAsset = isFemale
-        ? 'assets/images/avatar_female_1.jpg'
-        : 'assets/images/avatar_male_1.jpg';
+        ? 'assets/images/avatar_male_1.jpg'
+        : 'assets/images/avatar_female_1.jpg';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -2054,14 +2057,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             child: ClipOval(
               child: Padding(
                 padding: const EdgeInsets.all(2),
-                child: Image.asset(
-                  item.matchProfile != null
-                      ? item.matchProfile!.genderImageAsset
-                      : (isFemale
-                            ? 'assets/images/Girl.png'
-                            : 'assets/images/Boy.png'),
-                  fit: BoxFit.contain,
-                ),
+                child: Image.asset(avatarAsset, fit: BoxFit.contain),
               ),
             ),
           ),
@@ -2113,6 +2109,37 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             ),
           ),
 
+          GestureDetector(
+            onTap: () {
+              final wasFav = _viewModel.isFavorite(item.id);
+
+              _viewModel.toggleFavorite(item.id, item.matchProfile);
+
+              showNeoToast(
+                context,
+                wasFav
+                    ? 'Removed ${item.name} from favorites'
+                    : 'Added ${item.name} to favorites ❤️',
+              );
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 45,
+              height: 45,
+              decoration: BoxDecoration(
+                color: isFav ? const Color(0xFFFF4D6D) : AppColors.cardWhite,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.strokeBlack, width: 1.2),
+                boxShadow: AppTheme.neoShadow(offset: const Offset(1.2, 1.2)),
+              ),
+              child: Icon(
+                isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                size: 18,
+                color: isFav ? Colors.white : AppColors.strokeBlack,
+              ),
+            ),
+          ),
+          SizedBox(width: 5),
           // Colored Quick Call Button
           GestureDetector(
             onTap: () {
@@ -2382,9 +2409,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           icon: Icons.favorite_rounded,
                           value: '${_viewModel.favoritesCount}',
                           label: 'Favorites',
-                          bgColor: const Color(0xFFFFB7D5), // Pastel pink
+                          bgColor: const Color(0xFFFFB7D5),
                           onTap: () {
-                            _viewModel.setTab(1);
                             if (!_viewModel.showFavoritesOnly) {
                               _viewModel.toggleShowFavoritesOnly();
                             }
