@@ -57,8 +57,11 @@ class ApiConstants {
   static const String agentDutyOff = 'agent/duty/off/';
   static const String agentDutyToggle = 'agent/duty-toggle/';
   static const String agentDutyForm = 'agent/duty-form/';
-  static const String agentEarnings = 'agent/earnings/';
   static const String requestPayout = 'agent/request-payout/';
+  static const String agentPayouts = 'agent/payouts/';
+
+  /// Helper to construct agent payouts URL with agent_id query parameter
+  static String agentPayoutsUrl(dynamic agentId) => 'agent/payouts/?agent_id=$agentId';
 
   /// Helper to construct full URL for an endpoint
   static String fullUrl(String endpoint) {

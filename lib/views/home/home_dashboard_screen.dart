@@ -6,22 +6,19 @@ import 'package:buddy_app/views/widgets/toast_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_typography.dart';
 import '../../core/theme/app_theme.dart';
-import '../../data/models/caller_intent_model.dart';
 import '../../data/models/match_model.dart';
 import '../../data/repositories/auth_api_repository.dart';
 import '../../data/repositories/user_api_repository.dart';
 import '../../viewmodels/home_view_model.dart';
 import '../coins/coins_store_screen.dart';
+import '../coins/widgets/zero_coins_bottom_sheet.dart';
 import '../splash/splash_screen.dart';
 import '../widgets/slide_to_action.dart';
-import '../widgets/sparkle_widget.dart';
 import 'widgets/agent_rating_bottom_sheet.dart';
 import 'widgets/conversation_category_card.dart';
 import 'widgets/edit_caller_profile_bottom_sheet.dart';
 import 'widgets/live_call_bottom_sheet.dart';
-import 'widgets/quick_intent_bottom_sheet.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -33,6 +30,7 @@ class HomeDashboardScreen extends StatefulWidget {
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   late final HomeViewModel _viewModel;
   final TextEditingController _searchController = TextEditingController();
+  bool _hasCheckedZeroCoinsOnEntry = false;
 
   @override
   void initState() {
@@ -42,6 +40,25 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       authRepository: AuthApiRepository(),
     );
     _viewModel.addListener(_handleStateChange);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkZeroCoinsOnEntry();
+    });
+  }
+
+  Future<void> _checkZeroCoinsOnEntry() async {
+    // Wait briefly for initial balance fetch/hydration
+    await Future.delayed(const Duration(milliseconds: 700));
+    if (!mounted) return;
+    if (_viewModel.walletCoins <= 0 && !_hasCheckedZeroCoinsOnEntry) {
+      _hasCheckedZeroCoinsOnEntry = true;
+      await ZeroCoinsBottomSheet.show(
+        context,
+        _viewModel,
+        title: 'Wallet Empty! 🪙',
+        message:
+            'Your coin balance is 0. Add or purchase coins to start calling buddies!',
+      );
+    }
   }
 
   @override
@@ -52,6 +69,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   void _handleStateChange() {
+    if (_viewModel.walletCoins > 0) {
+      _hasCheckedZeroCoinsOnEntry = false;
+    }
     if (_viewModel.errorMessage != null &&
         _viewModel.errorMessage!.isNotEmpty) {
       showNeoToast(context, _viewModel.errorMessage!, isError: true);
@@ -82,19 +102,47 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   Future<void> _startCall(MatchProfile match) async {
+    if (_viewModel.walletCoins <= 0) {
+      await ZeroCoinsBottomSheet.show(
+        context,
+        _viewModel,
+        title: 'Out of Coins! 🪙',
+        message:
+            'Your wallet balance is 0 coins. Please recharge coins to start a call with ${match.name}.',
+      );
+      return;
+    }
+
     _viewModel.startCall(match);
     await LiveCallBottomSheet.show(context, _viewModel);
 
-    // Only show rating sheet if the call was answered/connected by the listener
-    if (mounted && _viewModel.wasLastCallConnected) {
+    final wasConnected = _viewModel.wasLastCallConnected;
+    final callEndedDueToZeroCoins =
+        _viewModel.isCallEndedDueToZeroCoins || _viewModel.walletCoins <= 0;
+    final lastCallId =
+        _viewModel.lastEndedCallId ?? _viewModel.lastCallRequest?.callId;
+    _viewModel.consumeZeroCoinsCallEndFlag();
+
+    // 1. If call ended because coins depleted to 0, FIRST show the coin recharge sheet:
+    if (mounted && callEndedDueToZeroCoins) {
+      await ZeroCoinsBottomSheet.show(
+        context,
+        _viewModel,
+        title: 'Call Ended - Out of Coins! 🪙',
+        message:
+            'Your coin balance became 0 during the call. Add or purchase coins to call again!',
+      );
+    }
+
+    // 2. AFTER that (or after normal call ended), show the rating sheet after every connected call:
+    if (mounted && wasConnected) {
       await AgentRatingBottomSheet.show(
         context,
         agentId: match.id,
         agentName: match.name,
         agentAvatar: match.avatarUrl,
         category: match.professionCategory,
-        callId:
-            _viewModel.lastEndedCallId ?? _viewModel.lastCallRequest?.callId,
+        callId: lastCallId,
       );
     }
   }
@@ -329,7 +377,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
               const SizedBox(height: 3),
               GestureDetector(
-                onTap: () => _viewModel.setTab(1),
+                onTap: () {
+                  if (_viewModel.walletCoins <= 0) {
+                    ZeroCoinsBottomSheet.show(context, _viewModel);
+                  } else {
+                    _viewModel.setTab(1);
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -1377,7 +1431,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         .where((language) => language.isNotEmpty)
         .toList();
 
-    final displayLanguages = languages.length > 3
+    final displayLanguages = languages.length > 2
         ? '${languages.take(2).join(', ')}...'
         : languages.join(', ');
     return Container(
@@ -2035,8 +2089,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         item.matchProfile?.isFemale == true;
 
     final avatarAsset = isFemale
-        ? 'assets/images/avatar_male_1.jpg'
-        : 'assets/images/avatar_female_1.jpg';
+        ? 'assets/images/Girl2.png'
+        : 'assets/images/Boy2.png';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

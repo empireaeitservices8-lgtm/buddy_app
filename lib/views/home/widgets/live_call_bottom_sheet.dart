@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import '../../../data/models/user_profile.dart';
 import '../../../viewmodels/home_view_model.dart';
 
 class LiveCallBottomSheet extends StatefulWidget {
@@ -27,6 +28,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
     with SingleTickerProviderStateMixin {
   late AnimationController _rippleController;
   late Animation<double> _pulseAnimation;
+  bool _hasPopped = false;
 
   @override
   void initState() {
@@ -58,12 +60,14 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
       builder: (context, _) {
         final match = widget.viewModel.activeCallMatch;
         if (match == null) {
-          // If call ended, close modal
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            }
-          });
+          if (!_hasPopped) {
+            _hasPopped = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            });
+          }
           return const SizedBox.shrink();
         }
 
@@ -125,8 +129,6 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final avatarSize = (constraints.maxHeight * 0.17).clamp(75.0, 135.0);
-                      final ringSize = avatarSize * 1.15;
-                      final pulseSize = _pulseAnimation.value.clamp(avatarSize * 1.15, avatarSize * 1.37);
 
                       return SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
@@ -214,67 +216,169 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
 
                                   const SizedBox(height: 20),
 
-                                  // Center Avatar Section with Concentric Pulse Rings
-                                  Center(
-                                    child: AnimatedBuilder(
-                                      animation: _pulseAnimation,
-                                      builder: (context, child) {
-                                        return Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            // Outer Pulse Ring
-                                            Container(
-                                              width: pulseSize,
-                                              height: pulseSize,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFE8EBFD)
-                                                    .withValues(alpha: 0.45),
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            // Middle Ring
-                                            Container(
-                                              width: ringSize,
-                                              height: ringSize,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFE8EBFD)
-                                                    .withValues(alpha: 0.65),
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            // Main Cartoon Neubrutal Avatar
-                                            Container(
-                                              width: avatarSize,
-                                              height: avatarSize,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFFE8EBFD),
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: const Color(0xFF1E2022),
-                                                  width: 3.5,
-                                                ),
-                                                boxShadow: const [
-                                                  BoxShadow(
-                                                    color: Color(0xFF1E2022),
-                                                    offset: Offset(0, 4),
-                                                    blurRadius: 0,
+                                  // Dual Avatar Section: User (You) <---> Agent
+                                  Builder(
+                                    builder: (context) {
+                                      final userProfile = widget.viewModel.userProfile;
+                                      final userIsFemale = userProfile?.gender == null ||
+                                          userProfile!.gender == Gender.woman;
+                                      final userAvatarAsset = userIsFemale
+                                          ? 'assets/images/Girl2.png'
+                                          : 'assets/images/Boy2.png';
+                                      final userInitial = (userProfile?.firstName.isNotEmpty == true
+                                              ? userProfile!.firstName[0]
+                                              : 'Y')
+                                          .toUpperCase();
+                                      final userBgColor = userIsFemale
+                                          ? const Color(0xFFFFF0F5)
+                                          : const Color(0xFFEFF6FF);
+                                      final agentBgColor = match.isFemale
+                                          ? const Color(0xFFFFF0F5)
+                                          : const Color(0xFFEFF6FF);
+                                      final smallSize = (avatarSize * 0.72).clamp(54.0, 95.0);
+
+                                      return AnimatedBuilder(
+                                        animation: _pulseAnimation,
+                                        builder: (context, child) {
+                                          return Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              // User (You) Avatar - left
+                                              Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: smallSize,
+                                                    height: smallSize,
+                                                    decoration: BoxDecoration(
+                                                      color: userBgColor,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: const Color(0xFF1E2022),
+                                                        width: 2.5,
+                                                      ),
+                                                      boxShadow: const [
+                                                        BoxShadow(
+                                                          color: Color(0xFF1E2022),
+                                                          offset: Offset(0, 3),
+                                                          blurRadius: 0,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: ClipOval(
+                                                      child: Image.asset(
+                                                        userAvatarAsset,
+                                                        width: smallSize,
+                                                        height: smallSize,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => Text(
+                                                          userInitial,
+                                                          style: TextStyle(
+                                                            fontSize: smallSize * 0.4,
+                                                            fontWeight: FontWeight.w900,
+                                                            color: const Color(0xFF1E2022),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  const Text(
+                                                    'You',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w800,
+                                                      color: Color(0xFF64748B),
+                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                initialLetter,
-                                                style: TextStyle(
-                                                  fontSize: avatarSize * 0.4,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: const Color(0xFF1E2022),
+
+                                              // Middle: Animated pulse wave / call indicator
+                                              Padding(
+                                                padding: const EdgeInsets.only(bottom: 20.0),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: List.generate(3, (i) {
+                                                    final scale = (i == 1)
+                                                        ? (_pulseAnimation.value - 155) / 30
+                                                        : ((i == 0)
+                                                              ? (_pulseAnimation.value - 155) / 50
+                                                              : (_pulseAnimation.value - 155) / 20);
+                                                    final opacity = (0.3 + scale.clamp(0.0, 1.0) * 0.7).clamp(0.3, 1.0);
+                                                    return Padding(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                                                      child: Container(
+                                                        width: 4,
+                                                        height: 14 + (scale * 12).clamp(0.0, 12.0),
+                                                        decoration: BoxDecoration(
+                                                          color: const Color(0xFF00A79D).withValues(alpha: opacity),
+                                                          borderRadius: BorderRadius.circular(3),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
+
+                                              // Agent Avatar - right (larger, main focus)
+                                              Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Container(
+                                                    width: avatarSize,
+                                                    height: avatarSize,
+                                                    decoration: BoxDecoration(
+                                                      color: agentBgColor,
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: const Color(0xFF1E2022),
+                                                        width: 3.5,
+                                                      ),
+                                                      boxShadow: const [
+                                                        BoxShadow(
+                                                          color: Color(0xFF1E2022),
+                                                          offset: Offset(0, 4),
+                                                          blurRadius: 0,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: ClipOval(
+                                                      child: Image.asset(
+                                                        match.genderImageAsset,
+                                                        width: avatarSize,
+                                                        height: avatarSize,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => Text(
+                                                          initialLetter,
+                                                          style: TextStyle(
+                                                            fontSize: avatarSize * 0.4,
+                                                            fontWeight: FontWeight.w900,
+                                                            color: const Color(0xFF1E2022),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  const Text(
+                                                    'Agent',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w800,
+                                                      color: Color(0xFF64748B),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
                                   ),
 
                                   const SizedBox(height: 18),
@@ -392,15 +496,81 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
 
                                       if (isAttended) ...[
                                         const SizedBox(height: 10),
-                                        Text(
-                                          widget.viewModel.formattedCallDuration,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w800,
-                                            color: Color(0xFF00A79D),
-                                            letterSpacing: 0.8,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              widget.viewModel.formattedCallDuration,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFF00A79D),
+                                                letterSpacing: 0.8,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 9,
+                                                vertical: 3,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: widget.viewModel.walletCoins <= 300
+                                                    ? const Color(0xFFFFE5E5)
+                                                    : Colors.white,
+                                                borderRadius: BorderRadius.circular(12),
+                                                border: Border.all(
+                                                  color: widget.viewModel.walletCoins <= 300
+                                                      ? const Color(0xFFE11D48)
+                                                      : const Color(0xFF1E2022),
+                                                  width: 1.8,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Text('🪙', style: TextStyle(fontSize: 11)),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${widget.viewModel.walletCoins}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w900,
+                                                      color: widget.viewModel.walletCoins <= 300
+                                                          ? const Color(0xFFE11D48)
+                                                          : const Color(0xFF1E2022),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
+                                        if (widget.viewModel.walletCoins <= 300) ...[
+                                          const SizedBox(height: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFFFF1F2),
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: const Color(0xFFE11D48),
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              '⚠️ Low balance: ${widget.viewModel.walletCoins} coins left',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFFE11D48),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ],
                                   ),

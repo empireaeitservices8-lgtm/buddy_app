@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../constants/agora_constants.dart';
 import '../constants/api_constants.dart';
 import '../navigation/navigation_service.dart';
+import '../network/api_response.dart';
 import '../network/api_service.dart';
 import '../network/token_manager.dart';
 import '../../data/models/call_model.dart';
@@ -471,7 +472,7 @@ class IncomingCallManager extends ChangeNotifier {
       callId: callData.callId.toString(),
       callerId: callData.callerName,
       callerName: callData.callerName,
-      callerAvatar: callData.callerAvatar,
+      callerAvatar: callData.callerAvatar ?? callData.avatarAsset,
       receiverId: 'Listener',
       receiverName: 'Listener',
       channelId: channel,
@@ -546,16 +547,32 @@ class IncomingCallManager extends ChangeNotifier {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'rejected') {
-        validStatus = 'reject';
+      } else if (validStatus == 'declined' || validStatus == 'reject') {
+        validStatus = 'rejected';
+      } else if (validStatus == 'canceled') {
+        validStatus = 'cancelled';
+      } else if (validStatus == 'accept') {
+        validStatus = 'accepted';
       }
 
-      final response = await _apiService.post(
+      ApiResponse response = await _apiService.post(
         ApiConstants.updateCallStatus(callId),
-        data: {'status': validStatus},
+        data: {'status': validStatus, 'call_id': callId},
         options: options,
         requiresAuth: true,
       );
+
+      // Also call calls/end/ endpoint as fallback
+      if (validStatus == 'rejected' || validStatus == 'completed' || validStatus == 'cancelled') {
+        try {
+          await _apiService.post(
+            ApiConstants.endCall,
+            data: {'call_id': callId, 'status': validStatus},
+            options: options,
+            requiresAuth: true,
+          );
+        } catch (_) {}
+      }
 
       if (response.isSuccess && response.rawData is Map) {
         return response.rawData as Map<String, dynamic>;

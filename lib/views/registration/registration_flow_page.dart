@@ -215,10 +215,11 @@ class _RegistrationFlowPageState extends State<RegistrationFlowPage> {
   Widget _buildTopLogoHeader() {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width: 38,
+          height: 38,
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
@@ -238,25 +239,11 @@ class _RegistrationFlowPageState extends State<RegistrationFlowPage> {
           ),
         ),
         const SizedBox(width: 8),
-        RichText(
-          text: const TextSpan(
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.4,
-              fontFamily: 'Roboto',
-            ),
-            children: [
-              TextSpan(
-                text: 'Gaby',
-                style: TextStyle(color: Color(0xFF0A2E65)),
-              ),
-              TextSpan(
-                text: 'Talk',
-                style: TextStyle(color: Color(0xFF00A79D)),
-              ),
-            ],
-          ),
+        Image.asset(
+          'assets/images/gaby_new.png',
+          fit: BoxFit.cover,
+          width: 110,
+          height: 42,
         ),
       ],
     );

@@ -255,12 +255,54 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                               ],
                                             ),
                                             alignment: Alignment.center,
-                                            child: Text(
-                                              initialLetter,
-                                              style: TextStyle(
-                                                fontSize: avatarSize * 0.4,
-                                                fontWeight: FontWeight.w900,
-                                                color: const Color(0xFF1E2022),
+                                            child: ClipOval(
+                                              child: Builder(
+                                                builder: (context) {
+                                                  final targetAvatar = call.isOutgoing
+                                                      ? call.receiverAvatar
+                                                      : call.callerAvatar;
+                                                  if (targetAvatar != null &&
+                                                      targetAvatar.startsWith('assets/')) {
+                                                    return Image.asset(
+                                                      targetAvatar,
+                                                      width: avatarSize,
+                                                      height: avatarSize,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (_, __, ___) => Text(
+                                                        initialLetter,
+                                                        style: TextStyle(
+                                                          fontSize: avatarSize * 0.4,
+                                                          fontWeight: FontWeight.w900,
+                                                          color: const Color(0xFF1E2022),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  } else if (targetAvatar != null &&
+                                                      targetAvatar.startsWith('http')) {
+                                                    return Image.network(
+                                                      targetAvatar,
+                                                      width: avatarSize,
+                                                      height: avatarSize,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (_, __, ___) => Text(
+                                                        initialLetter,
+                                                        style: TextStyle(
+                                                          fontSize: avatarSize * 0.4,
+                                                          fontWeight: FontWeight.w900,
+                                                          color: const Color(0xFF1E2022),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                  return Text(
+                                                    initialLetter,
+                                                    style: TextStyle(
+                                                      fontSize: avatarSize * 0.4,
+                                                      fontWeight: FontWeight.w900,
+                                                      color: const Color(0xFF1E2022),
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             ),
                                           ),

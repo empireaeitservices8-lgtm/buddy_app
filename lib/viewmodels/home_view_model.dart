@@ -52,6 +52,7 @@ class HomeViewModel extends BaseViewModel {
   MatchProfile? _activeCallMatch;
   bool _isCallAttended = false;
   bool _wasLastCallConnected = false;
+  bool _isCallEndedDueToZeroCoins = false;
   bool _hasTriggeredLowCoinWarning = false;
   int _callDurationSeconds = 0;
   int _callCoinsSpent = 0;
@@ -242,6 +243,8 @@ class HomeViewModel extends BaseViewModel {
   MatchProfile? get activeCallMatch => _activeCallMatch;
   bool get isCallAttended => _isCallAttended;
   bool get wasLastCallConnected => _wasLastCallConnected;
+  bool get isCallEndedDueToZeroCoins => _isCallEndedDueToZeroCoins;
+  void consumeZeroCoinsCallEndFlag() => _isCallEndedDueToZeroCoins = false;
   bool get isLowCoinWarning => _isCallAttended && _walletCoins <= 300;
   int get callDurationSeconds => _callDurationSeconds;
   int get callCoinsSpent => _callCoinsSpent;
@@ -1053,6 +1056,7 @@ class HomeViewModel extends BaseViewModel {
     _activeCallMatch = match;
     _isCallAttended = false;
     _wasLastCallConnected = false;
+    _isCallEndedDueToZeroCoins = false;
     _hasTriggeredLowCoinWarning = false;
     _callDurationSeconds = 0;
     _callCoinsSpent = 0;
@@ -1065,14 +1069,18 @@ class HomeViewModel extends BaseViewModel {
     clearError();
     notifyListenersSafely();
 
+    // Clean up previous call session before setting up listener
+    await _agoraService.stopRingtone();
+    await _agoraService.leaveCall();
+
     // Listen for the remote agent to attend/join the channel
     _remoteUserSub = _agoraService.remoteUserJoinedStream.listen((remoteUid) {
       if (remoteUid != null) {
         debugPrint('📞 [HomeVM] Agent attended call (remoteUid: $remoteUid)');
         _onAgentAttendedCall();
       } else if (remoteUid == null && _isCallAttended) {
-        debugPrint('📞 [HomeVM] Agent left call');
-        endCall();
+        debugPrint('📞 [HomeVM] Agent left call or disconnected');
+        endCall(status: 'completed');
       }
     });
 
@@ -1136,9 +1144,6 @@ class HomeViewModel extends BaseViewModel {
       debugPrint(
         '📞 [HomeVM] Joining Agora channel: channelId=$channelId, uid=$uid, hasToken=${token.isNotEmpty}',
       );
-
-      // Clean up previous call session before joining
-      await _agoraService.leaveCall();
 
       if (_activeCallMatch == null || _callSessionCounter != currentSession) {
         debugPrint('📞 [HomeVM] Call cancelled before joining channel');
@@ -1209,7 +1214,7 @@ class HomeViewModel extends BaseViewModel {
   void _startCallStatusPolling(int? callId) {
     _callStatusPollTimer?.cancel();
     int pollElapsedTicks = 0;
-    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (
+    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1200), (
       timer,
     ) async {
       pollElapsedTicks++;
@@ -1219,8 +1224,8 @@ class HomeViewModel extends BaseViewModel {
         return;
       }
 
-      // Timeout after 45 seconds (30 ticks * 1.5s = 45s)
-      if (pollElapsedTicks >= 30) {
+      // Timeout after 45 seconds (38 ticks * 1.2s = 45s)
+      if (pollElapsedTicks >= 38) {
         timer.cancel();
         _callStatusPollTimer = null;
         debugPrint(
@@ -1232,40 +1237,58 @@ class HomeViewModel extends BaseViewModel {
       }
 
       // Poll call history to check if agent declined or call was rejected/cancelled/completed
-      if (callId != null && callId > 0) {
-        try {
-          final history = await _userRepository.getCallHistory();
-          if (history.isNotEmpty) {
-            final targetLog = history.firstWhere(
-              (log) => log.id == callId.toString(),
-              orElse: () => history.first,
-            );
-            if (targetLog.id == callId.toString()) {
-              final status = targetLog.status.toUpperCase();
-              if (status == 'REJECT' ||
-                  status == 'REJECTED' ||
-                  status == 'DECLINED' ||
-                  status == 'CANCELLED' ||
-                  status == 'COMPLETED' ||
-                  status == 'ENDED' ||
-                  status == 'MISSED') {
-                debugPrint(
-                  '📞 [HomeVM] Call #$callId status changed to $status on server. Dismissing calling screen.',
-                );
-                timer.cancel();
-                _callStatusPollTimer = null;
-                if (status == 'REJECT' ||
-                    status == 'REJECTED' ||
-                    status == 'DECLINED') {
-                  setError('Call declined by listener.');
-                }
-                endCall(status: status.toLowerCase());
-                return;
+      try {
+        final history = await _userRepository.getCallHistory();
+        if (history.isNotEmpty) {
+          CallLogItem? targetLog;
+          if (callId != null && callId > 0) {
+            for (final log in history) {
+              if (log.id == callId.toString()) {
+                targetLog = log;
+                break;
               }
             }
           }
-        } catch (_) {}
-      }
+          if (targetLog == null) {
+            final latest = history.first;
+            final activeAgentId = _activeCallMatch?.id;
+            final activeAgentName = _activeCallMatch?.name.toLowerCase();
+            if ((activeAgentId != null && latest.matchProfile?.id == activeAgentId) ||
+                (activeAgentName != null && latest.name.toLowerCase() == activeAgentName)) {
+              targetLog = latest;
+            }
+          }
+
+          if (targetLog != null) {
+            final status = targetLog.status.toUpperCase();
+            if (status == 'REJECT' ||
+                status == 'REJECTED' ||
+                status == 'DECLINED' ||
+                status == 'CANCELLED' ||
+                status == 'COMPLETED' ||
+                status == 'ENDED' ||
+                status == 'MISSED' ||
+                status == 'FAILED' ||
+                status == 'BUSY' ||
+                status == 'INACTIVE') {
+              debugPrint(
+                '📞 [HomeVM] Call status changed to $status on server. Ending calling screen immediately.',
+              );
+              timer.cancel();
+              _callStatusPollTimer = null;
+              await _agoraService.stopRingtone();
+              if (status == 'REJECT' ||
+                  status == 'REJECTED' ||
+                  status == 'DECLINED' ||
+                  status == 'BUSY') {
+                setError('Call declined by listener.');
+              }
+              endCall(status: status.toLowerCase());
+              return;
+            }
+          }
+        }
+      } catch (_) {}
     });
   }
 
@@ -1310,6 +1333,8 @@ class HomeViewModel extends BaseViewModel {
         );
         timer.cancel();
         _callTimer = null;
+        _isCallEndedDueToZeroCoins = true;
+        _saveCachedCoins(_walletCoins);
         setError('Call ended: Your coin balance reached 0.');
         endCall(status: 'completed');
         return;

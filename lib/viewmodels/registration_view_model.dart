@@ -1,6 +1,5 @@
 import 'dart:async';
 import '../core/network/api_exceptions.dart';
-import '../core/network/token_manager.dart';
 import '../data/models/auth_state.dart';
 import '../data/models/interest_model.dart';
 import '../data/models/user_profile.dart';
@@ -50,6 +49,7 @@ class RegistrationViewModel extends BaseViewModel {
        _flowMode = initialMode;
 
   // Getters
+  IUserRepository get userRepository => _userRepository;
   AuthFlowMode get flowMode => _flowMode;
   bool get isLoginMode => _flowMode == AuthFlowMode.login;
   RegistrationStep get currentStep => _currentStep;
@@ -76,6 +76,7 @@ class RegistrationViewModel extends BaseViewModel {
 
   // Step 1: Phone methods
   void setCountryCode(String code) {
+    if (_countryCode == code) return;
     _countryCode = code;
     notifyListenersSafely();
   }

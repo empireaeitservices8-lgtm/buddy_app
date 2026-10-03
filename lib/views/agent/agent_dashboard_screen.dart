@@ -1,4 +1,4 @@
-﻿// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/theme/cartoon_theme.dart';
 import '../../data/repositories/auth_api_repository.dart';
 import '../../viewmodels/agent_dashboard_view_model.dart';
-import '../call/audio_call_screen.dart';
+
 import '../splash/splash_screen.dart';
 import 'agent_profile_screen.dart';
 
@@ -25,7 +25,6 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
   late final TextEditingController _displayNameController;
   late final TextEditingController _languagesController;
   late final TextEditingController _bioController;
-  bool _isAcceptingCall = false;
 
   @override
   void initState() {
@@ -538,25 +537,23 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildMetricColumn(
-                  'TODAY EARNED',
-                  '${_viewModel.todayEarned} 🪙',
-                ),
+                _buildMetricColumn('TOTAL CALLS', '${_viewModel.totalCalls}'),
                 Container(
                   height: 26,
                   width: 1.5,
                   color: AppColors.strokeBlack.withOpacity(0.2),
                 ),
                 _buildMetricColumn(
-                  'TOTAL CALLS',
-                  '${_viewModel.totalCalls} 📞',
+                  'TOTAL EARNED',
+                  _viewModel.formattedTotalEarnedBalance,
+                  valueColor: const Color(0xFF00A79D),
                 ),
                 Container(
                   height: 26,
                   width: 1.5,
                   color: AppColors.strokeBlack.withOpacity(0.2),
                 ),
-                _buildMetricColumn('DUTY TIME', '${_viewModel.dutyTime} ⏱️'),
+                _buildMetricColumn('TOTAL DURATION', _viewModel.dutyTime),
               ],
             ),
             const SizedBox(height: 14),
@@ -584,8 +581,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                     child: Text(
                       _viewModel.ratingData != null &&
                               _viewModel.ratingData!.totalReviews > 0
-                          ? '⭐ VIEW ${_viewModel.rating.toStringAsFixed(1)} RATING & ${_viewModel.ratingData!.totalReviews} REVIEWS →'
-                          : '⭐ VIEW PROFILE & CALLER REVIEWS →',
+                          ? 'VIEW ${_viewModel.rating.toStringAsFixed(1)} RATING & ${_viewModel.ratingData!.totalReviews} REVIEWS →'
+                          : 'VIEW PROFILE & CALLER REVIEWS →',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
@@ -606,8 +603,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
     );
   }
 
-  Widget _buildMetricColumn(String title, String value) {
+  Widget _buildMetricColumn(String title, String value, {Color? valueColor}) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           title,
@@ -621,10 +619,10 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w900,
-            color: AppColors.textBlack,
+            color: valueColor ?? AppColors.textBlack,
           ),
         ),
       ],
@@ -650,271 +648,6 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Incoming Call Request Card (Pink) when incoming call arrives
-            if (_viewModel.hasIncomingCall) ...[
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD1E3), // Soft pink
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-                  boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Tags Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF4D6D), // Bright red
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.strokeBlack,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.call_received_rounded,
-                                size: 12,
-                                color: Colors.white,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'INCOMING CALL REQUEST',
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: AppColors.strokeBlack,
-                              width: 1.4,
-                            ),
-                          ),
-                          child: Text(
-                            'Rate: ${_viewModel.selectedRate} Coins/sec',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Caller Header: Avatar, Name, Category
-                    Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFB7D5),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.strokeBlack,
-                              width: 1.8,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: AppColors.strokeBlack,
-                            size: 26,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _viewModel.callerName,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.textBlack,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                _viewModel.callTopic,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF5A189A),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Action Buttons: Accept / Decline
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: _isAcceptingCall
-                                ? null
-                                : () async {
-                                    setState(() {
-                                      _isAcceptingCall = true;
-                                    });
-                                    try {
-                                      final callModel = await _viewModel
-                                          .acceptCall();
-                                      if (callModel != null && mounted) {
-                                        await AudioCallScreen.start(
-                                          context,
-                                          callModel,
-                                        );
-                                        if (mounted) {
-                                          _viewModel.refresh();
-                                        }
-                                      }
-                                    } finally {
-                                      if (mounted) {
-                                        setState(() {
-                                          _isAcceptingCall = false;
-                                        });
-                                      }
-                                    }
-                                  },
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF06D6A0), // Bright green
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: AppColors.strokeBlack,
-                                  width: 1.8,
-                                ),
-                                boxShadow: AppTheme.neoShadow(
-                                  offset: const Offset(2.5, 2.5),
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: _isAcceptingCall
-                                  ? const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: 16,
-                                          height: 16,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                  AppColors.strokeBlack,
-                                                ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Connecting...',
-                                          style: TextStyle(
-                                            color: AppColors.textBlack,
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.call_rounded,
-                                          color: AppColors.strokeBlack,
-                                          size: 18,
-                                        ),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          'Accept Call',
-                                          style: TextStyle(
-                                            color: AppColors.textBlack,
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        GestureDetector(
-                          onTap: () => _viewModel.declineCall(),
-                          child: Container(
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEF476F),
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: AppColors.strokeBlack,
-                                width: 1.8,
-                              ),
-                              boxShadow: AppTheme.neoShadow(
-                                offset: const Offset(2, 2),
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.call_end_rounded,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Reject',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
             const SizedBox(height: 4),
 
             // Recent Sessions Section
@@ -999,19 +732,36 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
       ),
       child: Row(
         children: [
-          // Avatar
+          // Avatar based on caller_gender
           Container(
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: const Color(0xFFAEC4FE),
+              color: session.isFemale
+                  ? const Color(0xFFFFF0F5)
+                  : const Color(0xFFF0F9FF),
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.strokeBlack, width: 1.6),
             ),
-            child: const Icon(
-              Icons.person,
-              color: AppColors.strokeBlack,
-              size: 24,
+            child: ClipOval(
+              child:
+                  (session.callerAvatar != null &&
+                      session.callerAvatar!.startsWith('http'))
+                  ? Image.network(
+                      session.callerAvatar!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Image.asset(session.avatarAsset, fit: BoxFit.cover),
+                    )
+                  : Image.asset(
+                      session.avatarAsset,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.person,
+                        color: AppColors.strokeBlack,
+                        size: 24,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 14),
@@ -1041,16 +791,16 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
             ),
           ),
 
-          // Earned coins & timestamp
+          // Right side: Earned Amount & Timestamp
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '+${session.coinsEarned} 🪙',
+                '+${session.formattedEarnedAmount}',
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.textBlack,
+                  color: Color(0xFF06D6A0),
                 ),
               ),
               const SizedBox(height: 2),
@@ -1288,7 +1038,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Profile Changes Saved! ✨'),
+                            content: Text('Profile Changes Saved! âœ¨'),
                             duration: Duration(seconds: 2),
                           ),
                         );
@@ -1503,42 +1253,50 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 8),
+
             // AGENT EARNINGS LEDGER Pill Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFCE8),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.strokeBlack, width: 1.8),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.wallet_rounded,
-                    size: 14,
-                    color: AppColors.strokeBlack,
-                  ),
-                  SizedBox(width: 6),
-                  Text(
-                    'AGENT EARNINGS LEDGER',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3C4),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.strokeBlack, width: 1.8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet_rounded,
+                      size: 14,
+                      color: AppColors.textBlack,
                     ),
-                  ),
-                ],
+                    SizedBox(width: 6),
+                    Text(
+                      'AGENT EARNINGS LEDGER',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                        color: AppColors.textBlack,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
-            // Total Coin Balance Card
+            // Total Balance Card
             Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFCE8), // Warm cream
+                color: AppColors.cardWhite,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: AppColors.strokeBlack, width: 2.2),
                 boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
@@ -1547,86 +1305,69 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'TOTAL COIN BALANCE',
+                    'TOTAL EARNED BALANCE',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.8,
                       color: AppColors.textBlack,
                     ),
                   ),
-                  const SizedBox(height: 10),
-
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        _viewModel.formattedTotalEarnedBalance,
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textBlack,
+                          height: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (_viewModel.totalEarnedBalance < 500 &&
+                      _viewModel.totalCoinBalance < 25000)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3C4),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Text(
+                        'Minimum ₹500 required to request payout (Current: ${_viewModel.formattedTotalEarnedBalance})',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textBlack,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            '${_viewModel.totalCoinBalance}',
-                            style: const TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textBlack,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('🏛️', style: TextStyle(fontSize: 22)),
-                        ],
-                      ),
+                      const SizedBox(),
                       GestureDetector(
-                        onTap: () async {
-                          if (_viewModel.totalCoinBalance < 5000) {
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Minimum 5,000 coins required to request payout (Current: ${_viewModel.totalCoinBalance} 🪙)',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                backgroundColor: const Color(0xFF1E1E24),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                duration: const Duration(seconds: 3),
-                              ),
-                            );
-                            return;
-                          }
-
-                          final success = await _viewModel.requestPayout();
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  success
-                                      ? 'Payout request for ${_viewModel.totalCoinBalance} coins submitted! 💰'
-                                      : 'Failed to submit payout request. Please try again.',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                backgroundColor: success
-                                    ? const Color(0xFF22C55E)
-                                    : const Color(0xFFEF476F),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                duration: const Duration(seconds: 3),
-                              ),
-                            );
-                          }
-                        },
+                        onTap:
+                            (_viewModel.totalEarnedBalance < 500 &&
+                                _viewModel.totalCoinBalance < 25000)
+                            ? null
+                            : () => _showPayoutCheckoutBottomSheet(context),
                         child: Opacity(
-                          opacity: _viewModel.totalCoinBalance >= 5000
+                          opacity:
+                              (_viewModel.totalEarnedBalance >= 500 ||
+                                  _viewModel.totalCoinBalance >= 25000)
                               ? 1.0
                               : 0.75,
                           child: Container(
@@ -1641,7 +1382,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                                 color: AppColors.strokeBlack,
                                 width: 1.5,
                               ),
-                              boxShadow: _viewModel.totalCoinBalance >= 5000
+                              boxShadow:
+                                  (_viewModel.totalEarnedBalance >= 500 ||
+                                      _viewModel.totalCoinBalance >= 25000)
                                   ? AppTheme.neoShadow(
                                       offset: const Offset(2, 2),
                                     )
@@ -1661,9 +1404,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                     ],
                   ),
                   const SizedBox(height: 12),
-
                   Text(
-                    'Estimated Value: ~\$${(_viewModel.totalCoinBalance / 100).toStringAsFixed(2)} USD • Payouts processed weekly',
+                    'Bank Transfer & UPI • Payouts processed weekly',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -1674,6 +1416,119 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
               ),
             ),
             const SizedBox(height: 20),
+
+            // Payout Requests & Checkout History Section
+            if (_viewModel.payouts.isNotEmpty) ...[
+              const Text(
+                'Payouts & Checkout History',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textBlack,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.cardWhite,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.strokeBlack, width: 2.2),
+                  boxShadow: AppTheme.neoShadow(offset: const Offset(3.5, 3.5)),
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _viewModel.payouts.length,
+                  separatorBuilder: (context, index) => const Divider(
+                    height: 1,
+                    thickness: 1.2,
+                    color: Color(0xFFE2E4EB),
+                  ),
+                  itemBuilder: (context, index) {
+                    final payout = _viewModel.payouts[index];
+                    Color statusColor = const Color(0xFFFFB703);
+                    if (payout.isCompleted) {
+                      statusColor = const Color(0xFF22C55E);
+                    } else if (payout.isFailed) {
+                      statusColor = const Color(0xFFEF476F);
+                    } else if (payout.isProcessing) {
+                      statusColor = const Color(0xFF3A86FF);
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 14,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    payout.formattedAmount,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.textBlack,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: statusColor,
+                                        width: 1.2,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      payout.status.toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        color: statusColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${payout.payoutMethod?.toUpperCase() ?? "UPI"} • ${payout.formattedDate}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF7E849E),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (payout.upiId != null && payout.upiId!.isNotEmpty)
+                            Text(
+                              payout.upiId!,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textBlack,
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
 
             // Earnings History Section
             const Text(
@@ -1718,7 +1573,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Complete calls with users to start earning coins and see your payout history here.',
+                      'Complete calls with users to start earning and see your payout history here.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
@@ -1741,7 +1596,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _viewModel.earningsHistory.length,
-                  separatorBuilder: (_, _) => const Divider(
+                  separatorBuilder: (context, index) => const Divider(
                     height: 1,
                     thickness: 1.2,
                     color: Color(0xFFE2E4EB),
@@ -1778,19 +1633,13 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                               ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                '+${entry.coins.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color(0xFF06D6A0), // Bright green
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text('🪙', style: TextStyle(fontSize: 14)),
-                            ],
+                          Text(
+                            '+${entry.formattedAmount}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF06D6A0),
+                            ),
                           ),
                         ],
                       ),
@@ -1871,6 +1720,338 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
           ],
         ),
       ),
+    );
+  }
+
+  void _showPayoutCheckoutBottomSheet(BuildContext context) {
+    final upiController = TextEditingController();
+    final accountController = TextEditingController();
+    final ifscController = TextEditingController();
+    String selectedMethod = 'upi';
+    bool isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: const BoxDecoration(
+                  color: AppColors.cardWhite,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                  border: Border(
+                    top: BorderSide(color: AppColors.strokeBlack, width: 2.5),
+                    left: BorderSide(color: AppColors.strokeBlack, width: 2.5),
+                    right: BorderSide(color: AppColors.strokeBlack, width: 2.5),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppColors.strokeBlack.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Payout Checkout',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textBlack,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3C4),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.strokeBlack,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Text(
+                            _viewModel.formattedTotalEarnedBalance,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Payment Method Selector
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () =>
+                                setModalState(() => selectedMethod = 'upi'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: selectedMethod == 'upi'
+                                    ? AppColors.accentYellow
+                                    : AppColors.canvasCream,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: AppColors.strokeBlack,
+                                  width: selectedMethod == 'upi' ? 2.0 : 1.2,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'UPI Transfer',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  color: AppColors.textBlack,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () =>
+                                setModalState(() => selectedMethod = 'bank'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: selectedMethod == 'bank'
+                                    ? AppColors.accentYellow
+                                    : AppColors.canvasCream,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: AppColors.strokeBlack,
+                                  width: selectedMethod == 'bank' ? 2.0 : 1.2,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'Bank Account',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  color: AppColors.textBlack,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    if (selectedMethod == 'upi') ...[
+                      TextField(
+                        controller: upiController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter UPI ID (e.g. mobile@upi)',
+                          prefixIcon: const Icon(Icons.qr_code_2_rounded),
+                          filled: true,
+                          fillColor: AppColors.canvasCream,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: AppColors.strokeBlack,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      TextField(
+                        controller: accountController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: 'Bank Account Number',
+                          prefixIcon: const Icon(Icons.account_balance_rounded),
+                          filled: true,
+                          fillColor: AppColors.canvasCream,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: AppColors.strokeBlack,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: ifscController,
+                        textCapitalization: TextCapitalization.characters,
+                        decoration: InputDecoration(
+                          hintText: 'IFSC Code',
+                          prefixIcon: const Icon(Icons.password_rounded),
+                          filled: true,
+                          fillColor: AppColors.canvasCream,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: AppColors.strokeBlack,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: isSubmitting
+                          ? null
+                          : () async {
+                              final upi = upiController.text.trim();
+                              final acc = accountController.text.trim();
+                              final ifsc = ifscController.text.trim();
+
+                              if (_viewModel.totalEarnedBalance < 500 &&
+                                  _viewModel.totalCoinBalance < 25000) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Minimum ₹500 required to request payout.',
+                                    ),
+                                    backgroundColor: Color(0xFFEF476F),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (selectedMethod == 'upi' && upi.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please enter a valid UPI ID',
+                                    ),
+                                    backgroundColor: Color(0xFFEF476F),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (selectedMethod == 'bank' &&
+                                  (acc.isEmpty || ifsc.isEmpty)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please enter Account Number & IFSC',
+                                    ),
+                                    backgroundColor: Color(0xFFEF476F),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              setModalState(() => isSubmitting = true);
+
+                              final success = await _viewModel.requestPayout(
+                                payoutMethod: selectedMethod == 'upi'
+                                    ? 'upi'
+                                    : 'bank_transfer',
+                                upiId: selectedMethod == 'upi' ? upi : null,
+                                accountNumber: selectedMethod == 'bank'
+                                    ? acc
+                                    : null,
+                                ifscCode: selectedMethod == 'bank'
+                                    ? ifsc
+                                    : null,
+                              );
+
+                              if (context.mounted) {
+                                Navigator.pop(bottomSheetContext);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      success
+                                          ? 'Payout checkout of ${_viewModel.formattedTotalEarnedBalance} submitted successfully!'
+                                          : 'Failed to process payout checkout. Please try again.',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    backgroundColor: success
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF476F),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    duration: const Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                            },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: isSubmitting
+                              ? AppColors.strokeBlack.withOpacity(0.5)
+                              : AppColors.strokeBlack,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: AppColors.strokeBlack,
+                            width: 1.5,
+                          ),
+                          boxShadow: AppTheme.neoShadow(
+                            offset: const Offset(2, 2),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: isSubmitting
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Confirm Payout Checkout',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 15,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

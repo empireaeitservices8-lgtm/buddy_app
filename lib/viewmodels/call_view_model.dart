@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../core/constants/agora_constants.dart';
 import '../core/constants/api_constants.dart';
 import '../core/network/api_service.dart';
@@ -23,10 +24,12 @@ class CallViewModel extends BaseViewModel {
   StreamSubscription<int>? _userOfflineSub;
   StreamSubscription<bool>? _remoteMuteSub;
   StreamSubscription<String>? _errorSub;
+  StreamSubscription? _fcmMessageSub;
 
   CallViewModel({IAgoraAudioService? audioService})
     : _audioService = audioService ?? AgoraAudioService() {
     _subscribeToEngineEvents();
+    _subscribeToFcmEvents();
   }
 
   bool _wasConnected = false;
@@ -44,6 +47,22 @@ class CallViewModel extends BaseViewModel {
     final minutes = (_durationSeconds ~/ 60).toString().padLeft(2, '0');
     final seconds = (_durationSeconds % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
+  }
+
+  void _subscribeToFcmEvents() {
+    _fcmMessageSub?.cancel();
+    _fcmMessageSub = FcmService.onMessageStream.listen((message) {
+      final data = message.data;
+      if (isCallCancellationPayload(
+        data,
+        title: message.notification?.title,
+        body: message.notification?.body,
+      )) {
+        debugPrint('🛑 [CallVM] Call cancellation/rejection received via FCM -> ending call');
+        _audioService.stopRingtone();
+        endCall(reason: 'Call declined or ended');
+      }
+    });
   }
 
   void _subscribeToEngineEvents() {
@@ -143,20 +162,77 @@ class CallViewModel extends BaseViewModel {
   void _startOutgoingCallPolling(int? callId) {
     _callStatusPollTimer?.cancel();
     int ticks = 0;
-    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
+    _callStatusPollTimer = Timer.periodic(const Duration(milliseconds: 1200), (timer) async {
       ticks++;
       if (_wasConnected || _callModel?.status == CallStatus.connected || _callModel?.status == CallStatus.ended) {
         timer.cancel();
         _callStatusPollTimer = null;
         return;
       }
-      if (ticks >= 30) {
+      if (ticks >= 38) {
         timer.cancel();
         _callStatusPollTimer = null;
         await _audioService.stopRingtone();
         endCall(reason: 'No response from recipient');
         return;
       }
+
+      // Check call logs from server
+      try {
+        final response = await ApiService().get(
+          ApiConstants.callLogs,
+          requiresAuth: true,
+        );
+        if (response.rawData is Map) {
+          final raw = response.rawData as Map<String, dynamic>;
+          final list = (raw['data'] is List)
+              ? raw['data'] as List
+              : (raw['calls'] is List ? raw['calls'] as List : []);
+          if (list.isNotEmpty) {
+            Map<String, dynamic>? targetLog;
+            if (callId != null && callId > 0) {
+              for (final item in list) {
+                if (item is Map && item['id']?.toString() == callId.toString()) {
+                  targetLog = Map<String, dynamic>.from(item);
+                  break;
+                }
+              }
+            }
+            if (targetLog == null && list.first is Map) {
+              final firstItem = list.first as Map;
+              final targetReceiverId = _callModel?.receiverId;
+              final receiverMatch = firstItem['receiver_id']?.toString() == targetReceiverId ||
+                  (firstItem['agent'] is Map && (firstItem['agent'] as Map)['id']?.toString() == targetReceiverId);
+              if (receiverMatch) {
+                targetLog = Map<String, dynamic>.from(firstItem);
+              }
+            }
+
+            if (targetLog != null) {
+              final status = (targetLog['status']?.toString() ?? '').toUpperCase();
+              if (status == 'REJECT' ||
+                  status == 'REJECTED' ||
+                  status == 'DECLINED' ||
+                  status == 'CANCELLED' ||
+                  status == 'COMPLETED' ||
+                  status == 'ENDED' ||
+                  status == 'MISSED' ||
+                  status == 'FAILED' ||
+                  status == 'BUSY' ||
+                  status == 'INACTIVE') {
+                debugPrint('📞 [CallVM] Call #$callId was $status on server. Ending calling screen.');
+                timer.cancel();
+                _callStatusPollTimer = null;
+                await _audioService.stopRingtone();
+                endCall(reason: status == 'REJECT' || status == 'REJECTED' || status == 'DECLINED'
+                    ? 'Call declined by recipient'
+                    : 'Call ended');
+                return;
+              }
+            }
+          }
+        }
+      } catch (_) {}
     });
   }
 
@@ -221,16 +297,25 @@ class CallViewModel extends BaseViewModel {
     if (callIdStr != null && int.tryParse(callIdStr) != null && int.parse(callIdStr) > 0) {
       final callId = int.parse(callIdStr);
       FcmService.cancelCallNotification(callId);
+      final finalStatus = wasConnected
+          ? 'completed'
+          : (_callModel?.isOutgoing == true ? 'cancelled' : 'reject');
       try {
         await ApiService().post(
           ApiConstants.updateCallStatus(callId),
           data: {
-            'status': wasConnected
-                ? 'completed'
-                : (_callModel?.isOutgoing == true ? 'cancelled' : 'reject'),
+            'status': finalStatus,
+            'call_id': callId,
           },
           requiresAuth: true,
         );
+        if (finalStatus == 'reject' || finalStatus == 'completed' || finalStatus == 'cancelled') {
+          await ApiService().post(
+            ApiConstants.endCall,
+            data: {'call_id': callId, 'status': finalStatus},
+            requiresAuth: true,
+          );
+        }
       } catch (e) {
         // Fallback or ignore network error on tear-down
       }
@@ -244,6 +329,7 @@ class CallViewModel extends BaseViewModel {
   void dispose() {
     _callStatusPollTimer?.cancel();
     _durationTimer?.cancel();
+    _fcmMessageSub?.cancel();
     _joinSub?.cancel();
     _userJoinedSub?.cancel();
     _userOfflineSub?.cancel();

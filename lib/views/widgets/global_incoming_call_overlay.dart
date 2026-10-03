@@ -223,7 +223,9 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                               width: 135,
                               height: 135,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8EBFD), // Soft Lavender Fill
+                                color: _callManager.incomingCallData?.isFemale == true
+                                    ? const Color(0xFFFFF0F5)
+                                    : const Color(0xFFE8EBFD), // Soft Lavender/Pink Fill
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: const Color(0xFF1E2022),
@@ -238,12 +240,21 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                                 ],
                               ),
                               alignment: Alignment.center,
-                              child: Text(
-                                callerInitial,
-                                style: const TextStyle(
-                                  fontSize: 54,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color(0xFF1E2022),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  _callManager.incomingCallData?.avatarAsset ??
+                                      'assets/images/Boy2.png',
+                                  width: 135,
+                                  height: 135,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Text(
+                                    callerInitial,
+                                    style: const TextStyle(
+                                      fontSize: 54,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF1E2022),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

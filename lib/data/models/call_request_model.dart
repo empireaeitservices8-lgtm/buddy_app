@@ -90,20 +90,38 @@ class CallRequestResponse {
       message: rawData['message']?.toString() ?? json['message']?.toString() ?? '',
       callId: rawData['call_id'] is int
           ? rawData['call_id'] as int
-          : int.tryParse(rawData['call_id']?.toString() ?? '0') ?? 0,
-      status: rawData['status']?.toString() ?? 'RINGING',
+          : (int.tryParse(rawData['call_id']?.toString() ?? '') ??
+              (rawData['id'] is int
+                  ? rawData['id'] as int
+                  : (int.tryParse(rawData['id']?.toString() ?? '') ??
+                      (rawData['callId'] is int
+                          ? rawData['callId'] as int
+                          : (int.tryParse(rawData['callId']?.toString() ?? '') ??
+                              (rawData['pk'] is int
+                                  ? rawData['pk'] as int
+                                  : (int.tryParse(rawData['pk']?.toString() ?? '') ?? 0))))))),
+      status: rawData['status']?.toString() ?? json['status']?.toString() ?? 'RINGING',
       category: rawData['category'] is Map<String, dynamic>
           ? CallCategoryInfo.fromJson(rawData['category'] as Map<String, dynamic>)
           : null,
       agent: rawData['agent'] is Map<String, dynamic>
           ? CallAgentInfo.fromJson(rawData['agent'] as Map<String, dynamic>)
           : null,
-      channelName: rawData['channel_name']?.toString() ?? '',
-      agoraToken: rawData['agora_token']?.toString() ?? rawData['token']?.toString(),
+      channelName: rawData['channel_name']?.toString() ??
+          rawData['channelName']?.toString() ??
+          json['channel_name']?.toString() ??
+          '',
+      agoraToken: rawData['agora_token']?.toString() ??
+          rawData['token']?.toString() ??
+          rawData['rtc_token']?.toString() ??
+          json['agora_token']?.toString(),
       uid: rawData['uid'] is int
           ? rawData['uid'] as int
-          : int.tryParse(rawData['uid']?.toString() ?? ''),
-      requestedAt: rawData['requested_at']?.toString(),
+          : int.tryParse(rawData['uid']?.toString() ?? '') ??
+              (json['uid'] is int
+                  ? json['uid'] as int
+                  : int.tryParse(json['uid']?.toString() ?? '')),
+      requestedAt: rawData['requested_at']?.toString() ?? json['requested_at']?.toString(),
     );
   }
 

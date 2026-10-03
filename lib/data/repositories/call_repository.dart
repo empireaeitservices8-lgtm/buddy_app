@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/network/api_response.dart';
 import '../../core/network/api_service.dart';
 import '../../core/services/fcm_service.dart';
 import '../models/call_request_model.dart';
@@ -44,7 +45,7 @@ class CallApiRepository implements ICallRepository {
 
     final body = <String, dynamic>{
       'agent_user_id': agentUserId,
-      if (categoryId != null) 'category_id': categoryId,
+      'category_id': ?categoryId,
       if (effectiveFcmToken != null && effectiveFcmToken.isNotEmpty)
         'fcm_token': effectiveFcmToken,
     };
@@ -164,14 +165,30 @@ class CallApiRepository implements ICallRepository {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'rejected') {
-        validStatus = 'reject';
+      } else if (validStatus == 'declined' || validStatus == 'reject') {
+        validStatus = 'rejected';
+      } else if (validStatus == 'canceled') {
+        validStatus = 'cancelled';
+      } else if (validStatus == 'accept') {
+        validStatus = 'accepted';
       }
-      final response = await _apiService.post(
+      ApiResponse response = await _apiService.post(
         ApiConstants.updateCallStatus(callId),
-        data: {'status': validStatus},
+        data: {'status': validStatus, 'call_id': callId},
         requiresAuth: true,
       );
+
+      // Also call calls/end/ endpoint as fallback
+      if (validStatus == 'rejected' || validStatus == 'completed' || validStatus == 'cancelled') {
+        try {
+          await _apiService.post(
+            ApiConstants.endCall,
+            data: {'call_id': callId, 'status': validStatus},
+            requiresAuth: true,
+          );
+        } catch (_) {}
+      }
+
       if (response.isSuccess && response.rawData is Map) {
         return response.rawData as Map<String, dynamic>;
       }

@@ -3,11 +3,7 @@ class AgentDashboardModel {
   final AgentDashboardData? data;
   final String? message;
 
-  const AgentDashboardModel({
-    required this.success,
-    this.data,
-    this.message,
-  });
+  const AgentDashboardModel({required this.success, this.data, this.message});
 
   factory AgentDashboardModel.fromJson(Map<String, dynamic> json) {
     return AgentDashboardModel(
@@ -37,11 +33,14 @@ class AgentDashboardData {
 
   factory AgentDashboardData.fromJson(Map<String, dynamic> json) {
     var sessions = <AgentSessionModel>[];
-    final rawRecent = json['recent_sessions'] ?? json['recentSessions'] ?? json['sessions'];
+    final rawRecent =
+        json['recent_sessions'] ?? json['recentSessions'] ?? json['sessions'];
     if (rawRecent is List) {
       for (final item in rawRecent) {
         if (item is Map) {
-          sessions.add(AgentSessionModel.fromJson(Map<String, dynamic>.from(item)));
+          sessions.add(
+            AgentSessionModel.fromJson(Map<String, dynamic>.from(item)),
+          );
         }
       }
     }
@@ -54,7 +53,9 @@ class AgentDashboardData {
           ? AgentDutyModel.fromJson(json['duty'] as Map<String, dynamic>)
           : null,
       earnings: json['earnings'] is Map<String, dynamic>
-          ? AgentEarningsModel.fromJson(json['earnings'] as Map<String, dynamic>)
+          ? AgentEarningsModel.fromJson(
+              json['earnings'] as Map<String, dynamic>,
+            )
           : null,
       calls: json['calls'] is Map<String, dynamic>
           ? AgentCallsModel.fromJson(json['calls'] as Map<String, dynamic>)
@@ -80,6 +81,7 @@ class AgentProfileModel {
   final double rating;
   final int totalCalls;
   final int totalEarnedCoins;
+  final double totalEarnedAmount;
   final bool isOnDuty;
   final bool isBusy;
   final bool isAvailable;
@@ -109,6 +111,7 @@ class AgentProfileModel {
     this.rating = 5.0,
     this.totalCalls = 0,
     this.totalEarnedCoins = 0,
+    this.totalEarnedAmount = 0.0,
     this.isOnDuty = false,
     this.isBusy = false,
     this.isAvailable = true,
@@ -137,26 +140,29 @@ class AgentProfileModel {
         ? (json['category'] as Map)['name']?.toString()
         : null;
 
-    final resolvedProfessionName = json['profession_name']?.toString() ??
+    final resolvedProfessionName =
+        json['profession_name']?.toString() ??
         categoryName ??
         json['profession']?.toString() ??
         'General';
 
-    final rawAgentId = json['agent_id'] ??
+    final rawAgentId =
+        json['agent_id'] ??
         (json['agent'] is Map ? (json['agent'] as Map)['id'] : json['agent']) ??
         json['listener_id'] ??
         json['agent_profile_id'] ??
         json['profile_id'];
 
-    final rawUserId = json['user_id'] ??
+    final rawUserId =
+        json['user_id'] ??
         (json['user'] is Map ? (json['user'] as Map)['id'] : json['user']);
 
     final parsedId = json['id'] is int
         ? json['id'] as int
         : (int.tryParse(json['id']?.toString() ?? '') ??
-            (rawAgentId is int
-                ? rawAgentId
-                : int.tryParse(rawAgentId?.toString() ?? '')));
+              (rawAgentId is int
+                  ? rawAgentId
+                  : int.tryParse(rawAgentId?.toString() ?? '')));
 
     return AgentProfileModel(
       id: parsedId,
@@ -187,13 +193,30 @@ class AgentProfileModel {
       totalEarnedCoins: json['total_earned_coins'] is num
           ? (json['total_earned_coins'] as num).toInt()
           : (int.tryParse(json['total_earned_coins']?.toString() ?? '') ?? 0),
+      totalEarnedAmount: (() {
+        final raw = json['total_earned_amount'] ??
+            json['total_earned'] ??
+            json['earned_amount'] ??
+            json['total_earnings'] ??
+            json['total_amount'] ??
+            json['total_earned_coins'];
+        if (raw is num) return raw.toDouble();
+        return double.tryParse(raw?.toString() ?? '') ?? 0.0;
+      })(),
       isOnDuty: json['is_on_duty'] == true,
       isBusy: json['is_busy'] == true,
       isAvailable: json['is_available'] == true || json['is_available'] == null,
       isVerified: json['is_verified'] == true,
-      avatar: json['avatar']?.toString() ?? json['profile_picture_url']?.toString() ?? json['profile_picture']?.toString(),
-      profilePicture: json['profile_picture']?.toString() ?? json['profile_picture_url']?.toString(),
-      profilePictureUrl: json['profile_picture_url']?.toString() ?? json['profile_picture']?.toString(),
+      avatar:
+          json['avatar']?.toString() ??
+          json['profile_picture_url']?.toString() ??
+          json['profile_picture']?.toString(),
+      profilePicture:
+          json['profile_picture']?.toString() ??
+          json['profile_picture_url']?.toString(),
+      profilePictureUrl:
+          json['profile_picture_url']?.toString() ??
+          json['profile_picture']?.toString(),
       gender: json['gender']?.toString(),
       language: json['language']?.toString(),
       interests: parsedInterests,
@@ -219,7 +242,8 @@ class AgentDutyModel {
       isOnDuty: json['is_on_duty'] == true,
       activeSessionSeconds: json['active_session_seconds'] is num
           ? (json['active_session_seconds'] as num).toInt()
-          : (int.tryParse(json['active_session_seconds']?.toString() ?? '') ?? 0),
+          : (int.tryParse(json['active_session_seconds']?.toString() ?? '') ??
+                0),
       todayDutySeconds: json['today_duty_seconds'] is num
           ? (json['today_duty_seconds'] as num).toInt()
           : (int.tryParse(json['today_duty_seconds']?.toString() ?? '') ?? 0),
@@ -227,7 +251,9 @@ class AgentDutyModel {
   }
 
   String get formattedDutyTime {
-    final seconds = todayDutySeconds > 0 ? todayDutySeconds : activeSessionSeconds;
+    final seconds = todayDutySeconds > 0
+        ? todayDutySeconds
+        : activeSessionSeconds;
     if (seconds <= 0) return '0m';
     final hours = seconds ~/ 3600;
     final minutes = (seconds % 3600) ~/ 60;
@@ -239,27 +265,91 @@ class AgentDutyModel {
 }
 
 class AgentEarningsModel {
+  final double todayEarnings;
+  final double lifetimeEarnings;
+  final double walletBalance;
   final int todayCoins;
   final int lifetimeCoins;
-  final int walletBalance;
+  final double todayInr;
+  final double lifetimeInr;
+  final double totalInr;
 
   const AgentEarningsModel({
+    this.todayEarnings = 0.0,
+    this.lifetimeEarnings = 0.0,
+    this.walletBalance = 0.0,
     this.todayCoins = 0,
     this.lifetimeCoins = 0,
-    this.walletBalance = 0,
+    this.todayInr = 0.0,
+    this.lifetimeInr = 0.0,
+    this.totalInr = 0.0,
   });
 
   factory AgentEarningsModel.fromJson(Map<String, dynamic> json) {
+    double parseDouble(dynamic val) {
+      if (val is num) return val.toDouble();
+      if (val != null) return double.tryParse(val.toString()) ?? 0.0;
+      return 0.0;
+    }
+
+    int parseInt(dynamic val) {
+      if (val is num) return val.toInt();
+      if (val != null) return int.tryParse(val.toString()) ?? 0;
+      return 0;
+    }
+
+    final todayCoins = parseInt(json['today_coins'] ?? json['todayCoins']);
+    final lifetimeCoins =
+        parseInt(json['lifetime_coins'] ?? json['lifetimeCoins']);
+    final todayInr = parseDouble(
+      json['today_inr'] ?? json['todayInr'] ?? json['today_amount'],
+    );
+    final lifetimeInr = parseDouble(
+      json['lifetime_inr'] ?? json['lifetimeInr'] ?? json['lifetime_amount'],
+    );
+    final totalInr = parseDouble(
+      json['total_inr'] ??
+          json['totalInr'] ??
+          (lifetimeInr > 0 ? lifetimeInr : todayInr),
+    );
+    final todayEarned = parseDouble(
+      json['today_earnings'] ??
+          json['today_inr'] ??
+          json['today_amount'] ??
+          json['todayEarned'] ??
+          json['today_coins'] ??
+          0,
+    );
+    final lifetimeEarned = parseDouble(
+      json['lifetime_earnings'] ??
+          json['lifetime_inr'] ??
+          json['total_inr'] ??
+          json['lifetime_amount'] ??
+          json['total_earned'] ??
+          json['total_earnings'] ??
+          json['lifetimeEarned'] ??
+          json['lifetime_coins'] ??
+          0,
+    );
+    final balance = parseDouble(
+      json['wallet_balance'] ??
+          json['balance'] ??
+          json['total_balance'] ??
+          json['walletBalance'] ??
+          (totalInr > 0
+              ? totalInr
+              : (lifetimeEarned > 0 ? lifetimeEarned : lifetimeCoins.toDouble())),
+    );
+
     return AgentEarningsModel(
-      todayCoins: json['today_coins'] is num
-          ? (json['today_coins'] as num).toInt()
-          : (int.tryParse(json['today_coins']?.toString() ?? '') ?? 0),
-      lifetimeCoins: json['lifetime_coins'] is num
-          ? (json['lifetime_coins'] as num).toInt()
-          : (int.tryParse(json['lifetime_coins']?.toString() ?? '') ?? 0),
-      walletBalance: json['wallet_balance'] is num
-          ? (json['wallet_balance'] as num).toInt()
-          : (int.tryParse(json['wallet_balance']?.toString() ?? '') ?? 0),
+      todayEarnings: todayEarned,
+      lifetimeEarnings: lifetimeEarned,
+      walletBalance: balance,
+      todayCoins: todayCoins,
+      lifetimeCoins: lifetimeCoins,
+      todayInr: todayInr,
+      lifetimeInr: lifetimeInr,
+      totalInr: totalInr,
     );
   }
 }
@@ -268,10 +358,7 @@ class AgentCallsModel {
   final int todayCount;
   final int lifetimeCount;
 
-  const AgentCallsModel({
-    this.todayCount = 0,
-    this.lifetimeCount = 0,
-  });
+  const AgentCallsModel({this.todayCount = 0, this.lifetimeCount = 0});
 
   factory AgentCallsModel.fromJson(Map<String, dynamic> json) {
     return AgentCallsModel(
@@ -291,7 +378,12 @@ class AgentSessionModel {
   final String? callType;
   final String? duration;
   final int coinsEarned;
+  final double earnedAmount;
+  final double inrEarned;
+  final double totalInr;
   final String? timeAgo;
+  final String? callerGender;
+  final String? callerAvatar;
 
   const AgentSessionModel({
     this.id,
@@ -299,13 +391,55 @@ class AgentSessionModel {
     this.callType,
     this.duration,
     this.coinsEarned = 0,
+    this.earnedAmount = 0.0,
+    this.inrEarned = 0.0,
+    this.totalInr = 0.0,
     this.timeAgo,
+    this.callerGender,
+    this.callerAvatar,
   });
+
+  String get formattedEarnedAmount {
+    final effective = inrEarned > 0
+        ? inrEarned
+        : (totalInr > 0
+            ? totalInr
+            : (earnedAmount > 0 ? earnedAmount : coinsEarned.toDouble()));
+    return effective % 1 == 0
+        ? '₹${effective.toInt()}'
+        : '₹${effective.toStringAsFixed(2)}';
+  }
+
+  bool get isFemale {
+    final g = (callerGender ?? '').trim().toLowerCase();
+    if (g == 'female' ||
+        g == 'woman' ||
+        g == 'girl' ||
+        g == 'lady' ||
+        g == 'f' ||
+        g == 'w') {
+      return true;
+    }
+    if (g == 'male' || g == 'man' || g == 'boy' || g == 'guy' || g == 'm') {
+      return false;
+    }
+    final n = (callerName ?? '').trim().toLowerCase();
+    return n.endsWith('a') ||
+        n.endsWith('i') ||
+        n.endsWith('e') ||
+        n.contains('girl');
+  }
+
+  bool get isMale => !isFemale;
+
+  String get avatarAsset =>
+      isFemale ? 'assets/images/Girl2.png' : 'assets/images/Boy2.png';
 
   factory AgentSessionModel.fromJson(Map<String, dynamic> json) {
     // 1. Duration Formatting
     String formattedDuration = '0s';
-    final rawDurationSeconds = json['duration_seconds'] ?? json['durationSeconds'] ?? json['seconds'];
+    final rawDurationSeconds =
+        json['duration_seconds'] ?? json['durationSeconds'] ?? json['seconds'];
     if (rawDurationSeconds != null) {
       final sec = (rawDurationSeconds is num)
           ? rawDurationSeconds.toInt()
@@ -317,12 +451,14 @@ class AgentSessionModel {
         final s = sec % 60;
         formattedDuration = s > 0 ? '${m}m ${s}s' : '${m}m';
       }
-    } else if (json['duration'] != null && json['duration'].toString().trim().isNotEmpty) {
+    } else if (json['duration'] != null &&
+        json['duration'].toString().trim().isNotEmpty) {
       formattedDuration = json['duration'].toString().trim();
     }
 
     // 2. Time Ago Formatting
-    final rawTimeStr = json['time_ago'] ??
+    final rawTimeStr =
+        json['time_ago'] ??
         json['ended_at'] ??
         json['endedAt'] ??
         json['created_at'] ??
@@ -343,7 +479,9 @@ class AgentSessionModel {
           formattedTimeAgo = '${diff.inMinutes}m ago';
         } else if (diff.inHours < 24 && parsedDate.day == now.day) {
           formattedTimeAgo = '${diff.inHours}h ago';
-        } else if (diff.inDays == 1 || (diff.inHours < 48 && parsedDate.day == now.subtract(const Duration(days: 1)).day)) {
+        } else if (diff.inDays == 1 ||
+            (diff.inHours < 48 &&
+                parsedDate.day == now.subtract(const Duration(days: 1)).day)) {
           formattedTimeAgo = 'Yesterday';
         } else if (diff.inDays < 7) {
           formattedTimeAgo = '${diff.inDays}d ago';
@@ -357,23 +495,62 @@ class AgentSessionModel {
 
     // 3. Call Type / Category
     String callType = 'Voice Call 📞';
-    if (json['category'] != null && json['category'].toString().trim().isNotEmpty) {
+    if (json['category'] != null &&
+        json['category'].toString().trim().isNotEmpty) {
       final cat = json['category'].toString().trim();
       callType = cat.toLowerCase().contains('call') ? cat : '$cat Call 📞';
-    } else if (json['call_type'] != null && json['call_type'].toString().trim().isNotEmpty) {
+    } else if (json['call_type'] != null &&
+        json['call_type'].toString().trim().isNotEmpty) {
       callType = json['call_type'].toString().trim();
     }
 
-    // 4. Coins Earned
-    final coins = json['coins_earned'] is num
+    // 4. Earned Amount & Coins
+    final double inrEarned = (json['inr_earned'] is num)
+        ? (json['inr_earned'] as num).toDouble()
+        : (double.tryParse(json['inr_earned']?.toString() ?? json['inrEarned']?.toString() ?? '') ?? 0.0);
+
+    final double totalInr = (json['total_inr'] is num)
+        ? (json['total_inr'] as num).toDouble()
+        : (double.tryParse(json['total_inr']?.toString() ?? json['totalInr']?.toString() ?? '') ?? (inrEarned > 0 ? inrEarned : 0.0));
+
+    final rawAmount =
+        json['inr_earned'] ??
+        json['total_inr'] ??
+        json['inrEarned'] ??
+        json['totalInr'] ??
+        json['earned_amount'] ??
+        json['earnedAmount'] ??
+        json['amount'] ??
+        json['earnings'] ??
+        json['call_earnings'] ??
+        json['agent_earnings'] ??
+        json['rate_earned'] ??
+        json['total_earned'];
+
+    final double amount = (rawAmount is num)
+        ? rawAmount.toDouble()
+        : (double.tryParse(rawAmount?.toString() ?? '') ??
+            (json['coins_earned'] is num
+                ? (json['coins_earned'] as num).toDouble()
+                : (double.tryParse(
+                        json['coins_earned']?.toString() ??
+                            json['coins']?.toString() ??
+                            '',
+                      ) ??
+                      0.0)));
+
+    final coins = (json['coins_earned'] is num)
         ? (json['coins_earned'] as num).toInt()
-        : (int.tryParse(json['coins_earned']?.toString() ??
-                json['coins']?.toString() ??
-                '') ??
-            0);
+        : (int.tryParse(
+                json['coins_earned']?.toString() ??
+                    json['coins']?.toString() ??
+                    '',
+              ) ??
+              amount.toInt());
 
     // 5. Caller Name
-    final caller = json['caller_name']?.toString() ??
+    final caller =
+        json['caller_name']?.toString() ??
         json['client_name']?.toString() ??
         json['user']?.toString() ??
         json['caller']?.toString() ??
@@ -381,9 +558,27 @@ class AgentSessionModel {
         'Caller';
 
     // 6. ID
-    final id = json['call_id']?.toString() ??
+    final id =
+        json['call_id']?.toString() ??
         json['id']?.toString() ??
         json['session_id']?.toString();
+
+    // 7. Caller Gender & Avatar
+    final callerGender =
+        json['caller_gender']?.toString() ??
+        json['gender']?.toString() ??
+        json['user_gender']?.toString() ??
+        json['client_gender']?.toString() ??
+        (json['caller'] is Map ? json['caller']['gender']?.toString() : null) ??
+        (json['user'] is Map ? json['user']['gender']?.toString() : null);
+
+    final callerAvatar =
+        json['caller_avatar']?.toString() ??
+        json['avatar']?.toString() ??
+        json['profile_picture']?.toString() ??
+        json['profile_picture_url']?.toString() ??
+        (json['caller'] is Map ? json['caller']['avatar']?.toString() : null) ??
+        (json['user'] is Map ? json['user']['avatar']?.toString() : null);
 
     return AgentSessionModel(
       id: id,
@@ -391,7 +586,12 @@ class AgentSessionModel {
       callType: callType,
       duration: formattedDuration,
       coinsEarned: coins,
+      earnedAmount: amount,
+      inrEarned: inrEarned,
+      totalInr: totalInr,
       timeAgo: formattedTimeAgo,
+      callerGender: callerGender,
+      callerAvatar: callerAvatar,
     );
   }
 }

@@ -6,6 +6,7 @@ class IncomingCallData {
   final int callId;
   final String callerName;
   final String? callerAvatar;
+  final String? callerGender;
   final String channelName;
   final String? category;
   final String? token; // Agora token if backend provides one
@@ -15,11 +16,41 @@ class IncomingCallData {
     required this.callId,
     required this.callerName,
     this.callerAvatar,
+    this.callerGender,
     required this.channelName,
     this.category,
     this.token,
     this.uid = 0,
   });
+
+  bool get isFemale {
+    final g = (callerGender ?? '').trim().toLowerCase();
+    if (g == 'female' ||
+        g == 'woman' ||
+        g == 'girl' ||
+        g == 'lady' ||
+        g == 'f' ||
+        g == 'w') {
+      return true;
+    }
+    if (g == 'male' ||
+        g == 'man' ||
+        g == 'boy' ||
+        g == 'guy' ||
+        g == 'm') {
+      return false;
+    }
+    final n = callerName.trim().toLowerCase();
+    return n.endsWith('a') ||
+        n.endsWith('i') ||
+        n.endsWith('e') ||
+        n.contains('girl');
+  }
+
+  bool get isMale => !isFemale;
+
+  String get avatarAsset =>
+      isFemale ? 'assets/images/Girl2.png' : 'assets/images/Boy2.png';
 
   /// Returns true if this is a legitimate call with an ID or Agora channel name
   bool get isValid => callId > 0 || channelName.trim().isNotEmpty;
@@ -105,6 +136,12 @@ class IncomingCallData {
           data['avatar']?.toString() ??
           data['profile_picture']?.toString() ??
           data['profile_picture_url']?.toString(),
+      callerGender: data['caller_gender']?.toString() ??
+          data['gender']?.toString() ??
+          data['user_gender']?.toString() ??
+          data['client_gender']?.toString() ??
+          (data['caller'] is Map ? data['caller']['gender']?.toString() : null) ??
+          (data['user'] is Map ? data['user']['gender']?.toString() : null),
       channelName: rawChannel,
       category: data['category']?.toString() ??
           data['category_name']?.toString() ??

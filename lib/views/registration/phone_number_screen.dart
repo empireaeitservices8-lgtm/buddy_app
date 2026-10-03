@@ -57,7 +57,6 @@ class _PhoneNumberViewState extends State<PhoneNumberView> {
       (c) => c.code == existingCode,
       orElse: () => _supportedCountries.first, // India +91
     );
-    widget.viewModel.setCountryCode(_selectedCountry.code);
   }
 
   @override

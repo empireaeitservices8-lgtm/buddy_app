@@ -10,6 +10,7 @@ import '../core/services/agora_service.dart';
 import '../core/services/fcm_service.dart';
 import '../core/services/incoming_call_manager.dart';
 import '../data/models/agent_dashboard_model.dart';
+import '../data/models/agent_payout_model.dart';
 import '../data/models/agent_rating_model.dart';
 import '../data/models/call_model.dart';
 import '../data/models/incoming_call_data.dart';
@@ -22,16 +23,66 @@ class HandledSession {
   final String callType; // "Voice Call", "Video Call"
   final String duration;
   final int coinsEarned;
+  final double earnedAmount;
+  final double inrEarned;
+  final double totalInr;
   final String timeAgo;
+  final String? callerGender;
+  final String? callerAvatar;
 
   const HandledSession({
     required this.id,
     required this.clientName,
     required this.callType,
     required this.duration,
-    required this.coinsEarned,
+    this.coinsEarned = 0,
+    this.earnedAmount = 0.0,
+    this.inrEarned = 0.0,
+    this.totalInr = 0.0,
     required this.timeAgo,
+    this.callerGender,
+    this.callerAvatar,
   });
+
+  String get formattedEarnedAmount {
+    final effective = inrEarned > 0
+        ? inrEarned
+        : (totalInr > 0
+            ? totalInr
+            : (earnedAmount > 0 ? earnedAmount : coinsEarned.toDouble()));
+    return effective % 1 == 0
+        ? '₹${effective.toInt()}'
+        : '₹${effective.toStringAsFixed(2)}';
+  }
+
+  bool get isFemale {
+    final g = (callerGender ?? '').trim().toLowerCase();
+    if (g == 'female' ||
+        g == 'woman' ||
+        g == 'girl' ||
+        g == 'lady' ||
+        g == 'f' ||
+        g == 'w') {
+      return true;
+    }
+    if (g == 'male' ||
+        g == 'man' ||
+        g == 'boy' ||
+        g == 'guy' ||
+        g == 'm') {
+      return false;
+    }
+    final n = clientName.trim().toLowerCase();
+    return n.endsWith('a') ||
+        n.endsWith('i') ||
+        n.endsWith('e') ||
+        n.contains('girl');
+  }
+
+  bool get isMale => !isFemale;
+
+  String get avatarAsset =>
+      isFemale ? 'assets/images/Girl2.png' : 'assets/images/Boy2.png';
 }
 
 class EarningsLedgerEntry {
@@ -39,15 +90,32 @@ class EarningsLedgerEntry {
   final String title;
   final String timestamp;
   final int coins;
+  final double amount;
+  final double inrEarned;
+  final double totalInr;
   final bool isBonus;
 
   const EarningsLedgerEntry({
     required this.id,
     required this.title,
     required this.timestamp,
-    required this.coins,
+    this.coins = 0,
+    this.amount = 0.0,
+    this.inrEarned = 0.0,
+    this.totalInr = 0.0,
     this.isBonus = false,
   });
+
+  String get formattedAmount {
+    final effective = inrEarned > 0
+        ? inrEarned
+        : (totalInr > 0
+            ? totalInr
+            : (amount > 0 ? amount : coins.toDouble()));
+    return effective % 1 == 0
+        ? '₹${effective.toInt()}'
+        : '₹${effective.toStringAsFixed(2)}';
+  }
 }
 
 class AgentDashboardViewModel extends BaseViewModel {
@@ -88,6 +156,8 @@ class AgentDashboardViewModel extends BaseViewModel {
 
   // Earnings
   int _totalCoinBalance = 0;
+  double _totalEarnedBalance = 0.0;
+  double _todayEarnedAmount = 0.0;
 
   String? _authToken;
   AgentProfileModel? _agentProfile;
@@ -99,6 +169,11 @@ class AgentDashboardViewModel extends BaseViewModel {
 
   // Handled Sessions list
   final List<HandledSession> _handledSessions = [];
+
+  // Payouts State
+  List<AgentPayoutItem> _payouts = [];
+  AgentPayoutSummary? _payoutSummary;
+  bool _isLoadingPayouts = false;
 
   // Earnings Ledger History
   final List<EarningsLedgerEntry> _earningsHistory = [];
@@ -135,6 +210,7 @@ class AgentDashboardViewModel extends BaseViewModel {
   String get profession => _selectedProfession;
   int get selectedRate => _selectedRate;
   int get todayEarned => _todayEarned;
+  double get todayEarnedAmount => _todayEarnedAmount;
   int get totalCalls => _totalCalls;
   String get dutyTime => _dutyTime;
   double get rating => _rating;
@@ -151,14 +227,61 @@ class AgentDashboardViewModel extends BaseViewModel {
   AgentRatingData? get ratingData => _ratingData;
   bool get isLoadingRating => _isLoadingRating;
 
+  List<AgentPayoutItem> get payouts => _payouts;
+  AgentPayoutSummary? get payoutSummary => _payoutSummary;
+  bool get isLoadingPayouts => _isLoadingPayouts;
+
   bool get hasIncomingCall => _hasIncomingCall;
   IncomingCallData? get incomingCallData => _incomingCallData;
   String get callerName => _incomingCallData?.callerName ?? 'Caller';
+  bool get isIncomingCallerFemale => _incomingCallData?.isFemale ?? false;
+  String get incomingCallerAvatarAsset =>
+      _incomingCallData?.avatarAsset ?? 'assets/images/Boy2.png';
   String get callTopic => _incomingCallData?.category != null
       ? 'Topic: ${_incomingCallData!.category}'
       : 'Incoming Call';
 
   int get totalCoinBalance => _totalCoinBalance;
+  double get totalEarnedBalance {
+    if (_dashboardData?.earnings != null) {
+      final e = _dashboardData!.earnings!;
+      if (e.totalInr > 0) return e.totalInr;
+      if (e.lifetimeInr > 0) return e.lifetimeInr;
+      if (e.todayInr > 0) return e.todayInr;
+      if (e.walletBalance > 0) return e.walletBalance;
+    }
+    if (_totalEarnedBalance > 0) return _totalEarnedBalance;
+    if (_dashboardData?.earnings?.lifetimeEarnings != null &&
+        _dashboardData!.earnings!.lifetimeEarnings > 0) {
+      return _dashboardData!.earnings!.lifetimeEarnings;
+    }
+    if (_agentProfile != null && _agentProfile!.totalEarnedAmount > 0) {
+      return _agentProfile!.totalEarnedAmount;
+    }
+    if (_agentProfile != null && _agentProfile!.totalEarnedCoins > 0) {
+      return _agentProfile!.totalEarnedCoins.toDouble();
+    }
+    if (_handledSessions.isNotEmpty) {
+      final sum = _handledSessions.fold<double>(
+        0.0,
+        (prev, s) =>
+            prev +
+            (s.inrEarned > 0
+                ? s.inrEarned
+                : (s.totalInr > 0
+                    ? s.totalInr
+                    : (s.earnedAmount > 0 ? s.earnedAmount : s.coinsEarned.toDouble()))),
+      );
+      if (sum > 0) return sum;
+    }
+    return 0.0;
+  }
+  String get formattedTotalEarnedBalance {
+    final balance = totalEarnedBalance;
+    return balance % 1 == 0
+        ? '₹${balance.toInt()}'
+        : '₹${balance.toStringAsFixed(2)}';
+  }
   String? get authToken => _authToken;
   AgoraService get agoraService => _agoraService;
   AgentDashboardData? get dashboardData => _dashboardData;
@@ -204,7 +327,11 @@ class AgentDashboardViewModel extends BaseViewModel {
       _listenForIncomingCalls();
       await syncFcmTokenToBackend();
       await turnOnDutyAuto();
-      await Future.wait([fetchAgentProfile(), fetchDashboardData()]);
+      await Future.wait([
+        fetchAgentProfile(),
+        fetchDashboardData(),
+        fetchAgentPayouts(),
+      ]);
       await fetchAgentRating();
       // Check if the app was launched directly from an incoming call notification
       await checkPendingFcmCall();
@@ -217,7 +344,11 @@ class AgentDashboardViewModel extends BaseViewModel {
   Future<void> refresh() async {
     await _loadAuthToken();
     await checkPendingFcmCall();
-    await Future.wait([fetchAgentProfile(), fetchDashboardData(silent: true)]);
+    await Future.wait([
+      fetchAgentProfile(),
+      fetchDashboardData(silent: true),
+      fetchAgentPayouts(),
+    ]);
     await fetchAgentRating();
   }
 
@@ -748,6 +879,77 @@ class AgentDashboardViewModel extends BaseViewModel {
     }
   }
 
+  /// Fetches agent payout history and details from GET /api/agent/payouts/?agent_id={agent_id}
+  Future<List<AgentPayoutItem>> fetchAgentPayouts([dynamic targetAgentId]) async {
+    if (!await _ensureAgentRole()) return [];
+    _isLoadingPayouts = true;
+    notifyListenersSafely();
+    try {
+      await _loadAuthToken();
+      final options = _authToken != null && _authToken!.isNotEmpty
+          ? Options(headers: {'Authorization': 'Bearer $_authToken'})
+          : null;
+
+      final dynamic agentId = targetAgentId ??
+          _agentProfile?.userId ??
+          _dashboardData?.profile?.userId ??
+          _agentProfile?.agentId ??
+          _dashboardData?.profile?.agentId ??
+          _agentProfile?.id ??
+          _dashboardData?.profile?.id ??
+          285;
+
+      final Map<String, dynamic> queryParams = {'agent_id': agentId};
+
+      debugPrint(
+        '💳 [AgentDashboard] Fetching payouts from ${ApiConstants.agentPayouts} with query: $queryParams',
+      );
+
+      final response = await _apiService.get(
+        ApiConstants.agentPayouts,
+        queryParameters: queryParams,
+        options: options,
+        requiresAuth: true,
+      );
+
+      debugPrint(
+        '💳 [AgentDashboard] Agent payouts response: ${response.rawData}',
+      );
+
+      if (response.isSuccess) {
+        final parsedModel = AgentPayoutModel.fromJson(response.rawData);
+        _payouts = parsedModel.data;
+        if (parsedModel.summary != null) {
+          _payoutSummary = parsedModel.summary;
+        }
+
+        // If payouts exist, sync completed / pending payouts into earnings history
+        if (_payouts.isNotEmpty && _earningsHistory.isEmpty) {
+          for (final payout in _payouts) {
+            _earningsHistory.add(
+              EarningsLedgerEntry(
+                id: payout.id?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+                title: 'Payout (${payout.status.toUpperCase()})',
+                timestamp: payout.formattedDate,
+                amount: payout.amount,
+                coins: payout.coins,
+                inrEarned: payout.amount,
+                totalInr: payout.amount,
+              ),
+            );
+          }
+        }
+        return _payouts;
+      }
+    } catch (e) {
+      debugPrint('⚠️ [AgentDashboard] fetchAgentPayouts error: $e');
+    } finally {
+      _isLoadingPayouts = false;
+      notifyListenersSafely();
+    }
+    return _payouts;
+  }
+
   /// Automatically turns on duty when entering the screen
   Future<void> turnOnDutyAuto() async {
     if (!await _ensureAgentRole()) return;
@@ -967,9 +1169,13 @@ class AgentDashboardViewModel extends BaseViewModel {
 
           if (e != null) {
             _todayEarned = e.todayCoins;
-            _totalCoinBalance = e.walletBalance > 0
-                ? e.walletBalance
-                : e.lifetimeCoins;
+            _todayEarnedAmount = e.todayInr > 0 ? e.todayInr : e.todayEarnings;
+            _totalEarnedBalance = e.totalInr > 0
+                ? e.totalInr
+                : (e.lifetimeInr > 0
+                    ? e.lifetimeInr
+                    : e.walletBalance);
+            _totalCoinBalance = e.walletBalance.toInt();
           }
 
           if (c != null) {
@@ -987,7 +1193,12 @@ class AgentDashboardViewModel extends BaseViewModel {
                   callType: s.callType ?? 'Voice Call 📞',
                   duration: s.duration ?? '0s',
                   coinsEarned: s.coinsEarned,
+                  earnedAmount: s.earnedAmount,
+                  inrEarned: s.inrEarned,
+                  totalInr: s.totalInr,
                   timeAgo: s.timeAgo ?? 'Just now',
+                  callerGender: s.callerGender,
+                  callerAvatar: s.callerAvatar,
                 ),
               );
               _earningsHistory.add(
@@ -996,6 +1207,9 @@ class AgentDashboardViewModel extends BaseViewModel {
                   title: 'Call with ${s.callerName ?? "Caller"}',
                   timestamp: s.timeAgo ?? 'Just now',
                   coins: s.coinsEarned,
+                  amount: s.earnedAmount,
+                  inrEarned: s.inrEarned,
+                  totalInr: s.totalInr,
                   isBonus: false,
                 ),
               );
@@ -1116,7 +1330,7 @@ class AgentDashboardViewModel extends BaseViewModel {
       callId: callData.callId.toString(),
       callerId: callData.callerName,
       callerName: callData.callerName,
-      callerAvatar: callData.callerAvatar,
+      callerAvatar: callData.callerAvatar ?? callData.avatarAsset,
       receiverId: _agentName,
       receiverName: _agentName,
       channelId: channel,
@@ -1179,16 +1393,33 @@ class AgentDashboardViewModel extends BaseViewModel {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'rejected') {
-        validStatus = 'reject';
+      } else if (validStatus == 'declined' || validStatus == 'reject') {
+        validStatus = 'rejected';
+      } else if (validStatus == 'canceled') {
+        validStatus = 'cancelled';
+      } else if (validStatus == 'accept') {
+        validStatus = 'accepted';
       }
 
-      final response = await _apiService.post(
+      ApiResponse response = await _apiService.post(
         ApiConstants.updateCallStatus(callId),
-        data: {'status': validStatus},
+        data: {'status': validStatus, 'call_id': callId},
         options: options,
         requiresAuth: true,
       );
+
+      // Also call calls/end/ endpoint as fallback
+      if (validStatus == 'rejected' || validStatus == 'completed' || validStatus == 'cancelled') {
+        try {
+          await _apiService.post(
+            ApiConstants.endCall,
+            data: {'call_id': callId, 'status': validStatus},
+            options: options,
+            requiresAuth: true,
+          );
+        } catch (_) {}
+      }
+
       debugPrint(
         '📞 [AgentDashboard] Call status updated: endpoint=${ApiConstants.updateCallStatus(callId)}, status=$validStatus, res=${response.rawData}',
       );
@@ -1325,11 +1556,21 @@ class AgentDashboardViewModel extends BaseViewModel {
   /// Alias for submitDutyForm
   Future<bool> saveDutyForm() => submitDutyForm();
 
-  /// Submits a payout request to agent/request-payout/
-  Future<bool> requestPayout({int? amount}) async {
+  /// Submits a payout checkout / request to agent/payouts/ (fallback: agent/request-payout/)
+  Future<bool> requestPayout({
+    int? amount,
+    double? inrAmount,
+    String? payoutMethod,
+    String? upiId,
+    String? accountNumber,
+    String? ifscCode,
+    dynamic targetAgentId,
+  }) async {
     final payoutAmount = amount ?? _totalCoinBalance;
-    if (payoutAmount < 5000) {
-      setError('Minimum 5,000 coins required to request a payout.');
+    final inrValue = inrAmount ?? totalEarnedBalance;
+
+    if (payoutAmount < 25000 && inrValue < 500) {
+      setError('Minimum ₹500 or 25,000 coins required to request a payout.');
       return false;
     }
 
@@ -1339,15 +1580,58 @@ class AgentDashboardViewModel extends BaseViewModel {
           ? Options(headers: {'Authorization': 'Bearer $_authToken'})
           : null;
 
-      final response = await _apiService.post(
-        ApiConstants.requestPayout,
-        data: {'coins': payoutAmount, 'amount': payoutAmount},
-        options: options,
-        requiresAuth: true,
+      final dynamic agentId = targetAgentId ??
+          _agentProfile?.userId ??
+          _dashboardData?.profile?.userId ??
+          _agentProfile?.agentId ??
+          _dashboardData?.profile?.agentId ??
+          _agentProfile?.id ??
+          _dashboardData?.profile?.id ??
+          285;
+
+      final Map<String, dynamic> payload = {
+        'agent_id': agentId,
+        'amount': inrValue > 0 ? inrValue : payoutAmount,
+        'coins': payoutAmount,
+        if (payoutMethod != null && payoutMethod.isNotEmpty)
+          'payout_method': payoutMethod,
+        if (upiId != null && upiId.isNotEmpty) 'upi_id': upiId,
+        if (accountNumber != null && accountNumber.isNotEmpty)
+          'account_number': accountNumber,
+        if (ifscCode != null && ifscCode.isNotEmpty) 'ifsc_code': ifscCode,
+      };
+
+      debugPrint(
+        '💳 [AgentDashboard] Submitting Payout Checkout with payload: $payload',
       );
 
+      ApiResponse response;
+      try {
+        // 1. Primary checkout call to agent/payouts/
+        response = await _apiService.post(
+          ApiConstants.agentPayouts,
+          data: payload,
+          options: options,
+          requiresAuth: true,
+        );
+      } catch (e) {
+        debugPrint(
+          '⚠️ [AgentDashboard] agent/payouts/ failed, falling back to agent/request-payout/: $e',
+        );
+        // 2. Fallback call to agent/request-payout/
+        response = await _apiService.post(
+          ApiConstants.requestPayout,
+          data: payload,
+          options: options,
+          requiresAuth: true,
+        );
+      }
+
       if (response.isSuccess) {
-        await fetchDashboardData(silent: true);
+        await Future.wait([
+          fetchDashboardData(silent: true),
+          fetchAgentPayouts(agentId),
+        ]);
         return true;
       }
     } catch (e) {
