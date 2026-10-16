@@ -106,8 +106,8 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
   Widget build(BuildContext context) {
     final statusBadgeText = widget.viewModel != null
         ? (widget.viewModel!.isConnected
-            ? widget.viewModel!.formattedDuration
-            : widget.viewModel!.statusText)
+              ? widget.viewModel!.formattedDuration
+              : widget.viewModel!.statusText)
         : 'CALLING...';
 
     return Scaffold(
@@ -160,7 +160,7 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF0A2E65), // Pink Accent
-                                fontFamily: 'Inter',
+                                fontFamily: 'Nunito',
                               ),
                             ),
                             TextSpan(
@@ -169,7 +169,7 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF00A79D), // Teal Accent
-                                fontFamily: 'Inter',
+                                fontFamily: 'Nunito',
                               ),
                             ),
                           ],
@@ -178,12 +178,16 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                       // Status Pill Badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 6),
+                          horizontal: 16,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: const Color(0xFF1E2022), width: 2),
+                            color: const Color(0xFF1E2022),
+                            width: 2,
+                          ),
                           boxShadow: const [
                             BoxShadow(
                               color: Color(0xFF1E2022),
@@ -221,7 +225,9 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                             width: _pulseAnimation.value,
                             height: _pulseAnimation.value,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8EBFD).withValues(alpha: 0.45),
+                              color: const Color(
+                                0xFFE8EBFD,
+                              ).withValues(alpha: 0.45),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -230,7 +236,9 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                             width: 155,
                             height: 155,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8EBFD).withValues(alpha: 0.65),
+                              color: const Color(
+                                0xFFE8EBFD,
+                              ).withValues(alpha: 0.65),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -239,10 +247,14 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                             width: 130,
                             height: 130,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8EBFD), // Soft Lavender Fill
+                              color: const Color(
+                                0xFFE8EBFD,
+                              ), // Soft Lavender Fill
                               shape: BoxShape.circle,
                               border: Border.all(
-                                  color: const Color(0xFF1E2022), width: 3.5),
+                                color: const Color(0xFF1E2022),
+                                width: 3.5,
+                              ),
                               boxShadow: const [
                                 BoxShadow(
                                   color: Color(0xFF1E2022),
@@ -252,7 +264,8 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                               ],
                             ),
                             child: Center(
-                              child: widget.avatarUrl != null &&
+                              child:
+                                  widget.avatarUrl != null &&
                                       widget.avatarUrl!.isNotEmpty
                                   ? ClipOval(
                                       child: Image.network(
@@ -260,7 +273,9 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                         width: 124,
                                         height: 124,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => _buildAvatarInitial(),
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                _buildAvatarInitial(),
                                       ),
                                     )
                                   : _buildAvatarInitial(),
@@ -291,18 +306,25 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.check_circle,
-                        color: Color(0xFF38BDF8), size: 22),
+                    const Icon(
+                      Icons.check_circle,
+                      color: Color(0xFF38BDF8),
+                      size: 22,
+                    ),
                     if (widget.isPro) ...[
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFFF3C4),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                              color: const Color(0xFF1E2022), width: 1.8),
+                            color: const Color(0xFF1E2022),
+                            width: 1.8,
+                          ),
                           boxShadow: const [
                             BoxShadow(
                               color: Color(0xFF1E2022),
@@ -344,13 +366,17 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
 
                 // Star Rating Pill
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF3C4), // Light Yellow
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: const Color(0xFF1E2022), width: 2),
+                      color: const Color(0xFF1E2022),
+                      width: 2,
+                    ),
                     boxShadow: const [
                       BoxShadow(
                         color: Color(0xFF1E2022),
@@ -362,8 +388,11 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star_rounded,
-                          size: 18, color: Color(0xFF1E2022)),
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 18,
+                        color: Color(0xFF1E2022),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         widget.rating,
@@ -401,7 +430,9 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                     : Colors.white,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: const Color(0xFF1E2022), width: 2.5),
+                                  color: const Color(0xFF1E2022),
+                                  width: 2.5,
+                                ),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Color(0xFF1E2022),
@@ -441,7 +472,9 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                 color: const Color(0xFFFF5252), // Red Accent
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: const Color(0xFF1E2022), width: 3),
+                                  color: const Color(0xFF1E2022),
+                                  width: 3,
+                                ),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Color(0xFF1E2022),
@@ -449,8 +482,11 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                   ),
                                 ],
                               ),
-                              child: const Icon(Icons.call_end_rounded,
-                                  color: Colors.white, size: 34),
+                              child: const Icon(
+                                Icons.call_end_rounded,
+                                color: Colors.white,
+                                size: 34,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -480,7 +516,9 @@ class _OutgoingCallViewState extends State<OutgoingCallView>
                                     : Colors.white,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: const Color(0xFF1E2022), width: 2.5),
+                                  color: const Color(0xFF1E2022),
+                                  width: 2.5,
+                                ),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Color(0xFF1E2022),

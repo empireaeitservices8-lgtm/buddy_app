@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/cartoon_theme.dart';
 import '../../data/models/agent_rating_model.dart';
 import '../../viewmodels/agent_dashboard_view_model.dart';
 
@@ -81,6 +82,20 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // 0. Top Brand Header
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image.asset(
+                              'assets/images/gaby_banner.png',
+                              height: 28,
+                              fit: BoxFit.contain,
+                            ),
+                            CartoonBadge.agent(),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+
                         // 1. Top Bar
                         _buildTopBar(context),
                         const SizedBox(height: 16),

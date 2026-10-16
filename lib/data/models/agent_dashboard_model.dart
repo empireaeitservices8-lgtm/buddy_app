@@ -381,6 +381,9 @@ class AgentSessionModel {
   final double earnedAmount;
   final double inrEarned;
   final double totalInr;
+  final double agentInr;
+  final double commissionInr;
+  final double runningTotalInr;
   final String? timeAgo;
   final String? callerGender;
   final String? callerAvatar;
@@ -394,17 +397,22 @@ class AgentSessionModel {
     this.earnedAmount = 0.0,
     this.inrEarned = 0.0,
     this.totalInr = 0.0,
+    this.agentInr = 0.0,
+    this.commissionInr = 0.0,
+    this.runningTotalInr = 0.0,
     this.timeAgo,
     this.callerGender,
     this.callerAvatar,
   });
 
   String get formattedEarnedAmount {
-    final effective = inrEarned > 0
-        ? inrEarned
-        : (totalInr > 0
-            ? totalInr
-            : (earnedAmount > 0 ? earnedAmount : coinsEarned.toDouble()));
+    final effective = agentInr > 0
+        ? agentInr
+        : (inrEarned > 0
+            ? inrEarned
+            : (totalInr > 0
+                ? totalInr
+                : (earnedAmount > 0 ? earnedAmount : coinsEarned.toDouble())));
     return effective % 1 == 0
         ? '₹${effective.toInt()}'
         : '₹${effective.toStringAsFixed(2)}';
@@ -505,17 +513,31 @@ class AgentSessionModel {
     }
 
     // 4. Earned Amount & Coins
+    final double agentInr = (json['agent_inr'] is num)
+        ? (json['agent_inr'] as num).toDouble()
+        : (double.tryParse(json['agent_inr']?.toString() ?? json['agentInr']?.toString() ?? '') ?? 0.0);
+
+    final double commissionInr = (json['commission_inr'] is num)
+        ? (json['commission_inr'] as num).toDouble()
+        : (double.tryParse(json['commission_inr']?.toString() ?? json['commissionInr']?.toString() ?? '') ?? 0.0);
+
+    final double runningTotalInr = (json['running_total_inr'] is num)
+        ? (json['running_total_inr'] as num).toDouble()
+        : (double.tryParse(json['running_total_inr']?.toString() ?? json['runningTotalInr']?.toString() ?? '') ?? 0.0);
+
     final double inrEarned = (json['inr_earned'] is num)
         ? (json['inr_earned'] as num).toDouble()
-        : (double.tryParse(json['inr_earned']?.toString() ?? json['inrEarned']?.toString() ?? '') ?? 0.0);
+        : (double.tryParse(json['inr_earned']?.toString() ?? json['inrEarned']?.toString() ?? '') ?? (agentInr > 0 ? agentInr : 0.0));
 
     final double totalInr = (json['total_inr'] is num)
         ? (json['total_inr'] as num).toDouble()
-        : (double.tryParse(json['total_inr']?.toString() ?? json['totalInr']?.toString() ?? '') ?? (inrEarned > 0 ? inrEarned : 0.0));
+        : (double.tryParse(json['total_inr']?.toString() ?? json['totalInr']?.toString() ?? '') ?? (agentInr > 0 ? agentInr : (inrEarned > 0 ? inrEarned : 0.0)));
 
     final rawAmount =
+        json['agent_inr'] ??
         json['inr_earned'] ??
         json['total_inr'] ??
+        json['agentInr'] ??
         json['inrEarned'] ??
         json['totalInr'] ??
         json['earned_amount'] ??
@@ -589,6 +611,9 @@ class AgentSessionModel {
       earnedAmount: amount,
       inrEarned: inrEarned,
       totalInr: totalInr,
+      agentInr: agentInr,
+      commissionInr: commissionInr,
+      runningTotalInr: runningTotalInr,
       timeAgo: formattedTimeAgo,
       callerGender: callerGender,
       callerAvatar: callerAvatar,

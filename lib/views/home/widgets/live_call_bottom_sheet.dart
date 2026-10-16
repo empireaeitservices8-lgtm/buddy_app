@@ -72,8 +72,9 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
         }
 
         final isAttended = widget.viewModel.isCallAttended;
-        final initialLetter =
-            match.name.isNotEmpty ? match.name[0].toUpperCase() : 'T';
+        final initialLetter = match.name.isNotEmpty
+            ? match.name[0].toUpperCase()
+            : 'T';
 
         final statusBadgeText = isAttended ? 'ON CALL' : 'CALLING...';
 
@@ -128,7 +129,10 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                   top: false,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final avatarSize = (constraints.maxHeight * 0.17).clamp(75.0, 135.0);
+                      final avatarSize = (constraints.maxHeight * 0.17).clamp(
+                        75.0,
+                        135.0,
+                      );
 
                       return SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
@@ -138,9 +142,12 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                           ),
                           child: IntrinsicHeight(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0,
+                              ),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     children: [
@@ -151,8 +158,12 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                           width: 44,
                                           height: 4,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFF1E2022).withValues(alpha: 0.3),
-                                            borderRadius: BorderRadius.circular(2),
+                                            color: const Color(
+                                              0xFF1E2022,
+                                            ).withValues(alpha: 0.3),
+                                            borderRadius: BorderRadius.circular(
+                                              2,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -160,7 +171,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
 
                                       // Header Bar: Gabby Talk Logo + ON CALL Badge
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           RichText(
                                             text: const TextSpan(
@@ -171,7 +183,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                     fontSize: 24,
                                                     fontWeight: FontWeight.w900,
                                                     color: Color(0xFF0A2E65),
-                                                    fontFamily: 'Inter',
+                                                    fontFamily: 'Nunito',
                                                   ),
                                                 ),
                                                 TextSpan(
@@ -180,7 +192,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                     fontSize: 24,
                                                     fontWeight: FontWeight.w900,
                                                     color: Color(0xFF00A79D),
-                                                    fontFamily: 'Inter',
+                                                    fontFamily: 'Nunito',
                                                   ),
                                                 ),
                                               ],
@@ -193,7 +205,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             ),
                                             decoration: BoxDecoration(
                                               color: Colors.transparent,
-                                              borderRadius: BorderRadius.circular(20),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                               border: Border.all(
                                                 color: const Color(0xFF1E2022),
                                                 width: 2,
@@ -219,30 +232,37 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                   // Dual Avatar Section: User (You) <---> Agent
                                   Builder(
                                     builder: (context) {
-                                      final userProfile = widget.viewModel.userProfile;
-                                      final userIsFemale = userProfile?.gender == null ||
+                                      final userProfile =
+                                          widget.viewModel.userProfile;
+                                      final userIsFemale =
+                                          userProfile?.gender == null ||
                                           userProfile!.gender == Gender.woman;
                                       final userAvatarAsset = userIsFemale
                                           ? 'assets/images/Girl2.png'
                                           : 'assets/images/Boy2.png';
-                                      final userInitial = (userProfile?.firstName.isNotEmpty == true
-                                              ? userProfile!.firstName[0]
-                                              : 'Y')
-                                          .toUpperCase();
+                                      final userInitial =
+                                          (userProfile?.firstName.isNotEmpty ==
+                                                      true
+                                                  ? userProfile!.firstName[0]
+                                                  : 'Y')
+                                              .toUpperCase();
                                       final userBgColor = userIsFemale
                                           ? const Color(0xFFFFF0F5)
                                           : const Color(0xFFEFF6FF);
                                       final agentBgColor = match.isFemale
                                           ? const Color(0xFFFFF0F5)
                                           : const Color(0xFFEFF6FF);
-                                      final smallSize = (avatarSize * 0.72).clamp(54.0, 95.0);
+                                      final smallSize = (avatarSize * 0.72)
+                                          .clamp(54.0, 95.0);
 
                                       return AnimatedBuilder(
                                         animation: _pulseAnimation,
                                         builder: (context, child) {
                                           return Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: [
                                               // User (You) Avatar - left
                                               Column(
@@ -255,12 +275,16 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                       color: userBgColor,
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
-                                                        color: const Color(0xFF1E2022),
+                                                        color: const Color(
+                                                          0xFF1E2022,
+                                                        ),
                                                         width: 2.5,
                                                       ),
                                                       boxShadow: const [
                                                         BoxShadow(
-                                                          color: Color(0xFF1E2022),
+                                                          color: Color(
+                                                            0xFF1E2022,
+                                                          ),
                                                           offset: Offset(0, 3),
                                                           blurRadius: 0,
                                                         ),
@@ -273,14 +297,26 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                         width: smallSize,
                                                         height: smallSize,
                                                         fit: BoxFit.cover,
-                                                        errorBuilder: (_, __, ___) => Text(
-                                                          userInitial,
-                                                          style: TextStyle(
-                                                            fontSize: smallSize * 0.4,
-                                                            fontWeight: FontWeight.w900,
-                                                            color: const Color(0xFF1E2022),
-                                                          ),
-                                                        ),
+                                                        errorBuilder:
+                                                            (
+                                                              _,
+                                                              __,
+                                                              ___,
+                                                            ) => Text(
+                                                              userInitial,
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    smallSize *
+                                                                    0.4,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                                color:
+                                                                    const Color(
+                                                                      0xFF1E2022,
+                                                                    ),
+                                                              ),
+                                                            ),
                                                       ),
                                                     ),
                                                   ),
@@ -289,7 +325,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                     'You',
                                                     style: TextStyle(
                                                       fontSize: 11,
-                                                      fontWeight: FontWeight.w800,
+                                                      fontWeight:
+                                                          FontWeight.w800,
                                                       color: Color(0xFF64748B),
                                                     ),
                                                   ),
@@ -298,24 +335,61 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
 
                                               // Middle: Animated pulse wave / call indicator
                                               Padding(
-                                                padding: const EdgeInsets.only(bottom: 20.0),
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 20.0,
+                                                ),
                                                 child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: List.generate(3, (i) {
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: List.generate(3, (
+                                                    i,
+                                                  ) {
                                                     final scale = (i == 1)
-                                                        ? (_pulseAnimation.value - 155) / 30
+                                                        ? (_pulseAnimation
+                                                                      .value -
+                                                                  155) /
+                                                              30
                                                         : ((i == 0)
-                                                              ? (_pulseAnimation.value - 155) / 50
-                                                              : (_pulseAnimation.value - 155) / 20);
-                                                    final opacity = (0.3 + scale.clamp(0.0, 1.0) * 0.7).clamp(0.3, 1.0);
+                                                              ? (_pulseAnimation
+                                                                            .value -
+                                                                        155) /
+                                                                    50
+                                                              : (_pulseAnimation
+                                                                            .value -
+                                                                        155) /
+                                                                    20);
+                                                    final opacity =
+                                                        (0.3 +
+                                                                scale.clamp(
+                                                                      0.0,
+                                                                      1.0,
+                                                                    ) *
+                                                                    0.7)
+                                                            .clamp(0.3, 1.0);
                                                     return Padding(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 3,
+                                                          ),
                                                       child: Container(
                                                         width: 4,
-                                                        height: 14 + (scale * 12).clamp(0.0, 12.0),
+                                                        height:
+                                                            14 +
+                                                            (scale * 12).clamp(
+                                                              0.0,
+                                                              12.0,
+                                                            ),
                                                         decoration: BoxDecoration(
-                                                          color: const Color(0xFF00A79D).withValues(alpha: opacity),
-                                                          borderRadius: BorderRadius.circular(3),
+                                                          color:
+                                                              const Color(
+                                                                0xFF00A79D,
+                                                              ).withValues(
+                                                                alpha: opacity,
+                                                              ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                3,
+                                                              ),
                                                         ),
                                                       ),
                                                     );
@@ -334,12 +408,16 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                       color: agentBgColor,
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
-                                                        color: const Color(0xFF1E2022),
+                                                        color: const Color(
+                                                          0xFF1E2022,
+                                                        ),
                                                         width: 3.5,
                                                       ),
                                                       boxShadow: const [
                                                         BoxShadow(
-                                                          color: Color(0xFF1E2022),
+                                                          color: Color(
+                                                            0xFF1E2022,
+                                                          ),
                                                           offset: Offset(0, 4),
                                                           blurRadius: 0,
                                                         ),
@@ -352,14 +430,26 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                         width: avatarSize,
                                                         height: avatarSize,
                                                         fit: BoxFit.cover,
-                                                        errorBuilder: (_, __, ___) => Text(
-                                                          initialLetter,
-                                                          style: TextStyle(
-                                                            fontSize: avatarSize * 0.4,
-                                                            fontWeight: FontWeight.w900,
-                                                            color: const Color(0xFF1E2022),
-                                                          ),
-                                                        ),
+                                                        errorBuilder:
+                                                            (
+                                                              _,
+                                                              __,
+                                                              ___,
+                                                            ) => Text(
+                                                              initialLetter,
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    avatarSize *
+                                                                    0.4,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                                color:
+                                                                    const Color(
+                                                                      0xFF1E2022,
+                                                                    ),
+                                                              ),
+                                                            ),
                                                       ),
                                                     ),
                                                   ),
@@ -368,7 +458,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                     'Agent',
                                                     style: TextStyle(
                                                       fontSize: 11,
-                                                      fontWeight: FontWeight.w800,
+                                                      fontWeight:
+                                                          FontWeight.w800,
                                                       color: Color(0xFF64748B),
                                                     ),
                                                   ),
@@ -387,7 +478,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                   Column(
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Flexible(
                                             child: Text(
@@ -415,7 +507,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             ),
                                             decoration: BoxDecoration(
                                               color: Colors.transparent,
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                               border: Border.all(
                                                 color: const Color(0xFF1E2022),
                                                 width: 1.8,
@@ -457,8 +550,12 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                           vertical: 6,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFFFF3C4), // Light Yellow
-                                          borderRadius: BorderRadius.circular(16),
+                                          color: const Color(
+                                            0xFFFFF3C4,
+                                          ), // Light Yellow
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           border: Border.all(
                                             color: const Color(0xFF1E2022),
                                             width: 2,
@@ -482,7 +579,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             const SizedBox(width: 4),
                                             Text(
                                               match.rating > 0
-                                                  ? match.rating.toStringAsFixed(1)
+                                                  ? match.rating
+                                                        .toStringAsFixed(1)
                                                   : '5.0',
                                               style: const TextStyle(
                                                 fontSize: 13,
@@ -497,10 +595,13 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                       if (isAttended) ...[
                                         const SizedBox(height: 10),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              widget.viewModel.formattedCallDuration,
+                                              widget
+                                                  .viewModel
+                                                  .formattedCallDuration,
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w800,
@@ -510,17 +611,27 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             ),
                                             const SizedBox(width: 10),
                                             Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 9,
-                                                vertical: 3,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 9,
+                                                    vertical: 3,
+                                                  ),
                                               decoration: BoxDecoration(
-                                                color: widget.viewModel.walletCoins <= 300
+                                                color:
+                                                    widget
+                                                            .viewModel
+                                                            .walletCoins <=
+                                                        300
                                                     ? const Color(0xFFFFE5E5)
                                                     : Colors.white,
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                                 border: Border.all(
-                                                  color: widget.viewModel.walletCoins <= 300
+                                                  color:
+                                                      widget
+                                                              .viewModel
+                                                              .walletCoins <=
+                                                          300
                                                       ? const Color(0xFFE11D48)
                                                       : const Color(0xFF1E2022),
                                                   width: 1.8,
@@ -529,16 +640,30 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  const Text('🪙', style: TextStyle(fontSize: 11)),
+                                                  const Text(
+                                                    '🪙',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
                                                   const SizedBox(width: 4),
                                                   Text(
                                                     '${widget.viewModel.walletCoins}',
                                                     style: TextStyle(
                                                       fontSize: 12,
-                                                      fontWeight: FontWeight.w900,
-                                                      color: widget.viewModel.walletCoins <= 300
-                                                          ? const Color(0xFFE11D48)
-                                                          : const Color(0xFF1E2022),
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      color:
+                                                          widget
+                                                                  .viewModel
+                                                                  .walletCoins <=
+                                                              300
+                                                          ? const Color(
+                                                              0xFFE11D48,
+                                                            )
+                                                          : const Color(
+                                                              0xFF1E2022,
+                                                            ),
                                                     ),
                                                   ),
                                                 ],
@@ -546,7 +671,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             ),
                                           ],
                                         ),
-                                        if (widget.viewModel.walletCoins <= 300) ...[
+                                        if (widget.viewModel.walletCoins <=
+                                            300) ...[
                                           const SizedBox(height: 8),
                                           Container(
                                             padding: const EdgeInsets.symmetric(
@@ -555,7 +681,8 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             ),
                                             decoration: BoxDecoration(
                                               color: const Color(0xFFFFF1F2),
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                               border: Border.all(
                                                 color: const Color(0xFFE11D48),
                                                 width: 1.5,
@@ -579,27 +706,35 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
 
                                   // Control Buttons: Mute, End Call, Speaker / Earpiece
                                   Padding(
-                                    padding: const EdgeInsets.only(bottom: 24.0),
+                                    padding: const EdgeInsets.only(
+                                      bottom: 24.0,
+                                    ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                       children: [
                                         // Mute Button
                                         Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             GestureDetector(
-                                              onTap: widget.viewModel.toggleMute,
+                                              onTap:
+                                                  widget.viewModel.toggleMute,
                                               child: Container(
                                                 width: 58,
                                                 height: 58,
                                                 decoration: BoxDecoration(
-                                                  color: widget.viewModel.isMuted
+                                                  color:
+                                                      widget.viewModel.isMuted
                                                       ? const Color(0xFFFFD1DC)
                                                       : Colors.white,
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                    color: const Color(0xFF1E2022),
+                                                    color: const Color(
+                                                      0xFF1E2022,
+                                                    ),
                                                     width: 2.5,
                                                   ),
                                                   boxShadow: const [
@@ -615,14 +750,18 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                   widget.viewModel.isMuted
                                                       ? Icons.mic_off_rounded
                                                       : Icons.mic_rounded,
-                                                  color: const Color(0xFF1E2022),
+                                                  color: const Color(
+                                                    0xFF1E2022,
+                                                  ),
                                                   size: 26,
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(height: 6),
                                             Text(
-                                              widget.viewModel.isMuted ? 'Muted' : 'Mute',
+                                              widget.viewModel.isMuted
+                                                  ? 'Muted'
+                                                  : 'Mute',
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700,
@@ -639,16 +778,22 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                             GestureDetector(
                                               onTap: () {
                                                 widget.viewModel.endCall();
-                                                Navigator.of(context).maybePop();
+                                                Navigator.of(
+                                                  context,
+                                                ).maybePop();
                                               },
                                               child: Container(
                                                 width: 72,
                                                 height: 72,
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFFFF5252), // Red Accent
+                                                  color: const Color(
+                                                    0xFFFF5252,
+                                                  ), // Red Accent
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                    color: const Color(0xFF1E2022),
+                                                    color: const Color(
+                                                      0xFF1E2022,
+                                                    ),
                                                     width: 3.2,
                                                   ),
                                                   boxShadow: const [
@@ -684,17 +829,24 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             GestureDetector(
-                                              onTap: widget.viewModel.toggleSpeaker,
+                                              onTap: widget
+                                                  .viewModel
+                                                  .toggleSpeaker,
                                               child: Container(
                                                 width: 58,
                                                 height: 58,
                                                 decoration: BoxDecoration(
-                                                  color: widget.viewModel.isSpeakerOn
+                                                  color:
+                                                      widget
+                                                          .viewModel
+                                                          .isSpeakerOn
                                                       ? const Color(0xFFD4F19C)
                                                       : Colors.white,
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                    color: const Color(0xFF1E2022),
+                                                    color: const Color(
+                                                      0xFF1E2022,
+                                                    ),
                                                     width: 2.5,
                                                   ),
                                                   boxShadow: const [
@@ -710,14 +862,18 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                   widget.viewModel.isSpeakerOn
                                                       ? Icons.volume_up_rounded
                                                       : Icons.hearing_rounded,
-                                                  color: const Color(0xFF1E2022),
+                                                  color: const Color(
+                                                    0xFF1E2022,
+                                                  ),
                                                   size: 26,
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(height: 6),
                                             Text(
-                                              widget.viewModel.isSpeakerOn ? 'Speaker' : 'Earpiece',
+                                              widget.viewModel.isSpeakerOn
+                                                  ? 'Speaker'
+                                                  : 'Earpiece',
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700,

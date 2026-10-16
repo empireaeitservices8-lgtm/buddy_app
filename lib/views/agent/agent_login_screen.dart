@@ -58,7 +58,11 @@ class _AgentLoginScreenState extends State<AgentLoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: BuddyAppBar(
-        title: AppStrings.appName,
+        titleWidget: Image.asset(
+          'assets/images/gaby_banner.png',
+          height: 26,
+          fit: BoxFit.contain,
+        ),
         onBack: () => Navigator.of(context).maybePop(),
       ),
       body: Stack(
@@ -118,7 +122,19 @@ class _AgentLoginScreenState extends State<AgentLoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
+
+                    // Top Brand Banner Logo
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Image.asset(
+                          'assets/images/gaby_banner.png',
+                          height: 48,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
 
                     // Pill Badge: AGENT PORTAL
                     Container(

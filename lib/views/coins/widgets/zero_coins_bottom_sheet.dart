@@ -212,7 +212,7 @@ class _ZeroCoinsBottomSheetState extends State<ZeroCoinsBottomSheet>
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
                                   color: AppColors.textBlack,
-                                  fontFamily: 'Inter',
+                                  fontFamily: 'Nunito',
                                 ),
                               ),
                             ),
@@ -397,10 +397,7 @@ class _ZeroCoinsBottomSheetState extends State<ZeroCoinsBottomSheet>
             decoration: BoxDecoration(
               color: bundle.cardColor,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.strokeBlack,
-                width: 2.5,
-              ),
+              border: Border.all(color: AppColors.strokeBlack, width: 2.5),
               boxShadow: const [
                 BoxShadow(
                   color: AppColors.strokeBlack,
@@ -470,9 +467,7 @@ class _ZeroCoinsBottomSheetState extends State<ZeroCoinsBottomSheet>
                       color: AppColors.strokeBlack,
                       width: 2.2,
                     ),
-                    boxShadow: AppTheme.neoShadow(
-                      offset: const Offset(2, 2),
-                    ),
+                    boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
                   ),
                   child: Text(
                     '₹ ${bundle.priceRupees}',
@@ -500,10 +495,7 @@ class _ZeroCoinsBottomSheetState extends State<ZeroCoinsBottomSheet>
                 decoration: BoxDecoration(
                   color: const Color(0xFF7047EB), // Purple badge
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AppColors.strokeBlack,
-                    width: 1.8,
-                  ),
+                  border: Border.all(color: AppColors.strokeBlack, width: 1.8),
                   boxShadow: const [
                     BoxShadow(
                       color: AppColors.strokeBlack,

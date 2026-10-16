@@ -4,9 +4,10 @@ import 'app_colors.dart';
 class AppTypography {
   AppTypography._();
 
-  static const String fontFamily = 'Roboto'; // System fallback default
+  static const String fontFamily = 'Nunito'; // System fallback default
 
   static const TextStyle brandLogo = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 42,
     fontWeight: FontWeight.w900,
     letterSpacing: -1.0,
@@ -15,6 +16,7 @@ class AppTypography {
   );
 
   static const TextStyle headlineLarge = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 32,
     fontWeight: FontWeight.w900,
     letterSpacing: -0.8,
@@ -23,6 +25,7 @@ class AppTypography {
   );
 
   static const TextStyle headlineMedium = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 26,
     fontWeight: FontWeight.w800,
     letterSpacing: -0.5,
@@ -31,6 +34,7 @@ class AppTypography {
   );
 
   static const TextStyle titleLarge = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: FontWeight.w800,
     letterSpacing: -0.2,
@@ -38,12 +42,14 @@ class AppTypography {
   );
 
   static const TextStyle titleMedium = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 17,
     fontWeight: FontWeight.w700,
     color: AppColors.textBlack,
   );
 
   static const TextStyle bodyLarge = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w500,
     color: AppColors.textMuted,
@@ -51,6 +57,7 @@ class AppTypography {
   );
 
   static const TextStyle bodyMedium = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.textBlack,
@@ -58,6 +65,7 @@ class AppTypography {
   );
 
   static const TextStyle bodySmall = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w500,
     color: AppColors.textBlack,
@@ -65,6 +73,7 @@ class AppTypography {
   );
 
   static const TextStyle labelUppercase = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w900,
     letterSpacing: 0.8,
@@ -72,6 +81,7 @@ class AppTypography {
   );
 
   static const TextStyle badgeText = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 11,
     fontWeight: FontWeight.w900,
     letterSpacing: 0.6,
@@ -79,6 +89,7 @@ class AppTypography {
   );
 
   static const TextStyle buttonText = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: FontWeight.w700,
     color: AppColors.buttonTextLight,
@@ -86,6 +97,7 @@ class AppTypography {
   );
 
   static const TextStyle linkText = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w700,
     color: AppColors.textBlack,

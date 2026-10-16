@@ -26,6 +26,7 @@ class HandledSession {
   final double earnedAmount;
   final double inrEarned;
   final double totalInr;
+  final double agentInr;
   final String timeAgo;
   final String? callerGender;
   final String? callerAvatar;
@@ -39,17 +40,20 @@ class HandledSession {
     this.earnedAmount = 0.0,
     this.inrEarned = 0.0,
     this.totalInr = 0.0,
+    this.agentInr = 0.0,
     required this.timeAgo,
     this.callerGender,
     this.callerAvatar,
   });
 
   String get formattedEarnedAmount {
-    final effective = inrEarned > 0
-        ? inrEarned
-        : (totalInr > 0
-            ? totalInr
-            : (earnedAmount > 0 ? earnedAmount : coinsEarned.toDouble()));
+    final effective = agentInr > 0
+        ? agentInr
+        : (inrEarned > 0
+            ? inrEarned
+            : (totalInr > 0
+                ? totalInr
+                : (earnedAmount > 0 ? earnedAmount : coinsEarned.toDouble())));
     return effective % 1 == 0
         ? '₹${effective.toInt()}'
         : '₹${effective.toStringAsFixed(2)}';
@@ -93,6 +97,7 @@ class EarningsLedgerEntry {
   final double amount;
   final double inrEarned;
   final double totalInr;
+  final double agentInr;
   final bool isBonus;
 
   const EarningsLedgerEntry({
@@ -103,15 +108,18 @@ class EarningsLedgerEntry {
     this.amount = 0.0,
     this.inrEarned = 0.0,
     this.totalInr = 0.0,
+    this.agentInr = 0.0,
     this.isBonus = false,
   });
 
   String get formattedAmount {
-    final effective = inrEarned > 0
-        ? inrEarned
-        : (totalInr > 0
-            ? totalInr
-            : (amount > 0 ? amount : coins.toDouble()));
+    final effective = agentInr > 0
+        ? agentInr
+        : (inrEarned > 0
+            ? inrEarned
+            : (totalInr > 0
+                ? totalInr
+                : (amount > 0 ? amount : coins.toDouble())));
     return effective % 1 == 0
         ? '₹${effective.toInt()}'
         : '₹${effective.toStringAsFixed(2)}';
@@ -652,10 +660,10 @@ class AgentDashboardViewModel extends BaseViewModel {
   void _startIncomingCallVerification(IncomingCallData callData) {
     _incomingCallPollTimer?.cancel();
     int elapsedMs = 0;
-    _incomingCallPollTimer = Timer.periodic(const Duration(milliseconds: 1500), (
+    _incomingCallPollTimer = Timer.periodic(const Duration(milliseconds: 1000), (
       timer,
     ) async {
-      elapsedMs += 1500;
+      elapsedMs += 1000;
       if (!_hasIncomingCall ||
           _incomingCallData == null ||
           _incomingCallData?.callId != callData.callId) {
@@ -677,6 +685,80 @@ class AgentDashboardViewModel extends BaseViewModel {
             ? Options(headers: {'Authorization': 'Bearer $_authToken'})
             : null;
 
+        // 1. Check direct call status if callId is valid
+        if (callData.callId > 0) {
+          try {
+            final statusRes = await _apiService.get(
+              ApiConstants.updateCallStatus(callData.callId),
+              options: options,
+              requiresAuth: true,
+            );
+            if (statusRes.isSuccess && statusRes.rawData != null) {
+              final raw = statusRes.rawData is Map ? statusRes.rawData as Map : {};
+              final st = (raw['status'] ?? raw['call_status'] ?? (raw['data'] is Map ? (raw['data'] as Map)['status'] : null))?.toString().toUpperCase() ?? '';
+              if (st == 'REJECTED' ||
+                  st == 'REJECT' ||
+                  st == 'CANCELLED' ||
+                  st == 'CANCEL' ||
+                  st == 'COMPLETED' ||
+                  st == 'ENDED' ||
+                  st == 'MISSED' ||
+                  st == 'FAILED' ||
+                  st == 'DECLINED') {
+                debugPrint('📞 [AgentDashboard] Direct status for #${callData.callId} is $st. Dismissing.');
+                timer.cancel();
+                _incomingCallPollTimer = null;
+                dismissIncomingCall(reason: 'Caller cancelled or rejected call ($st)');
+                return;
+              }
+            }
+          } catch (_) {}
+        }
+
+        // 2. Check calls/history/
+        try {
+          final historyRes = await _apiService.get(
+            ApiConstants.callLogs,
+            options: options,
+            requiresAuth: true,
+          );
+          if (historyRes.isSuccess && historyRes.rawData != null) {
+            final dynamic rawList = historyRes.rawData is List
+                ? historyRes.rawData as List
+                : (historyRes.rawData is Map && (historyRes.rawData as Map)['data'] is List
+                    ? (historyRes.rawData as Map)['data'] as List
+                    : (historyRes.rawData is Map && (historyRes.rawData as Map)['results'] is List
+                        ? (historyRes.rawData as Map)['results'] as List
+                        : null));
+            if (rawList is List && rawList.isNotEmpty) {
+              for (final item in rawList) {
+                if (item is Map) {
+                  final logId = int.tryParse(item['id']?.toString() ?? item['call_id']?.toString() ?? '');
+                  final logStatus = item['status']?.toString().toUpperCase() ?? '';
+                  if (logId == callData.callId || (callData.callId <= 0 && rawList.indexOf(item) == 0)) {
+                    if (logStatus == 'REJECTED' ||
+                        logStatus == 'REJECT' ||
+                        logStatus == 'CANCELLED' ||
+                        logStatus == 'CANCEL' ||
+                        logStatus == 'COMPLETED' ||
+                        logStatus == 'ENDED' ||
+                        logStatus == 'MISSED' ||
+                        logStatus == 'FAILED' ||
+                        logStatus == 'DECLINED') {
+                      debugPrint('📞 [AgentDashboard] Call #${callData.callId} in history is $logStatus. Dismissing.');
+                      timer.cancel();
+                      _incomingCallPollTimer = null;
+                      dismissIncomingCall(reason: 'Call $logStatus by caller');
+                      return;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (_) {}
+
+        // 3. Check agent/dashboard/
         final response = await _apiService.get(
           ApiConstants.agentDashboard,
           options: options,
@@ -720,7 +802,8 @@ class AgentDashboardViewModel extends BaseViewModel {
                 status == 'reject' ||
                 status == 'completed' ||
                 status == 'ended' ||
-                status == 'missed';
+                status == 'missed' ||
+                status == 'declined';
 
             if (isCancelled ||
                 (activeCallId != null &&
@@ -732,6 +815,33 @@ class AgentDashboardViewModel extends BaseViewModel {
               _incomingCallPollTimer = null;
               dismissIncomingCall(reason: 'Caller cancelled or call ended');
               return;
+            }
+          } else if (elapsedMs >= 2000) {
+            final recent = dataJson['recent_sessions'] ?? dataJson['recentSessions'] ?? dataJson['sessions'];
+            if (recent is List && recent.isNotEmpty) {
+              for (final s in recent) {
+                if (s is Map) {
+                  final sId = int.tryParse(s['id']?.toString() ?? s['call_id']?.toString() ?? '');
+                  final sStatus = s['status']?.toString().toLowerCase() ?? '';
+                  if (sId == callData.callId &&
+                      (sStatus == 'rejected' ||
+                          sStatus == 'reject' ||
+                          sStatus == 'cancelled' ||
+                          sStatus == 'cancel' ||
+                          sStatus == 'completed' ||
+                          sStatus == 'ended' ||
+                          sStatus == 'missed' ||
+                          sStatus == 'declined')) {
+                    debugPrint(
+                      '📞 [AgentDashboard] Call #${callData.callId} ended ($sStatus) in dashboard sessions. Dismissing.',
+                    );
+                    timer.cancel();
+                    _incomingCallPollTimer = null;
+                    dismissIncomingCall(reason: 'Call $sStatus by caller');
+                    return;
+                  }
+                }
+              }
             }
           }
         }
@@ -1196,6 +1306,7 @@ class AgentDashboardViewModel extends BaseViewModel {
                   earnedAmount: s.earnedAmount,
                   inrEarned: s.inrEarned,
                   totalInr: s.totalInr,
+                  agentInr: s.agentInr,
                   timeAgo: s.timeAgo ?? 'Just now',
                   callerGender: s.callerGender,
                   callerAvatar: s.callerAvatar,
@@ -1210,6 +1321,7 @@ class AgentDashboardViewModel extends BaseViewModel {
                   amount: s.earnedAmount,
                   inrEarned: s.inrEarned,
                   totalInr: s.totalInr,
+                  agentInr: s.agentInr,
                   isBonus: false,
                 ),
               );
@@ -1360,6 +1472,7 @@ class AgentDashboardViewModel extends BaseViewModel {
     _hasIncomingCall = false;
     _incomingCallData = null;
     debugPrint('📞 [AgentDashboard] Incoming call dismissed: $reason');
+    IncomingCallManager.instance.dismissIncomingCall(reason: reason);
     notifyListenersSafely();
   }
 
@@ -1376,7 +1489,7 @@ class AgentDashboardViewModel extends BaseViewModel {
     notifyListenersSafely();
 
     if (targetCallId != null && targetCallId > 0) {
-      await _updateCallStatusOnServer(callId: targetCallId, status: 'reject');
+      await _updateCallStatusOnServer(callId: targetCallId, status: 'rejected');
     }
   }
 
@@ -1393,10 +1506,12 @@ class AgentDashboardViewModel extends BaseViewModel {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'reject') {
+      } else if (validStatus == 'declined' ||
+          validStatus == 'reject' ||
+          validStatus == 'rejected' ||
+          validStatus == 'cancelled' ||
+          validStatus == 'canceled') {
         validStatus = 'rejected';
-      } else if (validStatus == 'canceled') {
-        validStatus = 'cancelled';
       } else if (validStatus == 'accept') {
         validStatus = 'accepted';
       }

@@ -299,7 +299,7 @@ class CallViewModel extends BaseViewModel {
       FcmService.cancelCallNotification(callId);
       final finalStatus = wasConnected
           ? 'completed'
-          : (_callModel?.isOutgoing == true ? 'cancelled' : 'reject');
+          : (reason == 'completed' ? 'completed' : 'rejected');
       try {
         await ApiService().post(
           ApiConstants.updateCallStatus(callId),
@@ -309,7 +309,7 @@ class CallViewModel extends BaseViewModel {
           },
           requiresAuth: true,
         );
-        if (finalStatus == 'reject' || finalStatus == 'completed' || finalStatus == 'cancelled') {
+        if (finalStatus == 'rejected' || finalStatus == 'completed') {
           await ApiService().post(
             ApiConstants.endCall,
             data: {'call_id': callId, 'status': finalStatus},

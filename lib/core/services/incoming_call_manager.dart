@@ -189,8 +189,8 @@ class IncomingCallManager extends ChangeNotifier {
     _incomingCallPollTimer?.cancel();
     int elapsedMs = 0;
     _incomingCallPollTimer =
-        Timer.periodic(const Duration(milliseconds: 1500), (timer) async {
-      elapsedMs += 1500;
+        Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
+      elapsedMs += 1000;
       if (!_hasIncomingCall ||
           _incomingCallData == null ||
           _incomingCallData?.callId != callData.callId) {
@@ -213,6 +213,80 @@ class IncomingCallManager extends ChangeNotifier {
             ? Options(headers: {'Authorization': 'Bearer $token'})
             : null;
 
+        // 1. Check direct call status if callId is valid
+        if (callData.callId > 0) {
+          try {
+            final statusRes = await _apiService.get(
+              ApiConstants.updateCallStatus(callData.callId),
+              options: options,
+              requiresAuth: true,
+            );
+            if (statusRes.isSuccess && statusRes.rawData != null) {
+              final raw = statusRes.rawData is Map ? statusRes.rawData as Map : {};
+              final st = (raw['status'] ?? raw['call_status'] ?? (raw['data'] is Map ? (raw['data'] as Map)['status'] : null))?.toString().toUpperCase() ?? '';
+              if (st == 'REJECTED' ||
+                  st == 'REJECT' ||
+                  st == 'CANCELLED' ||
+                  st == 'CANCEL' ||
+                  st == 'COMPLETED' ||
+                  st == 'ENDED' ||
+                  st == 'MISSED' ||
+                  st == 'FAILED' ||
+                  st == 'DECLINED') {
+                debugPrint('📞 [IncomingCallManager] Direct status for #${callData.callId} is $st. Dismissing.');
+                timer.cancel();
+                _incomingCallPollTimer = null;
+                dismissIncomingCall(reason: 'Caller cancelled or rejected call ($st)');
+                return;
+              }
+            }
+          } catch (_) {}
+        }
+
+        // 2. Check calls/history/
+        try {
+          final historyRes = await _apiService.get(
+            ApiConstants.callLogs,
+            options: options,
+            requiresAuth: true,
+          );
+          if (historyRes.isSuccess && historyRes.rawData != null) {
+            final dynamic rawList = historyRes.rawData is List
+                ? historyRes.rawData as List
+                : (historyRes.rawData is Map && (historyRes.rawData as Map)['data'] is List
+                    ? (historyRes.rawData as Map)['data'] as List
+                    : (historyRes.rawData is Map && (historyRes.rawData as Map)['results'] is List
+                        ? (historyRes.rawData as Map)['results'] as List
+                        : null));
+            if (rawList is List && rawList.isNotEmpty) {
+              for (final item in rawList) {
+                if (item is Map) {
+                  final logId = int.tryParse(item['id']?.toString() ?? item['call_id']?.toString() ?? '');
+                  final logStatus = item['status']?.toString().toUpperCase() ?? '';
+                  if (logId == callData.callId || (callData.callId <= 0 && rawList.indexOf(item) == 0)) {
+                    if (logStatus == 'REJECTED' ||
+                        logStatus == 'REJECT' ||
+                        logStatus == 'CANCELLED' ||
+                        logStatus == 'CANCEL' ||
+                        logStatus == 'COMPLETED' ||
+                        logStatus == 'ENDED' ||
+                        logStatus == 'MISSED' ||
+                        logStatus == 'FAILED' ||
+                        logStatus == 'DECLINED') {
+                      debugPrint('📞 [IncomingCallManager] Call #${callData.callId} in history is $logStatus. Dismissing.');
+                      timer.cancel();
+                      _incomingCallPollTimer = null;
+                      dismissIncomingCall(reason: 'Call $logStatus by caller');
+                      return;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (_) {}
+
+        // 3. Check agent/dashboard/
         final response = await _apiService.get(
           ApiConstants.agentDashboard,
           options: options,
@@ -255,7 +329,8 @@ class IncomingCallManager extends ChangeNotifier {
                 status == 'reject' ||
                 status == 'completed' ||
                 status == 'ended' ||
-                status == 'missed';
+                status == 'missed' ||
+                status == 'declined';
 
             if (isCancelled ||
                 (activeCallId != null &&
@@ -267,6 +342,33 @@ class IncomingCallManager extends ChangeNotifier {
               _incomingCallPollTimer = null;
               dismissIncomingCall(reason: 'Caller cancelled or call ended');
               return;
+            }
+          } else if (elapsedMs >= 2000) {
+            final recent = dataJson['recent_sessions'] ?? dataJson['recentSessions'] ?? dataJson['sessions'];
+            if (recent is List && recent.isNotEmpty) {
+              for (final s in recent) {
+                if (s is Map) {
+                  final sId = int.tryParse(s['id']?.toString() ?? s['call_id']?.toString() ?? '');
+                  final sStatus = s['status']?.toString().toLowerCase() ?? '';
+                  if (sId == callData.callId &&
+                      (sStatus == 'rejected' ||
+                          sStatus == 'reject' ||
+                          sStatus == 'cancelled' ||
+                          sStatus == 'cancel' ||
+                          sStatus == 'completed' ||
+                          sStatus == 'ended' ||
+                          sStatus == 'missed' ||
+                          sStatus == 'declined')) {
+                    debugPrint(
+                      '📞 [IncomingCallManager] Call #${callData.callId} ended ($sStatus) in dashboard sessions. Dismissing.',
+                    );
+                    timer.cancel();
+                    _incomingCallPollTimer = null;
+                    dismissIncomingCall(reason: 'Call $sStatus by caller');
+                    return;
+                  }
+                }
+              }
             }
           }
         }
@@ -512,7 +614,7 @@ class IncomingCallManager extends ChangeNotifier {
     notifyListeners();
 
     if (targetCallId != null && targetCallId > 0) {
-      await _updateCallStatusOnServer(callId: targetCallId, status: 'reject');
+      await _updateCallStatusOnServer(callId: targetCallId, status: 'rejected');
     }
   }
 
@@ -547,10 +649,12 @@ class IncomingCallManager extends ChangeNotifier {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'reject') {
+      } else if (validStatus == 'declined' ||
+          validStatus == 'reject' ||
+          validStatus == 'rejected' ||
+          validStatus == 'cancelled' ||
+          validStatus == 'canceled') {
         validStatus = 'rejected';
-      } else if (validStatus == 'canceled') {
-        validStatus = 'cancelled';
       } else if (validStatus == 'accept') {
         validStatus = 'accepted';
       }

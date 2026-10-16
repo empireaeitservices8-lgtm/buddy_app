@@ -111,7 +111,7 @@ class CallViewModel extends ChangeNotifier {
     await _repository.leaveVoiceChannel();
     await _repository.updateCallStatus(
       callId: _session.callId,
-      status: 'reject',
+      status: 'rejected',
     );
     _session = _session.copyWith(status: CallStatus.rejected);
     _notifySafely();
@@ -125,7 +125,7 @@ class CallViewModel extends ChangeNotifier {
 
     final statusToSend = wasConnected
         ? 'completed'
-        : (_session.isIncoming ? 'reject' : 'cancelled');
+        : 'rejected';
 
     await _repository.updateCallStatus(
       callId: _session.callId,

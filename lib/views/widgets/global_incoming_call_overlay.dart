@@ -140,7 +140,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF0A2E65), // Navy Accent
-                                fontFamily: 'Inter',
+                                fontFamily: 'Nunito',
                               ),
                             ),
                             TextSpan(
@@ -149,7 +149,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF00A79D), // Teal Accent
-                                fontFamily: 'Inter',
+                                fontFamily: 'Nunito',
                               ),
                             ),
                           ],
@@ -203,8 +203,9 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                               width: _pulseAnimation.value,
                               height: _pulseAnimation.value,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8EBFD)
-                                    .withValues(alpha: 0.45),
+                                color: const Color(
+                                  0xFFE8EBFD,
+                                ).withValues(alpha: 0.45),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -213,8 +214,9 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                               width: 155,
                               height: 155,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8EBFD)
-                                    .withValues(alpha: 0.7),
+                                color: const Color(
+                                  0xFFE8EBFD,
+                                ).withValues(alpha: 0.7),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -223,9 +225,13 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                               width: 135,
                               height: 135,
                               decoration: BoxDecoration(
-                                color: _callManager.incomingCallData?.isFemale == true
+                                color:
+                                    _callManager.incomingCallData?.isFemale ==
+                                        true
                                     ? const Color(0xFFFFF0F5)
-                                    : const Color(0xFFE8EBFD), // Soft Lavender/Pink Fill
+                                    : const Color(
+                                        0xFFE8EBFD,
+                                      ), // Soft Lavender/Pink Fill
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: const Color(0xFF1E2022),
@@ -436,7 +442,9 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                                 width: 76,
                                 height: 76,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF4ADE80), // Vibrant Green
+                                  color: const Color(
+                                    0xFF4ADE80,
+                                  ), // Vibrant Green
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: const Color(0xFF1E2022),
@@ -459,8 +467,8 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                                           strokeWidth: 3.0,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                            Colors.white,
-                                          ),
+                                                Colors.white,
+                                              ),
                                         ),
                                       )
                                     : const Icon(

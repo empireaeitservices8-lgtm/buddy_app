@@ -5,7 +5,7 @@ import 'cartoon_colors.dart';
 class CartoonTextTheme {
   CartoonTextTheme._();
 
-  static const String fontFamily = 'Roboto';
+  static const String fontFamily = 'Nunito';
 
   static const TextStyle logo = TextStyle(
     fontFamily: fontFamily,

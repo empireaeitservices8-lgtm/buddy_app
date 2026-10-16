@@ -165,10 +165,12 @@ class CallApiRepository implements ICallRepository {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'reject') {
+      } else if (validStatus == 'declined' ||
+          validStatus == 'reject' ||
+          validStatus == 'rejected' ||
+          validStatus == 'cancelled' ||
+          validStatus == 'canceled') {
         validStatus = 'rejected';
-      } else if (validStatus == 'canceled') {
-        validStatus = 'cancelled';
       } else if (validStatus == 'accept') {
         validStatus = 'accepted';
       }

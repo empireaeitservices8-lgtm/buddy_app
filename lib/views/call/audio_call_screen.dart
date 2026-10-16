@@ -90,8 +90,10 @@ class _AudioCallScreenState extends State<AudioCallScreen>
         final statusBadgeText = call.status == CallStatus.connected
             ? 'ON CALL'
             : (call.status == CallStatus.calling
-                ? 'CALLING...'
-                : (call.status == CallStatus.ringing ? 'RINGING...' : 'ON CALL'));
+                  ? 'CALLING...'
+                  : (call.status == CallStatus.ringing
+                        ? 'RINGING...'
+                        : 'ON CALL'));
 
         return Scaffold(
           backgroundColor: const Color(0xFFF9F8F3), // Soft Cream Canvas
@@ -129,9 +131,15 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                 // Main Content Layer
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final avatarSize = (constraints.maxHeight * 0.17).clamp(80.0, 135.0);
+                    final avatarSize = (constraints.maxHeight * 0.17).clamp(
+                      80.0,
+                      135.0,
+                    );
                     final ringSize = avatarSize * 1.15;
-                    final pulseSize = _pulseAnimation.value.clamp(avatarSize * 1.15, avatarSize * 1.37);
+                    final pulseSize = _pulseAnimation.value.clamp(
+                      avatarSize * 1.15,
+                      avatarSize * 1.37,
+                    );
 
                     return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -141,7 +149,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                         ),
                         child: IntrinsicHeight(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0,
+                            ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -150,7 +160,8 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                     const SizedBox(height: 16),
                                     // Header Bar: Gabby Talk Logo + Status Badge
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         RichText(
                                           text: const TextSpan(
@@ -160,8 +171,10 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                 style: TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFF0A2E65), // Pink Accent
-                                                  fontFamily: 'Inter',
+                                                  color: Color(
+                                                    0xFF0A2E65,
+                                                  ), // Pink Accent
+                                                  fontFamily: 'Nunito',
                                                 ),
                                               ),
                                               TextSpan(
@@ -169,8 +182,10 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                 style: TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFF00A79D), // Teal Accent
-                                                  fontFamily: 'Inter',
+                                                  color: Color(
+                                                    0xFF00A79D,
+                                                  ), // Teal Accent
+                                                  fontFamily: 'Nunito',
                                                 ),
                                               ),
                                             ],
@@ -184,7 +199,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
-                                            borderRadius: BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             border: Border.all(
                                               color: const Color(0xFF1E2022),
                                               width: 2,
@@ -220,8 +237,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                             width: pulseSize,
                                             height: pulseSize,
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFE8EBFD)
-                                                  .withValues(alpha: 0.45),
+                                              color: const Color(
+                                                0xFFE8EBFD,
+                                              ).withValues(alpha: 0.45),
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -230,8 +248,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                             width: ringSize,
                                             height: ringSize,
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFE8EBFD)
-                                                  .withValues(alpha: 0.65),
+                                              color: const Color(
+                                                0xFFE8EBFD,
+                                              ).withValues(alpha: 0.65),
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -240,7 +259,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                             width: avatarSize,
                                             height: avatarSize,
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFE8EBFD), // Soft Lavender Fill
+                                              color: const Color(
+                                                0xFFE8EBFD,
+                                              ), // Soft Lavender Fill
                                               shape: BoxShape.circle,
                                               border: Border.all(
                                                 color: const Color(0xFF1E2022),
@@ -258,48 +279,74 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                             child: ClipOval(
                                               child: Builder(
                                                 builder: (context) {
-                                                  final targetAvatar = call.isOutgoing
+                                                  final targetAvatar =
+                                                      call.isOutgoing
                                                       ? call.receiverAvatar
                                                       : call.callerAvatar;
                                                   if (targetAvatar != null &&
-                                                      targetAvatar.startsWith('assets/')) {
+                                                      targetAvatar.startsWith(
+                                                        'assets/',
+                                                      )) {
                                                     return Image.asset(
                                                       targetAvatar,
                                                       width: avatarSize,
                                                       height: avatarSize,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder: (_, __, ___) => Text(
-                                                        initialLetter,
-                                                        style: TextStyle(
-                                                          fontSize: avatarSize * 0.4,
-                                                          fontWeight: FontWeight.w900,
-                                                          color: const Color(0xFF1E2022),
-                                                        ),
-                                                      ),
+                                                      errorBuilder:
+                                                          (_, __, ___) => Text(
+                                                            initialLetter,
+                                                            style: TextStyle(
+                                                              fontSize:
+                                                                  avatarSize *
+                                                                  0.4,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w900,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1E2022,
+                                                                  ),
+                                                            ),
+                                                          ),
                                                     );
-                                                  } else if (targetAvatar != null &&
-                                                      targetAvatar.startsWith('http')) {
+                                                  } else if (targetAvatar !=
+                                                          null &&
+                                                      targetAvatar.startsWith(
+                                                        'http',
+                                                      )) {
                                                     return Image.network(
                                                       targetAvatar,
                                                       width: avatarSize,
                                                       height: avatarSize,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder: (_, __, ___) => Text(
-                                                        initialLetter,
-                                                        style: TextStyle(
-                                                          fontSize: avatarSize * 0.4,
-                                                          fontWeight: FontWeight.w900,
-                                                          color: const Color(0xFF1E2022),
-                                                        ),
-                                                      ),
+                                                      errorBuilder:
+                                                          (_, __, ___) => Text(
+                                                            initialLetter,
+                                                            style: TextStyle(
+                                                              fontSize:
+                                                                  avatarSize *
+                                                                  0.4,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w900,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1E2022,
+                                                                  ),
+                                                            ),
+                                                          ),
                                                     );
                                                   }
                                                   return Text(
                                                     initialLetter,
                                                     style: TextStyle(
-                                                      fontSize: avatarSize * 0.4,
-                                                      fontWeight: FontWeight.w900,
-                                                      color: const Color(0xFF1E2022),
+                                                      fontSize:
+                                                          avatarSize * 0.4,
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      color: const Color(
+                                                        0xFF1E2022,
+                                                      ),
                                                     ),
                                                   );
                                                 },
@@ -318,7 +365,8 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                 Column(
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Flexible(
                                           child: Text(
@@ -346,7 +394,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                           ),
                                           decoration: BoxDecoration(
                                             color: Colors.transparent,
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                             border: Border.all(
                                               color: const Color(0xFF1E2022),
                                               width: 1.8,
@@ -386,7 +436,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFFF3C4), // Light Yellow
+                                        color: const Color(
+                                          0xFFFFF3C4,
+                                        ), // Light Yellow
                                         borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
                                           color: const Color(0xFF1E2022),
@@ -421,7 +473,8 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                       ),
                                     ),
 
-                                    if (call.status == CallStatus.connected) ...[
+                                    if (call.status ==
+                                        CallStatus.connected) ...[
                                       const SizedBox(height: 12),
                                       Text(
                                         vm.formattedDuration,
@@ -442,7 +495,8 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 32.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       // Mute Button
@@ -460,7 +514,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                     : Colors.white,
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
-                                                  color: const Color(0xFF1E2022),
+                                                  color: const Color(
+                                                    0xFF1E2022,
+                                                  ),
                                                   width: 2.5,
                                                 ),
                                                 boxShadow: const [
@@ -500,7 +556,10 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                           GestureDetector(
                                             onTap: () async {
                                               await vm.endCall();
-                                              if (mounted && Navigator.of(context).canPop()) {
+                                              if (mounted &&
+                                                  Navigator.of(
+                                                    context,
+                                                  ).canPop()) {
                                                 Navigator.of(context).pop();
                                               }
                                             },
@@ -508,10 +567,14 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                               width: 72,
                                               height: 72,
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFFFF5252), // Red Accent
+                                                color: const Color(
+                                                  0xFFFF5252,
+                                                ), // Red Accent
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
-                                                  color: const Color(0xFF1E2022),
+                                                  color: const Color(
+                                                    0xFF1E2022,
+                                                  ),
                                                   width: 3.2,
                                                 ),
                                                 boxShadow: const [
@@ -557,7 +620,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                     : Colors.white,
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
-                                                  color: const Color(0xFF1E2022),
+                                                  color: const Color(
+                                                    0xFF1E2022,
+                                                  ),
                                                   width: 2.5,
                                                 ),
                                                 boxShadow: const [
@@ -580,7 +645,9 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
-                                            vm.isSpeakerOn ? 'Speaker' : 'Earpiece',
+                                            vm.isSpeakerOn
+                                                ? 'Speaker'
+                                                : 'Earpiece',
                                             style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w700,

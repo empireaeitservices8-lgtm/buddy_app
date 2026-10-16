@@ -164,7 +164,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         //       fontSize: 32,
         //       fontWeight: FontWeight.w900,
         //       letterSpacing: -0.5,
-        //       fontFamily: 'Roboto',
+        //       fontFamily: 'Nunito',
         //     ),
         //     children: [
         //       TextSpan(

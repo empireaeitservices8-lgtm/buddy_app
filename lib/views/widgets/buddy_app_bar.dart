@@ -3,7 +3,8 @@ import '../../core/theme/cartoon_theme.dart';
 
 /// Reusable Cartoon App Bar
 class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
+  final String? title;
+  final Widget? titleWidget;
   final VoidCallback? onBack;
   final bool showSparkle;
   final bool showBack;
@@ -11,7 +12,8 @@ class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const BuddyAppBar({
     super.key,
-    required this.title,
+    this.title,
+    this.titleWidget,
     this.onBack,
     this.showSparkle = true,
     this.showBack = true,
@@ -55,16 +57,19 @@ class BuddyAppBar extends StatelessWidget implements PreferredSizeWidget {
               )
             else
               const SizedBox(width: 40),
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: CartoonTextTheme.fontFamily,
-                fontWeight: FontWeight.w900,
-                fontSize: 20,
-                color: CartoonColors.ink,
-                letterSpacing: -0.3,
+            if (titleWidget != null)
+              titleWidget!
+            else
+              Text(
+                title ?? '',
+                style: const TextStyle(
+                  fontFamily: CartoonTextTheme.fontFamily,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
+                  color: CartoonColors.ink,
+                  letterSpacing: -0.3,
+                ),
               ),
-            ),
             if (trailing != null)
               trailing!
             else if (showSparkle)

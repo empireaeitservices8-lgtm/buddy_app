@@ -30,7 +30,6 @@ class HomeDashboardScreen extends StatefulWidget {
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   late final HomeViewModel _viewModel;
   final TextEditingController _searchController = TextEditingController();
-  bool _hasCheckedZeroCoinsOnEntry = false;
 
   @override
   void initState() {
@@ -40,25 +39,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       authRepository: AuthApiRepository(),
     );
     _viewModel.addListener(_handleStateChange);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkZeroCoinsOnEntry();
-    });
-  }
-
-  Future<void> _checkZeroCoinsOnEntry() async {
-    // Wait briefly for initial balance fetch/hydration
-    await Future.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-    if (_viewModel.walletCoins <= 0 && !_hasCheckedZeroCoinsOnEntry) {
-      _hasCheckedZeroCoinsOnEntry = true;
-      await ZeroCoinsBottomSheet.show(
-        context,
-        _viewModel,
-        title: 'Wallet Empty! 🪙',
-        message:
-            'Your coin balance is 0. Add or purchase coins to start calling buddies!',
-      );
-    }
   }
 
   @override
@@ -69,9 +49,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   }
 
   void _handleStateChange() {
-    if (_viewModel.walletCoins > 0) {
-      _hasCheckedZeroCoinsOnEntry = false;
-    }
     if (_viewModel.errorMessage != null &&
         _viewModel.errorMessage!.isNotEmpty) {
       showNeoToast(context, _viewModel.errorMessage!, isError: true);

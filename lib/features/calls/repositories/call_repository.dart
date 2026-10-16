@@ -68,12 +68,18 @@ class CallFeatureRepository {
       String validStatus = status.toLowerCase().trim();
       if (validStatus == 'ended' || validStatus == 'finished') {
         validStatus = 'completed';
-      } else if (validStatus == 'declined' || validStatus == 'rejected') {
-        validStatus = 'reject';
+      } else if (validStatus == 'declined' ||
+          validStatus == 'reject' ||
+          validStatus == 'rejected' ||
+          validStatus == 'cancelled' ||
+          validStatus == 'canceled') {
+        validStatus = 'rejected';
+      } else if (validStatus == 'accept') {
+        validStatus = 'accepted';
       }
       final res = await _apiService.post(
         ApiConstants.updateCallStatus(callId),
-        data: {'status': validStatus},
+        data: {'status': validStatus, 'call_id': callId},
         requiresAuth: true,
       );
       return res.isSuccess;

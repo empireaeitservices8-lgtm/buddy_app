@@ -1370,7 +1370,7 @@ class HomeViewModel extends BaseViewModel {
       _lastEndedCallId = targetCallId;
       final finalStatus = wasConnected
           ? 'completed'
-          : (status == 'rejected' ? 'rejected' : 'cancelled');
+          : (status == 'completed' ? 'completed' : 'rejected');
       try {
         await _callRepository.updateCallStatus(
           callId: targetCallId,

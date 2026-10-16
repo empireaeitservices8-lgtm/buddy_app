@@ -240,28 +240,14 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
         children: [
           // Brand Logo: GabyTalk [AGENT]
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                    fontFamily: 'Roboto',
-                  ),
-                  children: [
-                    TextSpan(
-                      text: 'Gaby',
-                      style: TextStyle(color: CartoonColors.primary),
-                    ),
-                    TextSpan(
-                      text: 'Talk',
-                      style: TextStyle(color: Color(0xFF00A79D)),
-                    ),
-                  ],
-                ),
+              Image.asset(
+                'assets/images/gaby_banner.png',
+                height: 28,
+                fit: BoxFit.contain,
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               CartoonBadge.agent(),
             ],
           ),

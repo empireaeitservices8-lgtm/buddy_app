@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../models/call_session_model.dart';
 import '../viewmodels/call_viewmodel.dart';
 
@@ -157,7 +157,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF0A2E65), // Pink Accent
-                                fontFamily: 'Inter',
+                                fontFamily: 'Nunito',
                               ),
                             ),
                             TextSpan(
@@ -166,7 +166,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF00A79D), // Teal Accent
-                                fontFamily: 'Inter',
+                                fontFamily: 'Nunito',
                               ),
                             ),
                           ],
@@ -221,8 +221,9 @@ class _IncomingCallViewState extends State<IncomingCallView>
                               width: _pulseAnimation.value,
                               height: _pulseAnimation.value,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8EBFD)
-                                    .withValues(alpha: 0.45),
+                                color: const Color(
+                                  0xFFE8EBFD,
+                                ).withValues(alpha: 0.45),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -231,8 +232,9 @@ class _IncomingCallViewState extends State<IncomingCallView>
                               width: 155,
                               height: 155,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8EBFD)
-                                    .withValues(alpha: 0.65),
+                                color: const Color(
+                                  0xFFE8EBFD,
+                                ).withValues(alpha: 0.65),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -241,7 +243,9 @@ class _IncomingCallViewState extends State<IncomingCallView>
                               width: 135,
                               height: 135,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8EBFD), // Soft Lavender Fill
+                                color: const Color(
+                                  0xFFE8EBFD,
+                                ), // Soft Lavender Fill
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: const Color(0xFF1E2022),
@@ -256,7 +260,8 @@ class _IncomingCallViewState extends State<IncomingCallView>
                                 ],
                               ),
                               child: Center(
-                                child: widget.avatarUrl != null &&
+                                child:
+                                    widget.avatarUrl != null &&
                                         widget.avatarUrl!.isNotEmpty
                                     ? ClipOval(
                                         child: Image.network(
@@ -410,7 +415,9 @@ class _IncomingCallViewState extends State<IncomingCallView>
                                 width: 76,
                                 height: 76,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF4ADE80), // Vibrant Green
+                                  color: const Color(
+                                    0xFF4ADE80,
+                                  ), // Vibrant Green
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: const Color(0xFF1E2022),
