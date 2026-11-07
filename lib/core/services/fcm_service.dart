@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -17,21 +16,20 @@ import 'agora_service.dart';
 final FlutterLocalNotificationsPlugin _localNotifications =
     FlutterLocalNotificationsPlugin();
 
-const AndroidNotificationChannel
-_incomingCallsChannel = AndroidNotificationChannel(
-  'incoming_calls_channel_v2',
-  'Incoming Audio Calls',
-  description:
-      'High priority notifications for incoming audio calls with ringtone',
-  importance: Importance.max,
-  playSound: true,
-  enableVibration: true,
-  showBadge: true,
-  audioAttributesUsage: AudioAttributesUsage.notificationRingtone,
-);
+const AndroidNotificationChannel _incomingCallsChannel =
+    AndroidNotificationChannel(
+      'incoming_calls_channel_v2',
+      'Incoming Audio Calls',
+      description:
+          'High priority notifications for incoming audio calls with ringtone',
+      importance: Importance.max,
+      playSound: true,
+      enableVibration: true,
+      showBadge: true,
+      audioAttributesUsage: AudioAttributesUsage.notificationRingtone,
+    );
 
-const AndroidNotificationChannel
-_messagesChannel = AndroidNotificationChannel(
+const AndroidNotificationChannel _messagesChannel = AndroidNotificationChannel(
   'messages_channel_v2',
   'Messages & Updates',
   description:
@@ -49,7 +47,9 @@ bool isCallCancellationPayload(
   String? title,
   String? body,
 }) {
-  if (data.isEmpty && (title == null || title.isEmpty) && (body == null || body.isEmpty)) {
+  if (data.isEmpty &&
+      (title == null || title.isEmpty) &&
+      (body == null || body.isEmpty)) {
     return false;
   }
   final type = data['type']?.toString().toLowerCase() ?? '';
@@ -162,9 +162,11 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     } catch (_) {}
 
     try {
-      final callId = int.tryParse(
-        data['call_id']?.toString() ?? data['id']?.toString() ?? '',
-      ) ?? 0;
+      final callId =
+          int.tryParse(
+            data['call_id']?.toString() ?? data['id']?.toString() ?? '',
+          ) ??
+          0;
       if (callId > 0) {
         await _localNotifications.cancel(callId);
       } else {
@@ -231,7 +233,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
             data['user_name']?.toString() ??
             '';
 
-        final callerName = (rawCaller.isNotEmpty &&
+        final callerName =
+            (rawCaller.isNotEmpty &&
                 !rawCaller.toLowerCase().contains('call') &&
                 !rawCaller.toLowerCase().contains('reject') &&
                 !rawCaller.toLowerCase().contains('notification'))
@@ -242,7 +245,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
             int.tryParse(
               data['call_id']?.toString() ?? data['id']?.toString() ?? '',
             ) ??
-            (message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch) % 100000;
+            (message.messageId?.hashCode ??
+                    DateTime.now().millisecondsSinceEpoch) %
+                100000;
 
         const androidDetails = AndroidNotificationDetails(
           'incoming_calls_channel_v2',
@@ -273,10 +278,13 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         debugPrint(
           '🔔 [FCM Background] Displayed Heads-Up Notification for $callerName (Call ID: $callId)',
         );
-      } else if ((title.isNotEmpty || body.isNotEmpty) && message.notification == null) {
+      } else if ((title.isNotEmpty || body.isNotEmpty) &&
+          message.notification == null) {
         // Only show local notification if Firebase SDK didn't already display a notification payload
         final notifId =
-            (message.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch) % 100000;
+            (message.messageId?.hashCode ??
+                DateTime.now().millisecondsSinceEpoch) %
+            100000;
 
         const standardDetails = AndroidNotificationDetails(
           'messages_channel_v2',
@@ -526,7 +534,8 @@ class FcmService {
           final callId =
               int.tryParse(
                 data['call_id']?.toString() ?? data['id']?.toString() ?? '',
-              ) ?? 0;
+              ) ??
+              0;
           await AgoraService().stopRingtone();
           await cancelCallNotification(callId);
         }
@@ -629,10 +638,13 @@ class FcmService {
       final callId =
           int.tryParse(
             data['call_id']?.toString() ?? data['id']?.toString() ?? '',
-          ) ?? 0;
+          ) ??
+          0;
 
       if (isCancelled) {
-        debugPrint('🛑 [FcmService] Call cancelled or ended in foreground: $data');
+        debugPrint(
+          '🛑 [FcmService] Call cancelled or ended in foreground: $data',
+        );
         await AgoraService().stopRingtone();
         if (callId > 0) {
           await cancelCallNotification(callId);
@@ -682,7 +694,9 @@ class FcmService {
           final displayBody = data['body']?.toString() ?? fallbackBody ?? '';
           final notifKey = 'notif_${displayTitle}_$displayBody';
           if (_isDuplicateNotification(notifKey)) {
-            debugPrint('⏭️ [FcmService] Suppressed duplicate standard notification: $displayTitle');
+            debugPrint(
+              '⏭️ [FcmService] Suppressed duplicate standard notification: $displayTitle',
+            );
             return;
           }
           final notifId = DateTime.now().millisecondsSinceEpoch % 100000;
@@ -720,7 +734,9 @@ class FcmService {
         final displayBody = data['body']?.toString() ?? fallbackBody ?? '';
         final notifKey = 'notif_${displayTitle}_$displayBody';
         if (_isDuplicateNotification(notifKey)) {
-          debugPrint('⏭️ [FcmService] Suppressed duplicate standard notification: $displayTitle');
+          debugPrint(
+            '⏭️ [FcmService] Suppressed duplicate standard notification: $displayTitle',
+          );
           return;
         }
         final notifId = DateTime.now().millisecondsSinceEpoch % 100000;
@@ -760,19 +776,23 @@ class FcmService {
           data['user_name']?.toString() ??
           '';
 
-      final callerName = (rawCaller.isNotEmpty &&
+      final callerName =
+          (rawCaller.isNotEmpty &&
               !rawCaller.toLowerCase().contains('call') &&
               !rawCaller.toLowerCase().contains('reject') &&
               !rawCaller.toLowerCase().contains('notification'))
           ? rawCaller
           : 'Caller';
 
-      final effectiveCallId =
-          callId > 0 ? callId : (DateTime.now().millisecondsSinceEpoch % 100000);
+      final effectiveCallId = callId > 0
+          ? callId
+          : (DateTime.now().millisecondsSinceEpoch % 100000);
 
       final callKey = 'call_${effectiveCallId}_$callerName';
       if (_isDuplicateNotification(callKey)) {
-        debugPrint('⏭️ [FcmService] Suppressed duplicate call notification: $callKey');
+        debugPrint(
+          '⏭️ [FcmService] Suppressed duplicate call notification: $callKey',
+        );
         return;
       }
 
@@ -830,7 +850,9 @@ class FcmService {
     try {
       final fcmToken = token ?? await getFcmToken();
       if (fcmToken == null || fcmToken.isEmpty) {
-        debugPrint('⚠️ [FcmService] FCM token is empty, skipping backend sync.');
+        debugPrint(
+          '⚠️ [FcmService] FCM token is empty, skipping backend sync.',
+        );
         return false;
       }
 
@@ -860,10 +882,7 @@ class FcmService {
         ),
       );
 
-      final response = await dio.post(
-        fullUrl,
-        data: {'fcm_token': fcmToken},
-      );
+      final response = await dio.post(fullUrl, data: {'fcm_token': fcmToken});
 
       debugPrint(
         '📥 [FcmService] Backend FCM token sync response [${response.statusCode}]: ${response.data}',

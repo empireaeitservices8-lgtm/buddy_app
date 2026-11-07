@@ -1,7 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
-import 'package:buddy_app/data/models/user_profile.dart';
 import 'package:buddy_app/views/widgets/toast_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1066,275 +1065,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     );
   }
 
-  String _getCategoryImagePath(String id, String title) {
-    final key = '${id.toLowerCase()} ${title.toLowerCase()}';
-    if (key.contains('just_talk') ||
-        key.contains('just talk') ||
-        key.contains('conversation')) {
-      return 'assets/images/categories/just_talk.png';
-    } else if (key.contains('friendly') || key.contains('friendship')) {
-      return 'assets/images/categories/friendly_conversation.png';
-    } else if (key.contains('advice') || key.contains('perspective')) {
-      return 'assets/images/categories/advice.png';
-    } else if (key.contains('career') ||
-        key.contains('motivation') ||
-        key.contains('mentor') ||
-        key.contains('work')) {
-      return 'assets/images/categories/career.png';
-    } else if (key.contains('travel') ||
-        key.contains('guidance') ||
-        key.contains('place')) {
-      return 'assets/images/categories/travel.png';
-    } else if (key.contains('elder') ||
-        key.contains('companionship') ||
-        key.contains('retired')) {
-      return 'assets/images/categories/elder_companion.png';
-    } else if (key.contains('student') ||
-        key.contains('study') ||
-        key.contains('college') ||
-        key.contains('academics')) {
-      return 'assets/images/categories/student_companion.jpg';
-    } else if (key.contains('language') ||
-        key.contains('listening') ||
-        key.contains('english') ||
-        key.contains('hindi')) {
-      return 'assets/images/categories/language.png';
-    } else {
-      return 'assets/images/categories/casual.png';
-    }
-  }
-
   // TAB 1: All Matches Feed
-  Widget _buildMatchesTab() {
-    final matches = _viewModel.filteredMatches;
-
-    return RefreshIndicator(
-      onRefresh: () async {
-        await _viewModel.fetchCategories(force: true);
-      },
-      color: AppColors.strokeBlack,
-      backgroundColor: AppColors.cardWhite,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(
-          parent: BouncingScrollPhysics(),
-        ),
-        padding: const EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 4,
-          bottom: 120,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ALL MATCHES / FAVORITES Header Banner
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: _viewModel.showFavoritesOnly
-                    ? const Color(0xFFFFD6E5) // Soft pink for favorites
-                    : AppColors.accentLavender,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.strokeBlack, width: 2.2),
-                boxShadow: AppTheme.neoShadow(offset: const Offset(3, 3)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.strokeBlack,
-                        width: 1.8,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _viewModel.showFavoritesOnly
-                          ? '❤️'
-                          : (_viewModel.selectedIntent != null
-                                ? _viewModel.selectedIntent!.emoji
-                                : '✨'),
-                      style: const TextStyle(fontSize: 22),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                _viewModel.showFavoritesOnly
-                                    ? 'MY FAVORITES'
-                                    : (_viewModel.selectedIntent != null
-                                          ? _viewModel.selectedIntent!.title
-                                                .toUpperCase()
-                                          : (_viewModel.selectedCategoryTitle !=
-                                                    null
-                                                ? _viewModel
-                                                      .selectedCategoryTitle!
-                                                      .toUpperCase()
-                                                : 'ALL MATCHES')),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.textBlack,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFF2B2), // Pale yellow
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: AppColors.strokeBlack,
-                                  width: 1.4,
-                                ),
-                              ),
-                              child: Text(
-                                '${matches.length} ${matches.length == 1 ? "match" : "matches"}',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _viewModel.showFavoritesOnly
-                              ? 'Showing all your saved favorites (${matches.length})'
-                              : (_viewModel.selectedIntent != null
-                                    ? 'Intent: ${_viewModel.selectedIntent!.title} (${_viewModel.selectedCategoryTitle}) • Tap to clear'
-                                    : (_viewModel.selectedCategoryTitle != null
-                                          ? 'Filtered by ${_viewModel.selectedCategoryTitle!} • Tap to clear'
-                                          : 'Exploring all verified matches (${matches.length})')),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textBlack.withValues(alpha: 0.75),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (_viewModel.selectedCategory != null &&
-                      !_viewModel.showFavoritesOnly)
-                    IconButton(
-                      icon: const Icon(
-                        Icons.close_rounded,
-                        size: 20,
-                        color: AppColors.strokeBlack,
-                      ),
-                      onPressed: _viewModel.clearCategoryFilter,
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Quick Filter: All Matches vs Favorites
-            Row(
-              children: [
-                _buildFilterPill(
-                  label: 'All Matches',
-                  count: _viewModel.showFavoritesOnly
-                      ? _viewModel.allMatchesCount
-                      : matches.length,
-                  isSelected: !_viewModel.showFavoritesOnly,
-                  icon: Icons.people_rounded,
-                  onTap: () {
-                    if (_viewModel.showFavoritesOnly) {
-                      _viewModel.toggleShowFavoritesOnly();
-                    }
-                  },
-                ),
-                const SizedBox(width: 12),
-                _buildFilterPill(
-                  label: 'Favorites',
-                  count: _viewModel.favoritesCount,
-                  isSelected: _viewModel.showFavoritesOnly,
-                  icon: Icons.favorite_rounded,
-                  iconColor: const Color(0xFFFF4D6D),
-                  onTap: () {
-                    if (!_viewModel.showFavoritesOnly) {
-                      _viewModel.toggleShowFavoritesOnly();
-                    }
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Matches Feed Cards
-            if (matches.isEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.strokeBlack, width: 2.0),
-                  boxShadow: AppTheme.neoShadow(offset: const Offset(3, 3)),
-                ),
-                child: Column(
-                  children: [
-                    const Text('💔', style: TextStyle(fontSize: 40)),
-                    const SizedBox(height: 12),
-                    Text(
-                      _viewModel.showFavoritesOnly
-                          ? 'No favorites added yet'
-                          : 'No matches found',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textBlack,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _viewModel.showFavoritesOnly
-                          ? 'Tap the heart icon on any match card to save your favorites!'
-                          : 'Try searching for a different profession or keyword.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textBlack.withOpacity(0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: matches.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 14),
-                itemBuilder: (context, index) {
-                  return _buildMatchCard(matches[index]);
-                },
-              ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildFilterPill({
     required String label,
@@ -2220,24 +1951,24 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     //           : profile.fullName)
     //     : 'Tester, 29';
 
-    final langStr = (profile?.language != null && profile!.language!.isNotEmpty)
+    final langStr = (profile.language != null && profile.language!.isNotEmpty)
         ? (profile.language!.length > 1
               ? (profile.language![0].toUpperCase() +
                     profile.language!.substring(1))
               : profile.language!.toUpperCase())
         : 'English';
     final genderStr =
-        (profile?.gender != null && profile!.gender!.displayName.isNotEmpty)
+        (profile.gender != null && profile.gender!.displayName.isNotEmpty)
         ? profile.gender!.displayName
         : 'Man';
     final subtitleText = '$langStr • $genderStr';
 
-    final bioText = (profile?.bio != null && profile!.bio!.isNotEmpty)
+    final bioText = (profile.bio != null && profile.bio!.isNotEmpty)
         ? profile.bio!
         : 'Connecting with friendly companions through real-time voice calls 🎧✨';
 
-    final voiceCallsCount = profile?.voiceCallsCount ?? 0;
-    final ratingVal = (profile?.rating ?? 0.0).toStringAsFixed(1);
+    final voiceCallsCount = profile.voiceCallsCount;
+    final ratingVal = profile.rating.toStringAsFixed(1);
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -2308,7 +2039,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             ],
                           ),
                           child: ClipOval(
-                            child: _buildAvatarImage(profile?.avatarUrl),
+                            child: _buildAvatarImage(profile.avatarUrl),
                           ),
                         ),
                         Positioned(
@@ -2547,53 +2278,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     );
   }
 
-  String _formatInterestTag(String tag) {
-    final lower = tag.toLowerCase().trim();
-    if (lower.contains('philosophy')) return '🏛️ Philosophy & Life';
-    if (lower.contains('business') || lower.contains('startup')) {
-      return '💼 Business & Startups';
-    }
-    if (lower.contains('art') || lower.contains('design')) {
-      return '🎨 Art & Design';
-    }
-    if (lower.contains('fitness') || lower.contains('gym')) {
-      return '💪 Fitness & Gym';
-    }
-    if (lower.contains('tech') ||
-        lower.contains('coding') ||
-        lower.contains('software')) {
-      return '💻 Tech & Coding';
-    }
-    if (lower.contains('food') || lower.contains('cook')) {
-      return '🍳 Food & Cooking';
-    }
-    if (lower.contains('music') || lower.contains('sing')) {
-      return '🎵 Music & Songs';
-    }
-    if (lower.contains('movie') || lower.contains('cinema')) {
-      return '🎬 Movies & Cinema';
-    }
-    if (lower.contains('travel')) return '✈️ Travel & Explore';
-    if (lower.contains('gaming') || lower.contains('game')) return '🎮 Gaming';
-    if (lower.contains('book') || lower.contains('read')) {
-      return '📚 Books & Reading';
-    }
-    if (lower.contains('photo')) return '📸 Photography';
-    if (lower.contains('sports') ||
-        lower.contains('cricket') ||
-        lower.contains('football')) {
-      return '⚽ Sports';
-    }
-
-    // Default capitalize
-    return tag
-        .split(' ')
-        .map(
-          (w) => w.isNotEmpty ? '${w[0].toUpperCase()}${w.substring(1)}' : '',
-        )
-        .join(' ');
-  }
-
   Widget _buildAvatarImage(String? avatarUrl) {
     if (avatarUrl == null || avatarUrl.trim().isEmpty) {
       return const Icon(Icons.person, size: 52, color: AppColors.strokeBlack);
@@ -2796,25 +2480,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               size: 24,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInterestPill(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.strokeBlack, width: 1.5),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-          color: AppColors.textBlack,
         ),
       ),
     );

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_theme.dart';
 import '../../viewmodels/home_view_model.dart';
 import '../widgets/neo_background.dart';
 import '../widgets/toast_utils.dart';
@@ -703,7 +702,8 @@ class _CoinsStoreScreenState extends State<CoinsStoreScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
                                   textBaseline: TextBaseline.alphabetic,
                                   children: [
                                     Text(

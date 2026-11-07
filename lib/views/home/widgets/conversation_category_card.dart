@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../data/models/caller_intent_model.dart';
 
 /// Renders the 3D illustrated conversation category card with rich visual assets
@@ -38,7 +36,7 @@ class ConversationCategoryCard extends StatelessWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: bannerColor.withOpacity(0.40),
+                    color: bannerColor.withValues(alpha: 0.40),
                     offset: const Offset(0, 4),
                     blurRadius: 10,
                     spreadRadius: 1.0,
@@ -46,7 +44,7 @@ class ConversationCategoryCard extends StatelessWidget {
                 ]
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     offset: const Offset(0, 2),
                     blurRadius: 6,
                   ),
@@ -70,7 +68,7 @@ class ConversationCategoryCard extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback elegant card if image is not loaded
                       return Container(
-                        color: bannerColor.withOpacity(0.1),
+                        color: bannerColor.withValues(alpha: 0.1),
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -113,7 +111,7 @@ class ConversationCategoryCard extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 2.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
+                            color: Colors.black.withValues(alpha: 0.25),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),

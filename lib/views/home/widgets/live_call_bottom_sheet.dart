@@ -298,11 +298,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                         height: smallSize,
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
-                                                            (
-                                                              _,
-                                                              __,
-                                                              ___,
-                                                            ) => Text(
+                                                            (_, _, _) => Text(
                                                               userInitial,
                                                               style: TextStyle(
                                                                 fontSize:
@@ -431,11 +427,7 @@ class _LiveCallBottomSheetState extends State<LiveCallBottomSheet>
                                                         height: avatarSize,
                                                         fit: BoxFit.cover,
                                                         errorBuilder:
-                                                            (
-                                                              _,
-                                                              __,
-                                                              ___,
-                                                            ) => Text(
+                                                            (_, _, _) => Text(
                                                               initialLetter,
                                                               style: TextStyle(
                                                                 fontSize:

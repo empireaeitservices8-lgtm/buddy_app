@@ -122,7 +122,9 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
           'call_id': widget.callId,
       };
 
-      debugPrint('⭐ [AgentRatingBottomSheet] Submitting rating payload with user_id=$parsedUserId: $payload');
+      debugPrint(
+        '⭐ [AgentRatingBottomSheet] Submitting rating payload with user_id=$parsedUserId: $payload',
+      );
 
       // 1. Submit to agent/rating/ (main rating endpoint with user_id)
       final res = await ApiService().post(
@@ -135,8 +137,8 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
       final targetId = widget.agentId.isNotEmpty
           ? widget.agentId
           : (widget.callId != null && widget.callId! > 0
-              ? widget.callId.toString()
-              : '');
+                ? widget.callId.toString()
+                : '');
 
       if (!res.isSuccess && targetId.isNotEmpty) {
         await ApiService().post(
@@ -205,11 +207,17 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF7CE),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.strokeBlack, width: 1.8),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.8,
+                    ),
                     boxShadow: AppTheme.neoShadow(offset: const Offset(2, 2)),
                   ),
                   child: const Row(
@@ -237,8 +245,13 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                     decoration: BoxDecoration(
                       color: AppColors.cardWhite,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.strokeBlack, width: 1.8),
-                      boxShadow: AppTheme.neoShadow(offset: const Offset(1.8, 1.8)),
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 1.8,
+                      ),
+                      boxShadow: AppTheme.neoShadow(
+                        offset: const Offset(1.8, 1.8),
+                      ),
                     ),
                     child: const Icon(
                       Icons.close_rounded,
@@ -270,17 +283,25 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                     decoration: BoxDecoration(
                       color: const Color(0xFFD4DCFF),
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.strokeBlack, width: 2.0),
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 2.0,
+                      ),
                     ),
                     alignment: Alignment.center,
-                    child: widget.agentAvatar != null && widget.agentAvatar!.startsWith('http')
+                    child:
+                        widget.agentAvatar != null &&
+                            widget.agentAvatar!.startsWith('http')
                         ? ClipOval(
                             child: Image.network(
                               widget.agentAvatar!,
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Text('🎧', style: TextStyle(fontSize: 28)),
+                              errorBuilder: (_, _, _) => const Text(
+                                '🎧',
+                                style: TextStyle(fontSize: 28),
+                              ),
                             ),
                           )
                         : const Text('🎧', style: TextStyle(fontSize: 28)),
@@ -304,11 +325,17 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFD8F3DC),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppColors.strokeBlack, width: 1.2),
+                                border: Border.all(
+                                  color: AppColors.strokeBlack,
+                                  width: 1.2,
+                                ),
                               ),
                               child: Text(
                                 widget.category?.isNotEmpty == true
@@ -373,9 +400,13 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                       scale: isSelected ? 1.15 : 0.95,
                       duration: const Duration(milliseconds: 180),
                       child: Icon(
-                        isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
+                        isSelected
+                            ? Icons.star_rounded
+                            : Icons.star_outline_rounded,
                         size: 42,
-                        color: isSelected ? const Color(0xFFFFB703) : const Color(0xFFCCCCCC),
+                        color: isSelected
+                            ? const Color(0xFFFFB703)
+                            : const Color(0xFFCCCCCC),
                       ),
                     ),
                   ),
@@ -437,9 +468,14 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFFFD6E5) : AppColors.cardWhite,
+                      color: isSelected
+                          ? const Color(0xFFFFD6E5)
+                          : AppColors.cardWhite,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: AppColors.strokeBlack,
@@ -453,7 +489,9 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                       _tagDisplayMap[tag] ?? tag,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                        fontWeight: isSelected
+                            ? FontWeight.w900
+                            : FontWeight.w700,
                         color: AppColors.textBlack,
                       ),
                     ),
@@ -522,7 +560,9 @@ class _AgentRatingBottomSheetState extends State<AgentRatingBottomSheet> {
                         height: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Row(

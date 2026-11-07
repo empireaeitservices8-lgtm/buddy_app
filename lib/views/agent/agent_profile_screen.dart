@@ -9,10 +9,7 @@ import '../../viewmodels/agent_dashboard_view_model.dart';
 class AgentProfileScreen extends StatefulWidget {
   final AgentDashboardViewModel viewModel;
 
-  const AgentProfileScreen({
-    super.key,
-    required this.viewModel,
-  });
+  const AgentProfileScreen({super.key, required this.viewModel});
 
   @override
   State<AgentProfileScreen> createState() => _AgentProfileScreenState();
@@ -78,7 +75,10 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -200,7 +200,9 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                     padding: EdgeInsets.all(12.0),
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.strokeBlack),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.strokeBlack,
+                      ),
                     ),
                   )
                 : const Icon(
@@ -243,7 +245,10 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFFCE8),
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.strokeBlack, width: 2),
+                      border: Border.all(
+                        color: AppColors.strokeBlack,
+                        width: 2,
+                      ),
                     ),
                     child: ClipOval(
                       child: hasValidPic
@@ -275,7 +280,10 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                             ? const Color(0xFF22C55E)
                             : AppColors.errorRed,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.cardWhite, width: 2),
+                        border: Border.all(
+                          color: AppColors.cardWhite,
+                          width: 2,
+                        ),
                       ),
                     ),
                   ),
@@ -339,18 +347,24 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
 
                     // Profession
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.strokeBlack.withOpacity(0.3), width: 1),
+                        border: Border.all(
+                          color: AppColors.strokeBlack.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
                       ),
                       child: Text(
                         _viewModel.profession,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textBlack.withOpacity(0.85),
+                          color: AppColors.textBlack.withValues(alpha: 0.85),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -362,19 +376,22 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFEF3C7),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.strokeBlack, width: 1.2),
+                            border: Border.all(
+                              color: AppColors.strokeBlack,
+                              width: 1.2,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                '🪙 ',
-                                style: TextStyle(fontSize: 10),
-                              ),
+                              const Text('🪙 ', style: TextStyle(fontSize: 10)),
                               Text(
                                 '${_viewModel.selectedRate} coins/sec',
                                 style: const TextStyle(
@@ -393,7 +410,9 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textSecondary.withOpacity(0.8),
+                              color: AppColors.textSecondary.withValues(
+                                alpha: 0.8,
+                              ),
                             ),
                           ),
                       ],
@@ -413,7 +432,10 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.strokeBlack.withOpacity(0.2), width: 1.2),
+                border: Border.all(
+                  color: AppColors.strokeBlack.withValues(alpha: 0.2),
+                  width: 1.2,
+                ),
               ),
               child: Text(
                 '"${_viewModel.bio}"',
@@ -436,11 +458,17 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
               runSpacing: 6,
               children: _viewModel.interests.map((interest) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.accentLavenderLight,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.strokeBlack, width: 1.2),
+                    border: Border.all(
+                      color: AppColors.strokeBlack,
+                      width: 1.2,
+                    ),
                   ),
                   child: Text(
                     '#$interest',
@@ -463,7 +491,8 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
   Widget _buildRatingHeroCard() {
     final ratingData = _viewModel.ratingData;
     final avgRating = ratingData?.averageRating ?? _viewModel.rating;
-    final totalReviews = ratingData?.totalReviews ?? (ratingData?.recentReviews.length ?? 0);
+    final totalReviews =
+        ratingData?.totalReviews ?? (ratingData?.recentReviews.length ?? 0);
 
     return Container(
       width: double.infinity,
@@ -527,7 +556,10 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
               // Left Column: Big Average Rating Score
               Container(
                 width: 105,
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.cardWhite,
                   borderRadius: BorderRadius.circular(18),
@@ -552,12 +584,15 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                       children: List.generate(5, (index) {
                         final starThreshold = index + 1;
                         final isFull = avgRating >= starThreshold;
-                        final isHalf = !isFull && avgRating >= (starThreshold - 0.5);
+                        final isHalf =
+                            !isFull && avgRating >= (starThreshold - 0.5);
 
                         return Icon(
                           isFull
                               ? Icons.star_rounded
-                              : (isHalf ? Icons.star_half_rounded : Icons.star_outline_rounded),
+                              : (isHalf
+                                    ? Icons.star_half_rounded
+                                    : Icons.star_outline_rounded),
                           size: 16,
                           color: const Color(0xFFFFB800),
                         );
@@ -569,7 +604,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textSecondary.withOpacity(0.8),
+                        color: AppColors.textSecondary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -581,8 +616,12 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
               Expanded(
                 child: Column(
                   children: [5, 4, 3, 2, 1].map((star) {
-                    final percentage = ratingData?.percentageForStar(star) ?? (star == 5 ? 1.0 : 0.0);
-                    final count = ratingData?.ratingBreakdown[star] ?? (star == 5 && totalReviews > 0 ? totalReviews : 0);
+                    final percentage =
+                        ratingData?.percentageForStar(star) ??
+                        (star == 5 ? 1.0 : 0.0);
+                    final count =
+                        ratingData?.ratingBreakdown[star] ??
+                        (star == 5 && totalReviews > 0 ? totalReviews : 0);
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2.5),
@@ -604,7 +643,9 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                                 color: AppColors.cardWhite,
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color: AppColors.strokeBlack.withOpacity(0.4),
+                                  color: AppColors.strokeBlack.withValues(
+                                    alpha: 0.4,
+                                  ),
                                   width: 1,
                                 ),
                               ),
@@ -723,7 +764,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
               fontSize: 9,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.3,
-              color: AppColors.textSecondary.withOpacity(0.9),
+              color: AppColors.textSecondary.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -738,11 +779,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
       children: [
         const Row(
           children: [
-            Icon(
-              Icons.forum_rounded,
-              size: 20,
-              color: AppColors.strokeBlack,
-            ),
+            Icon(Icons.forum_rounded, size: 20, color: AppColors.strokeBlack),
             SizedBox(width: 8),
             Text(
               'CALLER FEEDBACK',
@@ -812,7 +849,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary.withOpacity(0.85),
+                color: AppColors.textSecondary.withValues(alpha: 0.85),
                 height: 1.35,
               ),
             ),
@@ -887,7 +924,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textSecondary.withOpacity(0.8),
+                        color: AppColors.textSecondary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -935,7 +972,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                 color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.strokeBlack.withOpacity(0.15),
+                  color: AppColors.strokeBlack.withValues(alpha: 0.15),
                   width: 1,
                 ),
               ),
@@ -963,7 +1000,7 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textSecondary.withOpacity(0.65),
+                    color: AppColors.textSecondary.withValues(alpha: 0.65),
                   ),
                 ),
               ],

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import 'sparkle_widget.dart';
 
 /// Signature neo-brutalist organic pastel background matching the reference mockups:
 /// - Warm cream base canvas (#FBF8EE)

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:buddy_app/core/network/api_response.dart';
-import 'package:dio/dio.dart';
 import 'package:buddy_app/core/network/token_manager.dart';
 
 import '../../core/constants/api_constants.dart';
@@ -295,8 +294,8 @@ class AuthApiRepository implements IAuthRepository {
           if (userJson != null) {
             final parsedProfile = UserProfile.fromJson(userJson);
             _currentUser = parsedProfile.copyWith(
-              phoneNumber: (parsedProfile.phoneNumber != null &&
-                      parsedProfile.phoneNumber!.isNotEmpty)
+              // ignore: unnecessary_null_comparison
+              phoneNumber: (parsedProfile.phoneNumber.isNotEmpty)
                   ? parsedProfile.phoneNumber
                   : (cleanDigits.isNotEmpty ? cleanDigits : phoneNumber),
             );
@@ -305,8 +304,9 @@ class AuthApiRepository implements IAuthRepository {
               if (!toSave.containsKey('phone_number') ||
                   toSave['phone_number'] == null ||
                   toSave['phone_number'].toString().isEmpty) {
-                toSave['phone_number'] =
-                    cleanDigits.isNotEmpty ? cleanDigits : phoneNumber;
+                toSave['phone_number'] = cleanDigits.isNotEmpty
+                    ? cleanDigits
+                    : phoneNumber;
               }
               await _apiService.tokenManager.saveUserData(jsonEncode(toSave));
               await _apiService.tokenManager.saveUserRole(role.name);
@@ -321,9 +321,11 @@ class AuthApiRepository implements IAuthRepository {
             try {
               await _apiService.tokenManager.saveUserData(
                 jsonEncode({
-                  if (rawUserId != null) 'id': rawUserId,
-                  if (rawUserId != null) 'user_id': rawUserId,
-                  'phone_number': cleanDigits.isNotEmpty ? cleanDigits : phoneNumber,
+                  'id': ?rawUserId,
+                  'user_id': ?rawUserId,
+                  'phone_number': cleanDigits.isNotEmpty
+                      ? cleanDigits
+                      : phoneNumber,
                 }),
               );
               await _apiService.tokenManager.saveUserRole(role.name);
@@ -448,11 +450,12 @@ class AuthApiRepository implements IAuthRepository {
         parsedUserId = int.tryParse(resolvedUserId.toString());
       }
 
-      String? resolvedPhone = phoneNumber ??
-          _currentUser?.phoneNumber ??
-          currentUser?.phoneNumber;
+      String? resolvedPhone =
+          phoneNumber ?? _currentUser?.phoneNumber ?? currentUser?.phoneNumber;
 
-      if (parsedUserId == null || resolvedPhone == null || resolvedPhone.isEmpty) {
+      if (parsedUserId == null ||
+          resolvedPhone == null ||
+          resolvedPhone.isEmpty) {
         final storedUserData = await _apiService.tokenManager.getUserData();
         if (storedUserData != null && storedUserData.isNotEmpty) {
           try {
@@ -466,7 +469,8 @@ class AuthApiRepository implements IAuthRepository {
               parsedUserId = int.tryParse(rawId.toString());
             }
             if (resolvedPhone == null || resolvedPhone.isEmpty) {
-              final rawPhone = map['phone_number'] ??
+              final rawPhone =
+                  map['phone_number'] ??
                   map['phone'] ??
                   map['mobile'] ??
                   map['user']?['phone_number'] ??
@@ -479,7 +483,9 @@ class AuthApiRepository implements IAuthRepository {
         }
       }
 
-      if (parsedUserId == null || resolvedPhone == null || resolvedPhone.isEmpty) {
+      if (parsedUserId == null ||
+          resolvedPhone == null ||
+          resolvedPhone.isEmpty) {
         try {
           final parts = stored!.split('.');
           if (parts.length == 3) {

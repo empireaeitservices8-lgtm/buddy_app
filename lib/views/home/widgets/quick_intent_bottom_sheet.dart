@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../data/models/caller_intent_model.dart';
 import '../../../viewmodels/home_view_model.dart';
 
 /// Interactive Neo-brutalist Modal Sheet: "What do you need right now?"
 class QuickIntentBottomSheet extends StatefulWidget {
   final HomeViewModel viewModel;
 
-  const QuickIntentBottomSheet({
-    super.key,
-    required this.viewModel,
-  });
+  const QuickIntentBottomSheet({super.key, required this.viewModel});
 
   static Future<void> show(BuildContext context, HomeViewModel viewModel) {
     return showModalBottomSheet(
@@ -92,7 +88,10 @@ class _QuickIntentBottomSheetState extends State<QuickIntentBottomSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.accentPink,
                   borderRadius: BorderRadius.circular(14),
@@ -115,7 +114,10 @@ class _QuickIntentBottomSheetState extends State<QuickIntentBottomSheet> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close_rounded, color: AppColors.strokeBlack),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  color: AppColors.strokeBlack,
+                ),
                 onPressed: () => Navigator.of(context).pop(),
                 splashRadius: 20,
               ),
@@ -174,7 +176,9 @@ class _QuickIntentBottomSheetState extends State<QuickIntentBottomSheet> {
                           ),
                           boxShadow: isSelected
                               ? AppTheme.neoShadow(offset: const Offset(3, 3))
-                              : AppTheme.neoShadow(offset: const Offset(1.5, 1.5)),
+                              : AppTheme.neoShadow(
+                                  offset: const Offset(1.5, 1.5),
+                                ),
                         ),
                         child: Row(
                           children: [
@@ -223,7 +227,9 @@ class _QuickIntentBottomSheetState extends State<QuickIntentBottomSheet> {
                                       fontWeight: FontWeight.w600,
                                       fontStyle: FontStyle.italic,
                                       fontSize: 11.5,
-                                      color: AppColors.textSecondary.withValues(alpha: 0.85),
+                                      color: AppColors.textSecondary.withValues(
+                                        alpha: 0.85,
+                                      ),
                                     ),
                                   ),
                                 ],

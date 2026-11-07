@@ -292,8 +292,8 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                       width: avatarSize,
                                                       height: avatarSize,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder:
-                                                          (_, __, ___) => Text(
+                                                      errorBuilder: (_, _, _) =>
+                                                          Text(
                                                             initialLetter,
                                                             style: TextStyle(
                                                               fontSize:
@@ -319,8 +319,8 @@ class _AudioCallScreenState extends State<AudioCallScreen>
                                                       width: avatarSize,
                                                       height: avatarSize,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder:
-                                                          (_, __, ___) => Text(
+                                                      errorBuilder: (_, _, _) =>
+                                                          Text(
                                                             initialLetter,
                                                             style: TextStyle(
                                                               fontSize:

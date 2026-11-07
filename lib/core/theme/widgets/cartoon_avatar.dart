@@ -58,15 +58,10 @@ class CartoonAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: borderColor,
-          width: borderWidth,
-        ),
+        border: Border.all(color: borderColor, width: borderWidth),
         boxShadow: CartoonDimensions.shadow(offset: shadowOffset),
       ),
-      child: ClipOval(
-        child: _buildContent(),
-      ),
+      child: ClipOval(child: _buildContent()),
     );
 
     if (status != CartoonAvatarStatus.none) {
@@ -107,13 +102,15 @@ class CartoonAvatar extends StatelessWidget {
   }
 
   Widget _buildContent() {
-    if (imageUrl != null && imageUrl!.trim().isNotEmpty && imageUrl!.startsWith('http')) {
+    if (imageUrl != null &&
+        imageUrl!.trim().isNotEmpty &&
+        imageUrl!.startsWith('http')) {
       return Image.network(
         imageUrl!,
         width: size,
         height: size,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildFallback(),
+        errorBuilder: (_, _, _) => _buildFallback(),
       );
     }
     return _buildFallback();
@@ -122,7 +119,9 @@ class CartoonAvatar extends StatelessWidget {
   Widget _buildFallback() {
     if (initials != null && initials!.trim().isNotEmpty) {
       final cleanInitials = initials!.trim();
-      final letter = cleanInitials.isNotEmpty ? cleanInitials[0].toUpperCase() : 'G';
+      final letter = cleanInitials.isNotEmpty
+          ? cleanInitials[0].toUpperCase()
+          : 'G';
       return Center(
         child: Text(
           letter,

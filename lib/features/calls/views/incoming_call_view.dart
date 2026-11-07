@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/call_session_model.dart';
 import '../viewmodels/call_viewmodel.dart';
 
@@ -269,7 +269,7 @@ class _IncomingCallViewState extends State<IncomingCallView>
                                           width: 128,
                                           height: 128,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
+                                          errorBuilder: (_, _, _) =>
                                               _buildAvatarInitial(),
                                         ),
                                       )

@@ -1,10 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-enum MascotPose {
-  phoneCall,
-  envelopeThumbsUp,
-}
+enum MascotPose { phoneCall, envelopeThumbsUp }
 
 /// Rich vector-rendered Gabby Mascot matching the exact brand spec:
 /// - Light blue rounded speech-bubble body with tail & rosy cheeks
@@ -110,7 +107,7 @@ class _GabbyMascotPainter extends CustomPainter {
   }
 
   void _drawSurroundingAccents(Canvas canvas) {
-    final strokePaint = Paint()
+    final _ = Paint()
       ..color = const Color(0xFF1E293B)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
@@ -173,7 +170,7 @@ class _GabbyMascotPainter extends CustomPainter {
   void _drawBody(Canvas canvas) {
     // Speech Bubble Main Body with Tail on Bottom-Right
     final bodyPath = Path();
-    
+
     // Rounded circle base centered at (100, 100), radius ~ 62
     final rect = RRect.fromRectAndRadius(
       const Rect.fromLTWH(38, 38, 124, 124),
@@ -202,7 +199,7 @@ class _GabbyMascotPainter extends CustomPainter {
     final shadowPaint = Paint()
       ..color = const Color(0x331E293B)
       ..style = PaintingStyle.fill;
-    
+
     canvas.save();
     canvas.translate(4, 4);
     canvas.drawPath(bodyPath, shadowPaint);
@@ -215,7 +212,7 @@ class _GabbyMascotPainter extends CustomPainter {
 
     // Subtle highlight on top of head
     final highlightPaint = Paint()
-      ..color = Colors.white.withOpacity(0.35)
+      ..color = Colors.white.withValues(alpha: 0.35)
       ..style = PaintingStyle.fill;
     canvas.drawOval(const Rect.fromLTWH(65, 46, 70, 20), highlightPaint);
 
@@ -283,7 +280,7 @@ class _GabbyMascotPainter extends CustomPainter {
 
     // 3. Pink Blushing Cheeks
     final cheekPaint = Paint()
-      ..color = const Color(0xFFFF8FA3).withOpacity(0.7)
+      ..color = const Color(0xFFFF8FA3).withValues(alpha: 0.7)
       ..style = PaintingStyle.fill;
     canvas.drawOval(const Rect.fromLTWH(58, 102, 16, 10), cheekPaint);
     canvas.drawOval(const Rect.fromLTWH(126, 102, 16, 10), cheekPaint);
@@ -469,7 +466,14 @@ class _GabbyMascotPainter extends CustomPainter {
     heartPath.moveTo(x, y + h * 0.3);
     heartPath.cubicTo(x, y, x - h * 0.5, y, x - h * 0.5, y + h * 0.35);
     heartPath.cubicTo(x - h * 0.5, y + h * 0.6, x, y + h * 0.85, x, y + h);
-    heartPath.cubicTo(x, y + h * 0.85, x + h * 0.5, y + h * 0.6, x + h * 0.5, y + h * 0.35);
+    heartPath.cubicTo(
+      x,
+      y + h * 0.85,
+      x + h * 0.5,
+      y + h * 0.6,
+      x + h * 0.5,
+      y + h * 0.35,
+    );
     heartPath.cubicTo(x + h * 0.5, y, x, y, x, y + h * 0.3);
     heartPath.close();
 
@@ -510,7 +514,13 @@ class _GabbyMascotPainter extends CustomPainter {
     canvas.drawPath(path, stroke);
   }
 
-  void _drawSparkle(Canvas canvas, double cx, double cy, double r, Color color) {
+  void _drawSparkle(
+    Canvas canvas,
+    double cx,
+    double cy,
+    double r,
+    Color color,
+  ) {
     final path = Path();
     path.moveTo(cx, cy - r);
     path.quadraticBezierTo(cx, cy, cx + r, cy);

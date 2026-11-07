@@ -99,7 +99,9 @@ class _OtpInputFieldState extends State<OtpInputField> {
     setState(() {});
   }
 
+  // ignore: deprecated_member_use
   void _onKeyEvent(int index, RawKeyEvent event) {
+    // ignore: deprecated_member_use
     if (event is RawKeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.backspace &&
         _controllers[index].text.isEmpty &&
@@ -122,6 +124,7 @@ class _OtpInputFieldState extends State<OtpInputField> {
       children: List.generate(widget.length, (index) {
         final isFocused = _focusNodes[index].hasFocus;
 
+        // ignore: deprecated_member_use
         return RawKeyboardListener(
           focusNode: FocusNode(),
           onKey: (event) => _onKeyEvent(index, event),
@@ -137,11 +140,15 @@ class _OtpInputFieldState extends State<OtpInputField> {
                 color: CartoonColors.white,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: isFocused ? const Color(0xFF00A79D) : CartoonColors.charcoal,
+                  color: isFocused
+                      ? const Color(0xFF00A79D)
+                      : CartoonColors.charcoal,
                   width: isFocused ? 2.5 : CartoonDimensions.borderWidthThin,
                 ),
                 boxShadow: CartoonDimensions.shadowSmall(
-                  offset: isFocused ? const Offset(1.5, 1.5) : const Offset(2.5, 2.5),
+                  offset: isFocused
+                      ? const Offset(1.5, 1.5)
+                      : const Offset(2.5, 2.5),
                 ),
               ),
               alignment: Alignment.center,
@@ -179,4 +186,3 @@ class _OtpInputFieldState extends State<OtpInputField> {
     );
   }
 }
-

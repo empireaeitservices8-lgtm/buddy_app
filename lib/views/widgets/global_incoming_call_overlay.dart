@@ -253,7 +253,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                                   width: 135,
                                   height: 135,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Text(
+                                  errorBuilder: (_, _, _) => Text(
                                     callerInitial,
                                     style: const TextStyle(
                                       fontSize: 54,
@@ -296,9 +296,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                       color: Color(0xFF64748B),
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
                   // Ringing with Cyan Animated Dots
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

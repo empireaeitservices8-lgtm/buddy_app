@@ -173,120 +173,127 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: LayoutBuilder(
                         builder: (context, gridConstraints) {
-                          final ratio = (gridConstraints.maxWidth / (gridConstraints.maxHeight / 2))
-                              .clamp(0.85, 1.15);
+                          final ratio =
+                              (gridConstraints.maxWidth /
+                                      (gridConstraints.maxHeight / 2))
+                                  .clamp(0.85, 1.15);
                           return GridView.builder(
                             physics: const BouncingScrollPhysics(),
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 14,
-                              childAspectRatio: ratio,
-                            ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 14,
+                                  mainAxisSpacing: 14,
+                                  childAspectRatio: ratio,
+                                ),
                             itemCount: _categories.length,
                             itemBuilder: (context, index) {
-                          final item = _categories[index];
-                          final isSelected = _selectedCategoryIndex == index;
+                              final item = _categories[index];
+                              final isSelected =
+                                  _selectedCategoryIndex == index;
 
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedCategoryIndex = index;
-                              });
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedCategoryIndex = index;
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cardWhite,
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(
+                                      color: AppColors.strokeBlack,
+                                      width: isSelected ? 2.6 : 1.8,
+                                    ),
+                                    boxShadow: AppTheme.neoShadow(
+                                      offset: isSelected
+                                          ? const Offset(1.5, 1.5)
+                                          : const Offset(3.5, 3.5),
+                                    ),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // Background Illustration Image
+                                      Positioned.fill(
+                                        bottom: 38,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                top: Radius.circular(20),
+                                              ),
+                                          child: Image.asset(
+                                            item['asset'] as String,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, _, _) => Center(
+                                              child: Text(
+                                                item['emoji'] as String,
+                                                style: const TextStyle(
+                                                  fontSize: 48,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Bottom Pill Tag
+                                      Positioned(
+                                        left: 10,
+                                        right: 10,
+                                        bottom: 10,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: item['pillColor'] as Color,
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.strokeBlack,
+                                              width: 1.4,
+                                            ),
+                                            boxShadow: AppTheme.neoShadow(
+                                              offset: const Offset(1.5, 1.5),
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                item['emoji'] as String,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                item['title'] as String,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
                             },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              decoration: BoxDecoration(
-                                color: AppColors.cardWhite,
-                                borderRadius: BorderRadius.circular(22),
-                                border: Border.all(
-                                  color: AppColors.strokeBlack,
-                                  width: isSelected ? 2.6 : 1.8,
-                                ),
-                                boxShadow: AppTheme.neoShadow(
-                                  offset: isSelected
-                                      ? const Offset(1.5, 1.5)
-                                      : const Offset(3.5, 3.5),
-                                ),
-                              ),
-                              child: Stack(
-                                children: [
-                                  // Background Illustration Image
-                                  Positioned.fill(
-                                    bottom: 38,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(20),
-                                      ),
-                                      child: Image.asset(
-                                        item['asset'] as String,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Center(
-                                          child: Text(
-                                            item['emoji'] as String,
-                                            style: const TextStyle(
-                                              fontSize: 48,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  // Bottom Pill Tag
-                                  Positioned(
-                                    left: 10,
-                                    right: 10,
-                                    bottom: 10,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: item['pillColor'] as Color,
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: AppColors.strokeBlack,
-                                          width: 1.4,
-                                        ),
-                                        boxShadow: AppTheme.neoShadow(
-                                          offset: const Offset(1.5, 1.5),
-                                        ),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            item['emoji'] as String,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            item['title'] as String,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w900,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           );
                         },
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
                   // Subtext
                   Padding(

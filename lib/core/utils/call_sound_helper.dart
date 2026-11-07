@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 /// Helper utility that generates clean, standard PCM WAV audio files
@@ -13,7 +12,8 @@ class CallSoundHelper {
   /// If the file does not already exist, it is generated and cached on the device filesystem.
   static Future<String?> getRingtonePath() async {
     try {
-      if (_cachedRingtonePath != null && File(_cachedRingtonePath!).existsSync()) {
+      if (_cachedRingtonePath != null &&
+          File(_cachedRingtonePath!).existsSync()) {
         return _cachedRingtonePath;
       }
 
@@ -23,7 +23,9 @@ class CallSoundHelper {
       if (!ringtoneFile.existsSync() || ringtoneFile.lengthSync() < 1000) {
         final wavBytes = _generateRingbackToneWav();
         await ringtoneFile.writeAsBytes(wavBytes, flush: true);
-        debugPrint('🔔 [CallSoundHelper] Generated ringback tone at: ${ringtoneFile.path} (${wavBytes.length} bytes)');
+        debugPrint(
+          '🔔 [CallSoundHelper] Generated ringback tone at: ${ringtoneFile.path} (${wavBytes.length} bytes)',
+        );
       }
 
       _cachedRingtonePath = ringtoneFile.path;
@@ -69,7 +71,8 @@ class CallSoundHelper {
     final int toneSamples = (sampleRate * toneDuration).toInt();
     final int silenceSamples = (sampleRate * silenceDuration).toInt();
     final int totalSamples = toneSamples + silenceSamples;
-    final int dataByteLength = totalSamples * numChannels * (bitsPerSample ~/ 8);
+    final int dataByteLength =
+        totalSamples * numChannels * (bitsPerSample ~/ 8);
 
     final wavHeader = _buildWavHeader(
       dataLength: dataByteLength,
@@ -88,7 +91,8 @@ class CallSoundHelper {
     // 1. Synthesize Tone Portion
     for (int i = 0; i < toneSamples; i++) {
       final double t = i / sampleRate;
-      final double rawSignal = 0.5 * sin(2 * pi * freq1 * t) + 0.5 * sin(2 * pi * freq2 * t);
+      final double rawSignal =
+          0.5 * sin(2 * pi * freq1 * t) + 0.5 * sin(2 * pi * freq2 * t);
 
       // Envelope shaping (fade in and fade out)
       double envelope = 1.0;
@@ -98,7 +102,9 @@ class CallSoundHelper {
         envelope = (toneSamples - i) / fadeSamples;
       }
 
-      final int sampleValue = (rawSignal * envelope * 0.75 * 32767).round().clamp(-32768, 32767);
+      final int sampleValue = (rawSignal * envelope * 0.75 * 32767)
+          .round()
+          .clamp(-32768, 32767);
       byteData.setInt16(byteOffset, sampleValue, Endian.little);
       byteOffset += 2;
     }
@@ -124,7 +130,8 @@ class CallSoundHelper {
     const int bitsPerSample = 16;
 
     final int totalSamples = (sampleRate * duration).toInt();
-    final int dataByteLength = totalSamples * numChannels * (bitsPerSample ~/ 8);
+    final int dataByteLength =
+        totalSamples * numChannels * (bitsPerSample ~/ 8);
 
     final wavHeader = _buildWavHeader(
       dataLength: dataByteLength,
@@ -140,7 +147,10 @@ class CallSoundHelper {
     for (int i = 0; i < totalSamples; i++) {
       final double t = i / sampleRate;
       final double rawSignal = sin(2 * pi * freq * t);
-      final int sampleValue = (rawSignal * 0.7 * 32767).round().clamp(-32768, 32767);
+      final int sampleValue = (rawSignal * 0.7 * 32767).round().clamp(
+        -32768,
+        32767,
+      );
       byteData.setInt16(byteOffset, sampleValue, Endian.little);
       byteOffset += 2;
     }
@@ -170,8 +180,8 @@ class CallSoundHelper {
     buffer.setUint8(2, 0x46); // 'F'
     buffer.setUint8(3, 0x46); // 'F'
     buffer.setUint32(4, totalLength, Endian.little);
-    buffer.setUint8(8, 0x57);  // 'W'
-    buffer.setUint8(9, 0x41);  // 'A'
+    buffer.setUint8(8, 0x57); // 'W'
+    buffer.setUint8(9, 0x41); // 'A'
     buffer.setUint8(10, 0x56); // 'V'
     buffer.setUint8(11, 0x45); // 'E'
 
@@ -181,7 +191,7 @@ class CallSoundHelper {
     buffer.setUint8(14, 0x74); // 't'
     buffer.setUint8(15, 0x20); // ' '
     buffer.setUint32(16, 16, Endian.little); // Subchunk1Size = 16 for PCM
-    buffer.setUint16(20, 1, Endian.little);  // AudioFormat = 1 (PCM)
+    buffer.setUint16(20, 1, Endian.little); // AudioFormat = 1 (PCM)
     buffer.setUint16(22, numChannels, Endian.little);
     buffer.setUint32(24, sampleRate, Endian.little);
     buffer.setUint32(28, byteRate, Endian.little);

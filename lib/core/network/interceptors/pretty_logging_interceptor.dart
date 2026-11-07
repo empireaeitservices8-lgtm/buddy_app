@@ -138,15 +138,14 @@ class PrettyLoggingInterceptor extends Interceptor {
       String? displayMessage;
       if (err.response?.data is Map) {
         final data = err.response!.data as Map;
-        displayMessage = data['message']?.toString() ??
+        displayMessage =
+            data['message']?.toString() ??
             data['detail']?.toString() ??
             data['error']?.toString();
       }
       displayMessage ??= err.message?.split('\n').first;
 
-      buffer.writeln(
-        '$_red│$_reset $_red[Error]:$_reset $displayMessage',
-      );
+      buffer.writeln('$_red│$_reset $_red[Error]:$_reset $displayMessage');
 
       if (err.response?.data != null) {
         buffer.writeln('$_red│$_reset $_yellow[Server Response]:$_reset');
@@ -191,11 +190,5 @@ class PrettyLoggingInterceptor extends Interceptor {
     } catch (_) {
       return '$prefix$body';
     }
-  }
-
-  /// Obfuscates sensitive authorization header string.
-  String _obfuscateToken(String token) {
-    if (token.length <= 15) return 'Bearer ***';
-    return '${token.substring(0, 12)}...${token.substring(token.length - 4)}';
   }
 }

@@ -21,7 +21,8 @@ class DummyPaymentGatewaySheet extends StatefulWidget {
   });
 
   @override
-  State<DummyPaymentGatewaySheet> createState() => _DummyPaymentGatewaySheetState();
+  State<DummyPaymentGatewaySheet> createState() =>
+      _DummyPaymentGatewaySheetState();
 }
 
 class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
@@ -33,13 +34,18 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
   bool _isCustomUpi = false;
 
   final TextEditingController _upiIdController = TextEditingController();
-  final TextEditingController _cardNumberController =
-      TextEditingController(text: '4532  8821  9012  4491');
-  final TextEditingController _expiryController =
-      TextEditingController(text: '08/29');
-  final TextEditingController _cvvController = TextEditingController(text: '721');
-  final TextEditingController _cardHolderController =
-      TextEditingController(text: 'SAMUEL K');
+  final TextEditingController _cardNumberController = TextEditingController(
+    text: '4532  8821  9012  4491',
+  );
+  final TextEditingController _expiryController = TextEditingController(
+    text: '08/29',
+  );
+  final TextEditingController _cvvController = TextEditingController(
+    text: '721',
+  );
+  final TextEditingController _cardHolderController = TextEditingController(
+    text: 'SAMUEL K',
+  );
 
   late final String _orderId;
   late final String _txnId;
@@ -90,7 +96,7 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
 
         _processingTimer = Timer(const Duration(milliseconds: 600), () async {
           if (!mounted) return;
-          final success = await widget.onPaymentSuccess(widget.bundle.coins);
+          final _ = await widget.onPaymentSuccess(widget.bundle.coins);
           if (mounted) {
             setState(() {
               _processingProgress = 100;
@@ -171,7 +177,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                     decoration: BoxDecoration(
                       color: const Color(0xFF6366F1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.2),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.4),
+                        width: 1.2,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFF6366F1).withOpacity(0.4),
@@ -204,7 +213,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                           ),
                           const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1.5,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFF22C55E).withOpacity(0.2),
                               borderRadius: BorderRadius.circular(6),
@@ -234,11 +246,17 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF10B981).withOpacity(0.18),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFF10B981), width: 1.2),
+                  border: Border.all(
+                    color: const Color(0xFF10B981),
+                    width: 1.2,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -308,7 +326,11 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               ),
               Row(
                 children: [
-                  const Icon(Icons.lock_rounded, size: 12, color: Color(0xFF10B981)),
+                  const Icon(
+                    Icons.lock_rounded,
+                    size: 12,
+                    color: Color(0xFF10B981),
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     '100% Safe Checkout',
@@ -330,13 +352,29 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
-                _buildCategoryTab(PaymentCategory.upi, '⚡ UPI Apps', const Color(0xFFE0F2FE)),
+                _buildCategoryTab(
+                  PaymentCategory.upi,
+                  '⚡ UPI Apps',
+                  const Color(0xFFE0F2FE),
+                ),
                 const SizedBox(width: 8),
-                _buildCategoryTab(PaymentCategory.card, '💳 Cards', const Color(0xFFF3E8FF)),
+                _buildCategoryTab(
+                  PaymentCategory.card,
+                  '💳 Cards',
+                  const Color(0xFFF3E8FF),
+                ),
                 const SizedBox(width: 8),
-                _buildCategoryTab(PaymentCategory.netbanking, '🏛️ Net Banking', const Color(0xFFFEF3C7)),
+                _buildCategoryTab(
+                  PaymentCategory.netbanking,
+                  '🏛️ Net Banking',
+                  const Color(0xFFFEF3C7),
+                ),
                 const SizedBox(width: 8),
-                _buildCategoryTab(PaymentCategory.wallet, '👛 Wallets', const Color(0xFFFCE7F3)),
+                _buildCategoryTab(
+                  PaymentCategory.wallet,
+                  '👛 Wallets',
+                  const Color(0xFFFCE7F3),
+                ),
               ],
             ),
           ),
@@ -345,8 +383,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
           // Content of Selected Category
           if (_selectedCategory == PaymentCategory.upi) _buildUpiSection(),
           if (_selectedCategory == PaymentCategory.card) _buildCardSection(),
-          if (_selectedCategory == PaymentCategory.netbanking) _buildNetBankingSection(),
-          if (_selectedCategory == PaymentCategory.wallet) _buildWalletSection(),
+          if (_selectedCategory == PaymentCategory.netbanking)
+            _buildNetBankingSection(),
+          if (_selectedCategory == PaymentCategory.wallet)
+            _buildWalletSection(),
 
           const SizedBox(height: 20),
 
@@ -382,7 +422,11 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ],
               ),
             ),
@@ -394,7 +438,11 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey.shade600),
+                Icon(
+                  Icons.verified_user_rounded,
+                  size: 14,
+                  color: Colors.grey.shade600,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   '256-Bit SSL • PCI-DSS Level 1 • Powered by GabyPay',
@@ -436,7 +484,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFF7CE),
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.strokeBlack, width: 1.5),
+                        border: Border.all(
+                          color: AppColors.strokeBlack,
+                          width: 1.5,
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: const Text('🪙', style: TextStyle(fontSize: 22)),
@@ -457,7 +508,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 1.5,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFDCFCE7),
                                 borderRadius: BorderRadius.circular(6),
@@ -508,7 +562,9 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               30,
               (index) => Expanded(
                 child: Container(
-                  color: index % 2 == 0 ? Colors.transparent : Colors.grey.shade300,
+                  color: index % 2 == 0
+                      ? Colors.transparent
+                      : Colors.grey.shade300,
                   height: 1.2,
                 ),
               ),
@@ -547,7 +603,11 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
     );
   }
 
-  Widget _buildCategoryTab(PaymentCategory category, String label, Color activeBg) {
+  Widget _buildCategoryTab(
+    PaymentCategory category,
+    String label,
+    Color activeBg,
+  ) {
     final isSelected = _selectedCategory == category;
     return GestureDetector(
       onTap: () => setState(() => _selectedCategory = category),
@@ -628,7 +688,9 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                 color: isSelected ? const Color(0xFFF0FDF4) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelected ? const Color(0xFF16A34A) : Colors.grey.shade300,
+                  color: isSelected
+                      ? const Color(0xFF16A34A)
+                      : Colors.grey.shade300,
                   width: isSelected ? 2.0 : 1.2,
                 ),
                 boxShadow: isSelected
@@ -674,10 +736,14 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF16A34A) : Colors.grey.shade400,
+                        color: isSelected
+                            ? const Color(0xFF16A34A)
+                            : Colors.grey.shade400,
                         width: isSelected ? 2 : 1.5,
                       ),
-                      color: isSelected ? const Color(0xFF16A34A) : Colors.white,
+                      color: isSelected
+                          ? const Color(0xFF16A34A)
+                          : Colors.white,
                     ),
                     child: isSelected
                         ? const Icon(Icons.check, size: 14, color: Colors.white)
@@ -699,7 +765,9 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               color: _isCustomUpi ? const Color(0xFFF0FDF4) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _isCustomUpi ? const Color(0xFF16A34A) : Colors.grey.shade300,
+                color: _isCustomUpi
+                    ? const Color(0xFF16A34A)
+                    : Colors.grey.shade300,
                 width: _isCustomUpi ? 2.0 : 1.2,
               ),
             ),
@@ -717,10 +785,19 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                           decoration: BoxDecoration(
                             color: const Color(0xFFFFF7CE),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.strokeBlack, width: 1.2),
+                            border: Border.all(
+                              color: AppColors.strokeBlack,
+                              width: 1.2,
+                            ),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('@', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                          child: const Text(
+                            '@',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Column(
@@ -751,13 +828,21 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _isCustomUpi ? const Color(0xFF16A34A) : Colors.grey.shade400,
+                          color: _isCustomUpi
+                              ? const Color(0xFF16A34A)
+                              : Colors.grey.shade400,
                           width: _isCustomUpi ? 2 : 1.5,
                         ),
-                        color: _isCustomUpi ? const Color(0xFF16A34A) : Colors.white,
+                        color: _isCustomUpi
+                            ? const Color(0xFF16A34A)
+                            : Colors.white,
                       ),
                       child: _isCustomUpi
-                          ? const Icon(Icons.check, size: 14, color: Colors.white)
+                          ? const Icon(
+                              Icons.check,
+                              size: 14,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   ],
@@ -768,21 +853,36 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                     controller: _upiIdController,
                     decoration: InputDecoration(
                       hintText: 'yourname@upi',
-                      hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      hintStyle: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade400,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.strokeBlack, width: 1.5),
+                        borderSide: const BorderSide(
+                          color: AppColors.strokeBlack,
+                          width: 1.5,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF16A34A), width: 2),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF16A34A),
+                          width: 2,
+                        ),
                       ),
                       suffixIcon: Container(
                         margin: const EdgeInsets.all(6),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(8),
@@ -921,11 +1021,23 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               ),
               Row(
                 children: [
-                  _buildCardBadge('VISA', const Color(0xFF1A1F71), Colors.white),
+                  _buildCardBadge(
+                    'VISA',
+                    const Color(0xFF1A1F71),
+                    Colors.white,
+                  ),
                   const SizedBox(width: 4),
-                  _buildCardBadge('Mastercard', const Color(0xFFEB001B), Colors.white),
+                  _buildCardBadge(
+                    'Mastercard',
+                    const Color(0xFFEB001B),
+                    Colors.white,
+                  ),
                   const SizedBox(width: 4),
-                  _buildCardBadge('RuPay', const Color(0xFF0F75BD), Colors.white),
+                  _buildCardBadge(
+                    'RuPay',
+                    const Color(0xFF0F75BD),
+                    Colors.white,
+                  ),
                 ],
               ),
             ],
@@ -936,15 +1048,29 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
           _buildInputLabel('CARD NUMBER'),
           TextField(
             controller: _cardNumberController,
-            style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1.2, fontSize: 14),
+            style: const TextStyle(
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              fontSize: 14,
+            ),
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.credit_card_rounded, color: AppColors.strokeBlack, size: 20),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              prefixIcon: const Icon(
+                Icons.credit_card_rounded,
+                color: AppColors.strokeBlack,
+                size: 20,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.strokeBlack, width: 1.5),
+                borderSide: const BorderSide(
+                  color: AppColors.strokeBlack,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
@@ -960,14 +1086,23 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                     _buildInputLabel('EXPIRY (MM/YY)'),
                     TextField(
                       controller: _expiryController,
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.strokeBlack, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: AppColors.strokeBlack,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -983,15 +1118,28 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                     TextField(
                       controller: _cvvController,
                       obscureText: true,
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
                       decoration: InputDecoration(
-                        suffixIcon: const Icon(Icons.lock_outline, size: 16, color: Colors.grey),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        suffixIcon: const Icon(
+                          Icons.lock_outline,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.strokeBlack, width: 1.5),
+                          borderSide: const BorderSide(
+                            color: AppColors.strokeBlack,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -1008,12 +1156,18 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
             controller: _cardHolderController,
             style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.strokeBlack, width: 1.5),
+                borderSide: const BorderSide(
+                  color: AppColors.strokeBlack,
+                  width: 1.5,
+                ),
               ),
             ),
           ),
@@ -1046,11 +1200,7 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 9,
-          fontWeight: FontWeight.w900,
-          color: fg,
-        ),
+        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: fg),
       ),
     );
   }
@@ -1076,7 +1226,9 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               color: isSelected ? const Color(0xFFFEF3C7) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? const Color(0xFFD97706) : Colors.grey.shade300,
+                color: isSelected
+                    ? const Color(0xFFD97706)
+                    : Colors.grey.shade300,
                 width: isSelected ? 2.0 : 1.2,
               ),
             ),
@@ -1109,7 +1261,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(8),
@@ -1130,13 +1285,21 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected ? const Color(0xFFD97706) : Colors.grey.shade400,
+                          color: isSelected
+                              ? const Color(0xFFD97706)
+                              : Colors.grey.shade400,
                           width: 2,
                         ),
-                        color: isSelected ? const Color(0xFFD97706) : Colors.white,
+                        color: isSelected
+                            ? const Color(0xFFD97706)
+                            : Colors.white,
                       ),
                       child: isSelected
-                          ? const Icon(Icons.check, size: 12, color: Colors.white)
+                          ? const Icon(
+                              Icons.check,
+                              size: 12,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   ],
@@ -1169,7 +1332,9 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
               color: isSelected ? const Color(0xFFFDF2F8) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? const Color(0xFFDB2777) : Colors.grey.shade300,
+                color: isSelected
+                    ? const Color(0xFFDB2777)
+                    : Colors.grey.shade300,
                 width: isSelected ? 2.0 : 1.2,
               ),
             ),
@@ -1193,7 +1358,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFCE7F3),
                         borderRadius: BorderRadius.circular(8),
@@ -1214,13 +1382,21 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected ? const Color(0xFFDB2777) : Colors.grey.shade400,
+                          color: isSelected
+                              ? const Color(0xFFDB2777)
+                              : Colors.grey.shade400,
                           width: 2,
                         ),
-                        color: isSelected ? const Color(0xFFDB2777) : Colors.white,
+                        color: isSelected
+                            ? const Color(0xFFDB2777)
+                            : Colors.white,
                       ),
                       child: isSelected
-                          ? const Icon(Icons.check, size: 12, color: Colors.white)
+                          ? const Icon(
+                              Icons.check,
+                              size: 12,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   ],
@@ -1399,7 +1575,10 @@ class _DummyPaymentGatewaySheetState extends State<DummyPaymentGatewaySheet> {
             ),
             child: Column(
               children: [
-                _buildReceiptRow('Amount Paid', '₹ ${widget.bundle.priceRupees}.00'),
+                _buildReceiptRow(
+                  'Amount Paid',
+                  '₹ ${widget.bundle.priceRupees}.00',
+                ),
                 const Divider(height: 14, thickness: 1),
                 _buildReceiptRow('Transaction ID', _txnId),
                 const Divider(height: 14, thickness: 1),
