@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:buddy_app/core/network/api_response.dart';
-import 'package:buddy_app/core/network/token_manager.dart';
+import '../../core/network/api_response.dart';
+import '../../core/network/token_manager.dart';
 
 import '../../core/constants/api_constants.dart';
 import '../../core/network/api_exceptions.dart';

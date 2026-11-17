@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:buddy_app/core/constants/agora_constants.dart';
+import '../core/constants/agora_constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../core/constants/api_constants.dart';

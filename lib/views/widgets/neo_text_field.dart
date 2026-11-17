@@ -1,6 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
-import 'package:buddy_app/core/constants/app_strings.dart';
+import '../../core/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';

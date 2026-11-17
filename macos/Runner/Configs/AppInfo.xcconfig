@@ -8,7 +8,7 @@
 PRODUCT_NAME = buddy_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.buddyApp
+PRODUCT_BUNDLE_IDENTIFIER = com.gabby.talk
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.gabby.talk. All rights reserved.

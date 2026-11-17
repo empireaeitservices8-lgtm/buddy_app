@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:buddy_app/main.dart';
-import 'package:buddy_app/core/constants/app_strings.dart';
+import 'package:gaby_talk/main.dart';
+import 'package:gaby_talk/core/constants/app_strings.dart';
 
 void main() {
   testWidgets('BuddyApp smoke test renders SplashScreen correctly', (WidgetTester tester) async {

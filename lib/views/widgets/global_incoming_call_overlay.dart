@@ -355,7 +355,7 @@ class _GlobalIncomingCallOverlayState extends State<GlobalIncomingCallOverlay>
                         width: 1.8,
                       ),
                       boxShadow: const [
-                        BoxShadow(
+                         BoxShadow(
                           color: Color(0xFF1E2022),
                           offset: Offset(2, 2),
                           blurRadius: 0,
